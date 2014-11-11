@@ -33,7 +33,6 @@ urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'TestSite.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
-        #url(r'^djangular/', include('djangular.urls')),
         url(r'^', include(router.urls)),
         url(r'^admin/', include(admin.site.urls)),
         url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
