@@ -8,14 +8,6 @@ from django.http  import HttpResponse as request
 #        model = User
 #        fields = ('url', 'username', 'email', 'groups')
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    #posts = serializers.HyperlinkedIdentityField('posts', view_name='userpost-list', lookup_field='username')
-
-
-    class Meta:
-        model = User
-        fields = ('url', 'username', 'email', 'is_staff' )
-        context={'request': request}
 
 
 
