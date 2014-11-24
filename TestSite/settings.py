@@ -27,7 +27,7 @@ TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = []
 
 
-AUTH_USER_MODEL = 'authentication.Account'
+AUTH_USER_MODEL = 'Authentication.Account'
 
 # Application definition
 
@@ -36,9 +36,9 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'djangular',
     'DataTools',
-    'authentication',
+    'Authentication',
     'rest_framework',
-    'django.contrib.contenttypes',
+     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
