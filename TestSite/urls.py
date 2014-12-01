@@ -3,7 +3,7 @@ from django.conf.urls import patterns, include, url
 from Authentication.views import AccountViewSet
 from rest_framework import routers
 from django.views.generic.base import TemplateView
-from DataTools.serializers import *
+
 
 
 # Routers provide an easy way of automatically determining the URL conf.

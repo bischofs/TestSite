@@ -35,10 +35,10 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
     'djangular',
-    'DataTools',
     'Authentication',
     'rest_framework',
-     'django.contrib.contenttypes',
+    'compressor',
+    'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
@@ -88,11 +88,22 @@ USE_TZ = True
 
 STATICFILES_FINDERS = (
       'django.contrib.staticfiles.finders.FileSystemFinder',
-      'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-      'djangular.finders.NamespacedAngularAppDirectoriesFinder'
+      'django.contrib.staticfiles.finders.AppDirectoriesFinder'
+      #'djangular.finders.NamespacedAngularAppDirectoriesFinder'
 )
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = 'staticfiles'
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'dist/static'),
+    os.path.join(BASE_DIR, 'static'),
+)
+
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR, 'templates'),
+)
 
 
 REST_FRAMEWORK = {
