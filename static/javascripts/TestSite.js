@@ -5,7 +5,7 @@
     .module('TestSite', [
       'TestSite.routes',
       'TestSite.authentication',
-	'Testsite.config'
+      'TestSite.config'
     ]);
 
   angular

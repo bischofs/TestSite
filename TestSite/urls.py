@@ -19,5 +19,6 @@ urlpatterns = patterns('',
     # url(r'^$', 'TestSite.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
         url(r'^api/v1/', include(router.urls)),
-         url(r'^', TemplateView.as_view(template_name='index.html'))
+        url(r'^api/v1/auth/login/$', LoginView.as_view(), name='login'),
+        url(r'^', TemplateView.as_view(template_name='index.html'))
 )
