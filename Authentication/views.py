@@ -10,7 +10,7 @@ from Authentication.permissions import IsAccountOwner
 from Authentication.serializers import AccountSerializer
 from django.contrib.auth import authenticate, login
 
-from rest_framework improt status, views
+from rest_framework import status, views
 from rest_framework.response import Response
 
 

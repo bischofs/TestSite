@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, include, url
 
-from Authentication.views import AccountViewSet
+from Authentication.views import AccountViewSet, LoginView
 from rest_framework import routers
 from django.views.generic.base import TemplateView
 
