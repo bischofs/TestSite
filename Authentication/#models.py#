@@ -4,7 +4,6 @@ from django.contrib.auth.models import BaseUserManager
 
 
 
-
 class AccountManager(BaseUserManager):
 
     def create_user(self, email, password=None, **kwargs):
@@ -30,7 +29,6 @@ class AccountManager(BaseUserManager):
         account.save()
 
         return account
-
 
 
 
