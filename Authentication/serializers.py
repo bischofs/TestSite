@@ -6,6 +6,7 @@ from Authentication.models import Account
 
 
 class AccountSerializer(serializers.ModelSerializer):
+
     password = serializers.CharField(source='password', write_only=True, required=False)
     confirm_password = serializers.CharField(write_only=True, required=False)
 

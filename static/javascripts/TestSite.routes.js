@@ -17,13 +17,11 @@
       controllerAs: 'vm',
       templateUrl: '/static/templates/authentication/register.html'
     }).when('/login', {
-  controller: 'LoginController',
-  controllerAs: 'vm',
-  templateUrl: '/static/templates/authentication/login.html'
-}).otherwise('/',{
-  controller: 'LoginController',
-  controllerAs: 'vm',
-  templateUrl: '/static/templates/authentication/login.html'
-});
+	controller: 'LoginController',
+	controllerAs: 'vm',
+	templateUrl: '/static/templates/authentication/login.html'
+    }).otherwise('/');
   }
+
 })();
+ 
