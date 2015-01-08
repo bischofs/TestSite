@@ -3,17 +3,20 @@
     <h1>Login</h1>
 
     <div class="well">
-      <form role="form" ng-submit="vm.login()">
+      <form name="loginForm" role="form" ng-submit="vm.login()">
         <div class="alert alert-danger" ng-show="error" ng-bind="error"></div>
 
         <div class="form-group">
           <label for="login__email">Email</label>
-          <input type="text" class="form-control" id="login__email" ng-model="vm.email" placeholder="ex. john@example.com" />
-        </div>
+          <input type="email" class="form-control" name="emailInput" id="login__email" ng-model="vm.email" ng-model-options="{ updateOn: 'blur' }" placeholder="ex. bischoff_S@fev.com" required="" />
+	  <span class="help-block" ng-show="loginForm.emailInput.$error.required">Required</span>
+          <span class="help-block" ng-show="loginForm.emailInput.$error.email">This is not a valid email.</span>
+	</div>
 
         <div class="form-group">
           <label for="login__password">Password</label>
-          <input type="password" class="form-control" id="login__password" ng-model="vm.password" placeholder="ex. thisisnotgoogleplus" />
+          <input type="password" class="form-control" name="passwordInput" id="login__password" ng-model="vm.password" required="" />
+	  <span class="help-block" ng-show="loginForm.passwordInput.$error.required">Required</span>
         </div>
 
         <div class="form-group">

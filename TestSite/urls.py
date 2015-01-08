@@ -15,10 +15,8 @@ router.register(r'accounts', AccountViewSet)
 
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'TestSite.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
         url(r'^api/v1/', include(router.urls)),
         url(r'^api/v1/auth/login/$', LoginView.as_view(), name='login'),
-        url(r'^', TemplateView.as_view(template_name='index.html'))
+        url(r'^', TemplateView.as_view(template_name='index.html')),
+        #url('^.*$', IndexView.as_view(), name='index'),
 )
