@@ -36,6 +36,7 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'djangular',
     'Authentication',
+    'Project',
     'rest_framework',
     'compressor',
     'django.contrib.contenttypes',
@@ -106,10 +107,26 @@ TEMPLATE_DIRS = (
 )
 
 
-REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+# REST_FRAMEWORK = {
+#      'DEFAULT_PERMISSION_CLASSES': [
+#          'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+#      ]
+# }
+
+
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'console':{
+            'level':'DEBUG',
+            'class':'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers':['console'],
+            'propagate': True,
+            'level':'DEBUG',
+        }
+    },
 }

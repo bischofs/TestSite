@@ -6,7 +6,7 @@ from django.shortcuts import render
 from rest_framework import permissions, viewsets
 
 from Authentication.models import Account
-from Authentication.permissions import IsAccountOwner
+#from Authentication.permissions import IsAccountOwner
 from Authentication.serializers import AccountSerializer
 from django.contrib.auth import authenticate, login
 
@@ -18,8 +18,6 @@ class AccountViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
-
-
 
     def get_permissions(self):
         if self.request.method in permissions.SAFE_METHODS:
@@ -52,7 +50,10 @@ class AccountViewSet(viewsets.ModelViewSet):
 class LoginView(views.APIView):
 
     def post(self, request, format=None):
-        data = json.loads(request.body)
+
+        encoding = request.read().decode("utf-8")
+
+        data = json.loads(encoding)
 
         email = data.get('email', None)
         password = data.get('password', None)

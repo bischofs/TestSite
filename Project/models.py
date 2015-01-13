@@ -1,11 +1,15 @@
 from django.db import models
-
-# Create your models here.
-
+from Authentication.models import Account
 
 class Project(models.Model):
 
+    Accounts  = models.ManyToManyField(Account) 
     name = models.CharField(max_length=30)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return '{0}'.format(self.name)
 
 
 
