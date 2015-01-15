@@ -48,11 +48,12 @@ INSTALLED_APPS = (
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+  #  'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'TestSite.middleware.DisableCSRF'
 )
 
 ROOT_URLCONF = 'TestSite.urls'
@@ -107,11 +108,11 @@ TEMPLATE_DIRS = (
 )
 
 
-# REST_FRAMEWORK = {
-#      'DEFAULT_PERMISSION_CLASSES': [
-#          'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-#      ]
-# }
+REST_FRAMEWORK = {
+     'DEFAULT_PERMISSION_CLASSES': [
+         'rest_framework.permissions.AllowAny'
+     ]
+}
 
 
 LOGGING = {

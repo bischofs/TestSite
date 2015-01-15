@@ -1,6 +1,8 @@
 from django.conf.urls import patterns, include, url
+from django.conf import settings
 
-from Authentication.views import AccountViewSet, LoginView
+
+from Authentication.views import AccountViewSet, LoginView, LogoutView
 from rest_framework import routers
 from django.views.generic.base import TemplateView
 
@@ -17,9 +19,17 @@ router.register(r'accounts', AccountViewSet)
 urlpatterns = patterns('',
         url(r'^api/v1/', include(router.urls)),
         url(r'^api/v1/auth/login/$', LoginView.as_view(), name='login'),
+        url(r'^api/v1/auth/logout/$', LogoutView.as_view(), name='logout'),
         url(r'^', TemplateView.as_view(template_name='index.html')),
-        
-        
+
 
 #url('^.*$', IndexView.as_view(), name='index'),
 )
+
+
+if settings.DEBUG:
+    urlpatterns += patterns('',
+        url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {
+            'document_root': settings.MEDIA_ROOT,
+        }),
+   )

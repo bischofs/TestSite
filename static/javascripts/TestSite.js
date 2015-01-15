@@ -5,6 +5,7 @@
     .module('TestSite', [
       'TestSite.routes',
       'TestSite.authentication',
+      'TestSite.layout',
       'TestSite.config'
     ]);
 
