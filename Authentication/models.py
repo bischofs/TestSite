@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import BaseUserManager
-
+#from Project.models import Project
 
 
 
@@ -50,6 +50,7 @@ class Account(AbstractBaseUser):
     updated_at = models.DateTimeField(auto_now=True)
 
     objects = AccountManager()
+    
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
