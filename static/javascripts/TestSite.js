@@ -6,6 +6,7 @@
       'TestSite.routes',
       'TestSite.authentication',
       'TestSite.project',
+      'TestSite.import',
       'TestSite.layout',
       'TestSite.config'
     ]);
