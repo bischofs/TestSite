@@ -15,17 +15,18 @@
     $routeProvider.when('/register', {
       controller: 'RegisterController',
       controllerAs: 'vm',
-      templateUrl: '/static/templates/authentication/register.html'
+      templateUrl: '/static/javascripts/authentication/register.html'
     }).when('/login', {
 	controller: 'LoginController',
 	controllerAs: 'vm',
-	templateUrl: '/static/templates/authentication/login.html'
-    }).when('/projects',{
-	controller: 'LoginController',
-	controllerAs: 'vm',
-	templateUrl: '/static/templates/authentication/login.html'
+	templateUrl: '/static/javascripts/authentication/login.html'
+    }).when('/1065', {
+    	controller: 'UploadController',
+    	controllerAs: 'vm',
+    	templateUrl: '/static/javascripts/import/upload.html'
     }).otherwise('/');
+
   }
 
 })();
- 
+

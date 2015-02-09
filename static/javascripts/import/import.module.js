@@ -7,5 +7,5 @@
     ]);
 
   angular
-    .module('TestSite.import.controllers', []);
+    .module('TestSite.import.controllers', ['angularFileUpload']);
 })();

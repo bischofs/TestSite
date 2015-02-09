@@ -6,7 +6,7 @@
   'use strict';
 
   angular
-    .module('TestSite.services')
+    .module('TestSite.project')
     .factory('Projects', Projects);
 
   Projects.$inject = ['$http'];

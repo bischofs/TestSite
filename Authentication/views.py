@@ -89,8 +89,7 @@ class LogoutView(views.APIView):
 
     def post(self,request,format=None):
 
-
-                logout(request)
-
-                return Response({},status=status.HTTP_204_NO_CONTENT)
+        logout(request)
+        
+        return Response({},status=status.HTTP_204_NO_CONTENT)
 

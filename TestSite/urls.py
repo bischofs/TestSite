@@ -23,9 +23,7 @@ urlpatterns = patterns('',
         url(r'^api/v1/auth/login/$', LoginView.as_view(), name='login'),
         url(r'^api/v1/auth/logout/$', LogoutView.as_view(), name='logout'),
         url(r'^', TemplateView.as_view(template_name='index.html')),
-        url(r'^api/vi/import/', FileUploadView.as_view(), name='file'),
-
-
+        url(r'^api/v1/data/import/', FileUploadView.as_view()),
 
 #url('^.*$', IndexView.as_view(), name='index'),
 )
