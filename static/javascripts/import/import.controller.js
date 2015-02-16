@@ -16,7 +16,7 @@
   */
   function UploadController($scope, FileUploader) {
     $scope.uploader = new FileUploader();
-    $scope.uploader.url = 'api/v1/data/import/file'
+    $scope.uploader.url = 'api/v1/data/import/'
     $scope.uploader.method = 'PUT'
 
 

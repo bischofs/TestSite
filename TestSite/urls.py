@@ -22,8 +22,9 @@ urlpatterns = patterns('',
         url(r'^api/v1/', include(router.urls)),
         url(r'^api/v1/auth/login/$', LoginView.as_view(), name='login'),
         url(r'^api/v1/auth/logout/$', LogoutView.as_view(), name='logout'),
-        url(r'^', TemplateView.as_view(template_name='index.html')),
-        url(r'^api/v1/data/import/', FileUploadView.as_view()),
+        url(r'^api/v1/data/import/$', FileUploadView.as_view(), name='upload'),
+        url(r'^', TemplateView.as_view(template_name='index.html')), #I THINK THIS ALWAYS HAS TO BE THE LAST ONE
+
 
 #url('^.*$', IndexView.as_view(), name='index'),
 )
