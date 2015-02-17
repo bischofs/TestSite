@@ -12,7 +12,7 @@
     ]);
 
   angular
-    .module('TestSite.routes', ['ngRoute']);
+    .module('TestSite.routes', ['ui.router']);
 
   angular
     .module('TestSite.config', []);

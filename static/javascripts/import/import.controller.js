@@ -7,20 +7,23 @@
 
   angular
     .module('TestSite.import.controllers' )
-    .controller('UploadController', UploadController);
+    .controller('ImportController', ImportController);
 
- UploadController.$inject = ['$scope', 'FileUploader'];
+ ImportController.$inject = ['$scope', 'FileUploader'];
 
   /**
   * @namespace UploadController
   */
-  function UploadController($scope, FileUploader) {
+  function ImportController($scope, FileUploader) {
     $scope.uploader = new FileUploader();
     $scope.uploader.url = 'api/v1/data/import/'
     $scope.uploader.method = 'PUT'
 
 
 
-  };
+  }
+
+
+
 
 })();
