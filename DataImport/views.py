@@ -16,6 +16,8 @@ class FileUploadView(views.APIView):
 
         file_obj = request.FILES['file']
 
+        import pdb; pdb.set_trace()
+
         data = DataIO()
 
         try:

@@ -48,19 +48,16 @@
   })
   .state('1065', {
     url: "/1065",
-    templateUrl: "/static/javascripts/layout/switch.html"
+    templateUrl: "/static/javascripts/layout/1065.html"
   })
   .state('1065.Import', {
     url: "/import",
     templateUrl: "/static/javascripts/import/upload.html",
     controller: "ImportController"
-  }, { onEnter: function(){
-   $('#reg').show();
- }
-})
+  })
   .state('1065.Regression', {
     url: "/regression",
-    templateUrl: "/static/javascripts/import/login.html"
+    templateUrl: "/static/javascripts/authentication/login.html"
   });
 }
 
