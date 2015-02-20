@@ -1,3 +1,7 @@
+
+
+
+
 <div class="row">
 
   <div class="col-md-3">
@@ -5,7 +9,7 @@
    <h3>Select Cycle</h3>
 
    <div class="form-group">
-     <select class="form-control" >
+     <select class="form-control" ng-model="uploader.formData">
       <option value="FTP">FTP</option>
       <option value="Otto">Otto</option>
     </select>
@@ -22,7 +26,7 @@
 
 </div>
 
-<div class="col-md-7" style="margin-bottom: 40px">
+<div class="col-md-6" style="margin-bottom: 40px">
 
   <h3>Upload queue</h3>
   <p>Queue length: {{ uploader.queue.length }}</p>
@@ -83,6 +87,34 @@
       <span class="glyphicon glyphicon-trash"></span> Remove all
     </button>
   </div>
+
+</div>
+
+<div class="col-md-3">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">1065 Requirements</h3>
+    </div>
+    <div class="panel-body">
+<!--
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Condition</th>
+            <th>Valid</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+           <th scope="row">stuff</th>
+           <td>stuff</td>
+           <th scope="row">stuff</th>
+           <td>stuff</td>
+         </tr>
+       </tbody>
+     </table> -->
+   </div>
+ </div>
 
 </div>
 

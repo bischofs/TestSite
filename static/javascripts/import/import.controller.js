@@ -19,18 +19,12 @@
     $scope.uploader.url = 'api/v1/data/import/'
     $scope.uploader.method = 'PUT'
 
-    $scope.uploader.onBeforeUploadItem = onBeforeUploadItem;
+    $scope.uploader.onSuccessItem = onSuccessItem;
 
-    function onBeforeUploadItem(item) {
-      item.formData.push({your: 'data'});
-      console.log(item);
+    function onSuccessItem(item, response, status, headers) {
+      console.log(response);
     }
 
-
-
   }
-
-
-
 
 })();
