@@ -7,5 +7,5 @@
     ]);
 
   angular
-    .module('TestSite.import.controllers', ['angularFileUpload']);
+    .module('TestSite.import.controllers', ['angularFileUpload','ngAnimate', 'toastr']);
 })();

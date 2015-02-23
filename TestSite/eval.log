@@ -94,3 +94,641 @@
 2015-02-20 21:04:11,719 - models - INFO - Logger initialized
 2015-02-20 21:04:11,719 - models - INFO - Beginning Data Import
 2015-02-20 21:04:11,932 - models - INFO - Data Import successful - ftp.csv
+2015-02-20 21:32:05,460 - models - INFO - Logger initialized
+2015-02-20 21:32:05,460 - models - INFO - Beginning Data Import
+2015-02-20 21:32:05,674 - models - INFO - Data Import successful - ftp.csv
+2015-02-20 21:33:35,092 - models - INFO - Logger initialized
+2015-02-20 21:33:35,092 - models - INFO - Logger initialized
+2015-02-20 21:33:35,092 - models - INFO - Beginning Data Import
+2015-02-20 21:33:35,092 - models - INFO - Beginning Data Import
+2015-02-20 21:33:35,303 - models - INFO - Data Import successful - ftp.csv
+2015-02-20 21:33:35,303 - models - INFO - Data Import successful - ftp.csv
+2015-02-20 21:44:33,105 - models - INFO - Logger initialized
+2015-02-20 21:44:33,105 - models - INFO - Logger initialized
+2015-02-20 21:44:33,105 - models - INFO - Logger initialized
+2015-02-20 21:44:33,106 - models - INFO - Beginning Data Import
+2015-02-20 21:44:33,106 - models - INFO - Beginning Data Import
+2015-02-20 21:44:33,106 - models - INFO - Beginning Data Import
+2015-02-20 21:44:33,307 - models - INFO - Data Import successful - ftp.csv
+2015-02-20 21:44:33,307 - models - INFO - Data Import successful - ftp.csv
+2015-02-20 21:44:33,307 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 01:36:22,549 - models - INFO - Logger initialized
+2015-02-23 01:36:22,549 - models - INFO - Logger initialized
+2015-02-23 01:36:22,549 - models - INFO - Logger initialized
+2015-02-23 01:36:22,549 - models - INFO - Logger initialized
+2015-02-23 01:36:22,549 - models - INFO - Beginning Data Import
+2015-02-23 01:36:22,549 - models - INFO - Beginning Data Import
+2015-02-23 01:36:22,549 - models - INFO - Beginning Data Import
+2015-02-23 01:36:22,549 - models - INFO - Beginning Data Import
+2015-02-23 02:44:55,163 - models - INFO - Logger initialized
+2015-02-23 02:44:55,163 - models - INFO - Logger initialized
+2015-02-23 02:44:55,163 - models - INFO - Logger initialized
+2015-02-23 02:44:55,163 - models - INFO - Logger initialized
+2015-02-23 02:44:55,163 - models - INFO - Logger initialized
+2015-02-23 02:44:55,164 - models - INFO - Beginning Data Import
+2015-02-23 02:44:55,164 - models - INFO - Beginning Data Import
+2015-02-23 02:44:55,164 - models - INFO - Beginning Data Import
+2015-02-23 02:44:55,164 - models - INFO - Beginning Data Import
+2015-02-23 02:44:55,164 - models - INFO - Beginning Data Import
+2015-02-23 02:44:55,369 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 02:44:55,369 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 02:44:55,369 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 02:44:55,369 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 02:44:55,369 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 02:48:13,504 - models - INFO - Logger initialized
+2015-02-23 02:48:13,504 - models - INFO - Logger initialized
+2015-02-23 02:48:13,504 - models - INFO - Logger initialized
+2015-02-23 02:48:13,504 - models - INFO - Logger initialized
+2015-02-23 02:48:13,504 - models - INFO - Logger initialized
+2015-02-23 02:48:13,504 - models - INFO - Logger initialized
+2015-02-23 02:48:13,505 - models - INFO - Beginning Data Import
+2015-02-23 02:48:13,505 - models - INFO - Beginning Data Import
+2015-02-23 02:48:13,505 - models - INFO - Beginning Data Import
+2015-02-23 02:48:13,505 - models - INFO - Beginning Data Import
+2015-02-23 02:48:13,505 - models - INFO - Beginning Data Import
+2015-02-23 02:48:13,505 - models - INFO - Beginning Data Import
+2015-02-23 02:48:13,722 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 02:48:13,722 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 02:48:13,722 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 02:48:13,722 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 02:48:13,722 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 02:48:13,722 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:11:51,370 - models - INFO - Logger initialized
+2015-02-23 03:11:51,370 - models - INFO - Logger initialized
+2015-02-23 03:11:51,370 - models - INFO - Logger initialized
+2015-02-23 03:11:51,370 - models - INFO - Logger initialized
+2015-02-23 03:11:51,370 - models - INFO - Logger initialized
+2015-02-23 03:11:51,370 - models - INFO - Logger initialized
+2015-02-23 03:11:51,370 - models - INFO - Logger initialized
+2015-02-23 03:11:51,371 - models - INFO - Beginning Data Import
+2015-02-23 03:11:51,371 - models - INFO - Beginning Data Import
+2015-02-23 03:11:51,371 - models - INFO - Beginning Data Import
+2015-02-23 03:11:51,371 - models - INFO - Beginning Data Import
+2015-02-23 03:11:51,371 - models - INFO - Beginning Data Import
+2015-02-23 03:11:51,371 - models - INFO - Beginning Data Import
+2015-02-23 03:11:51,371 - models - INFO - Beginning Data Import
+2015-02-23 03:11:51,591 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:11:51,591 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:11:51,591 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:11:51,591 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:11:51,591 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:11:51,591 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:11:51,591 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:12:53,924 - models - INFO - Logger initialized
+2015-02-23 03:12:53,924 - models - INFO - Logger initialized
+2015-02-23 03:12:53,924 - models - INFO - Logger initialized
+2015-02-23 03:12:53,924 - models - INFO - Logger initialized
+2015-02-23 03:12:53,924 - models - INFO - Logger initialized
+2015-02-23 03:12:53,924 - models - INFO - Logger initialized
+2015-02-23 03:12:53,924 - models - INFO - Logger initialized
+2015-02-23 03:12:53,924 - models - INFO - Logger initialized
+2015-02-23 03:12:53,924 - models - INFO - Beginning Data Import
+2015-02-23 03:12:53,924 - models - INFO - Beginning Data Import
+2015-02-23 03:12:53,924 - models - INFO - Beginning Data Import
+2015-02-23 03:12:53,924 - models - INFO - Beginning Data Import
+2015-02-23 03:12:53,924 - models - INFO - Beginning Data Import
+2015-02-23 03:12:53,924 - models - INFO - Beginning Data Import
+2015-02-23 03:12:53,924 - models - INFO - Beginning Data Import
+2015-02-23 03:12:53,924 - models - INFO - Beginning Data Import
+2015-02-23 03:12:54,150 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:12:54,150 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:12:54,150 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:12:54,150 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:12:54,150 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:12:54,150 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:12:54,150 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:12:54,150 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:13:27,804 - models - INFO - Logger initialized
+2015-02-23 03:13:27,804 - models - INFO - Logger initialized
+2015-02-23 03:13:27,804 - models - INFO - Logger initialized
+2015-02-23 03:13:27,804 - models - INFO - Logger initialized
+2015-02-23 03:13:27,804 - models - INFO - Logger initialized
+2015-02-23 03:13:27,804 - models - INFO - Logger initialized
+2015-02-23 03:13:27,804 - models - INFO - Logger initialized
+2015-02-23 03:13:27,804 - models - INFO - Logger initialized
+2015-02-23 03:13:27,804 - models - INFO - Logger initialized
+2015-02-23 03:13:27,805 - models - INFO - Beginning Data Import
+2015-02-23 03:13:27,805 - models - INFO - Beginning Data Import
+2015-02-23 03:13:27,805 - models - INFO - Beginning Data Import
+2015-02-23 03:13:27,805 - models - INFO - Beginning Data Import
+2015-02-23 03:13:27,805 - models - INFO - Beginning Data Import
+2015-02-23 03:13:27,805 - models - INFO - Beginning Data Import
+2015-02-23 03:13:27,805 - models - INFO - Beginning Data Import
+2015-02-23 03:13:27,805 - models - INFO - Beginning Data Import
+2015-02-23 03:13:27,805 - models - INFO - Beginning Data Import
+2015-02-23 03:13:28,022 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:13:28,022 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:13:28,022 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:13:28,022 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:13:28,022 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:13:28,022 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:13:28,022 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:13:28,022 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:13:28,022 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:15:18,461 - models - INFO - Logger initialized
+2015-02-23 03:15:18,461 - models - INFO - Logger initialized
+2015-02-23 03:15:18,461 - models - INFO - Logger initialized
+2015-02-23 03:15:18,461 - models - INFO - Logger initialized
+2015-02-23 03:15:18,461 - models - INFO - Logger initialized
+2015-02-23 03:15:18,461 - models - INFO - Logger initialized
+2015-02-23 03:15:18,461 - models - INFO - Logger initialized
+2015-02-23 03:15:18,461 - models - INFO - Logger initialized
+2015-02-23 03:15:18,461 - models - INFO - Logger initialized
+2015-02-23 03:15:18,461 - models - INFO - Logger initialized
+2015-02-23 03:15:18,462 - models - INFO - Beginning Data Import
+2015-02-23 03:15:18,462 - models - INFO - Beginning Data Import
+2015-02-23 03:15:18,462 - models - INFO - Beginning Data Import
+2015-02-23 03:15:18,462 - models - INFO - Beginning Data Import
+2015-02-23 03:15:18,462 - models - INFO - Beginning Data Import
+2015-02-23 03:15:18,462 - models - INFO - Beginning Data Import
+2015-02-23 03:15:18,462 - models - INFO - Beginning Data Import
+2015-02-23 03:15:18,462 - models - INFO - Beginning Data Import
+2015-02-23 03:15:18,462 - models - INFO - Beginning Data Import
+2015-02-23 03:15:18,462 - models - INFO - Beginning Data Import
+2015-02-23 03:15:18,680 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:15:18,680 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:15:18,680 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:15:18,680 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:15:18,680 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:15:18,680 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:15:18,680 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:15:18,680 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:15:18,680 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:15:18,680 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:19:06,436 - models - INFO - Logger initialized
+2015-02-23 03:19:06,436 - models - INFO - Logger initialized
+2015-02-23 03:19:06,436 - models - INFO - Logger initialized
+2015-02-23 03:19:06,436 - models - INFO - Logger initialized
+2015-02-23 03:19:06,436 - models - INFO - Logger initialized
+2015-02-23 03:19:06,436 - models - INFO - Logger initialized
+2015-02-23 03:19:06,436 - models - INFO - Logger initialized
+2015-02-23 03:19:06,436 - models - INFO - Logger initialized
+2015-02-23 03:19:06,436 - models - INFO - Logger initialized
+2015-02-23 03:19:06,436 - models - INFO - Logger initialized
+2015-02-23 03:19:06,436 - models - INFO - Logger initialized
+2015-02-23 03:19:06,437 - models - INFO - Beginning Data Import
+2015-02-23 03:19:06,437 - models - INFO - Beginning Data Import
+2015-02-23 03:19:06,437 - models - INFO - Beginning Data Import
+2015-02-23 03:19:06,437 - models - INFO - Beginning Data Import
+2015-02-23 03:19:06,437 - models - INFO - Beginning Data Import
+2015-02-23 03:19:06,437 - models - INFO - Beginning Data Import
+2015-02-23 03:19:06,437 - models - INFO - Beginning Data Import
+2015-02-23 03:19:06,437 - models - INFO - Beginning Data Import
+2015-02-23 03:19:06,437 - models - INFO - Beginning Data Import
+2015-02-23 03:19:06,437 - models - INFO - Beginning Data Import
+2015-02-23 03:19:06,437 - models - INFO - Beginning Data Import
+2015-02-23 03:19:06,664 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:19:06,664 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:19:06,664 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:19:06,664 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:19:06,664 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:19:06,664 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:19:06,664 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:19:06,664 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:19:06,664 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:19:06,664 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:19:06,664 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:27:30,345 - models - INFO - Logger initialized
+2015-02-23 03:27:30,345 - models - INFO - Logger initialized
+2015-02-23 03:27:30,345 - models - INFO - Logger initialized
+2015-02-23 03:27:30,345 - models - INFO - Logger initialized
+2015-02-23 03:27:30,345 - models - INFO - Logger initialized
+2015-02-23 03:27:30,345 - models - INFO - Logger initialized
+2015-02-23 03:27:30,345 - models - INFO - Logger initialized
+2015-02-23 03:27:30,345 - models - INFO - Logger initialized
+2015-02-23 03:27:30,345 - models - INFO - Logger initialized
+2015-02-23 03:27:30,345 - models - INFO - Logger initialized
+2015-02-23 03:27:30,345 - models - INFO - Logger initialized
+2015-02-23 03:27:30,345 - models - INFO - Logger initialized
+2015-02-23 03:27:30,346 - models - INFO - Beginning Data Import
+2015-02-23 03:27:30,346 - models - INFO - Beginning Data Import
+2015-02-23 03:27:30,346 - models - INFO - Beginning Data Import
+2015-02-23 03:27:30,346 - models - INFO - Beginning Data Import
+2015-02-23 03:27:30,346 - models - INFO - Beginning Data Import
+2015-02-23 03:27:30,346 - models - INFO - Beginning Data Import
+2015-02-23 03:27:30,346 - models - INFO - Beginning Data Import
+2015-02-23 03:27:30,346 - models - INFO - Beginning Data Import
+2015-02-23 03:27:30,346 - models - INFO - Beginning Data Import
+2015-02-23 03:27:30,346 - models - INFO - Beginning Data Import
+2015-02-23 03:27:30,346 - models - INFO - Beginning Data Import
+2015-02-23 03:27:30,346 - models - INFO - Beginning Data Import
+2015-02-23 03:27:30,567 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:27:30,567 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:27:30,567 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:27:30,567 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:27:30,567 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:27:30,567 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:27:30,567 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:27:30,567 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:27:30,567 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:27:30,567 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:27:30,567 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:27:30,567 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:30:50,854 - models - INFO - Logger initialized
+2015-02-23 03:30:50,854 - models - INFO - Logger initialized
+2015-02-23 03:30:50,854 - models - INFO - Logger initialized
+2015-02-23 03:30:50,854 - models - INFO - Logger initialized
+2015-02-23 03:30:50,854 - models - INFO - Logger initialized
+2015-02-23 03:30:50,854 - models - INFO - Logger initialized
+2015-02-23 03:30:50,854 - models - INFO - Logger initialized
+2015-02-23 03:30:50,854 - models - INFO - Logger initialized
+2015-02-23 03:30:50,854 - models - INFO - Logger initialized
+2015-02-23 03:30:50,854 - models - INFO - Logger initialized
+2015-02-23 03:30:50,854 - models - INFO - Logger initialized
+2015-02-23 03:30:50,854 - models - INFO - Logger initialized
+2015-02-23 03:30:50,854 - models - INFO - Logger initialized
+2015-02-23 03:30:50,856 - models - INFO - Beginning Data Import
+2015-02-23 03:30:50,856 - models - INFO - Beginning Data Import
+2015-02-23 03:30:50,856 - models - INFO - Beginning Data Import
+2015-02-23 03:30:50,856 - models - INFO - Beginning Data Import
+2015-02-23 03:30:50,856 - models - INFO - Beginning Data Import
+2015-02-23 03:30:50,856 - models - INFO - Beginning Data Import
+2015-02-23 03:30:50,856 - models - INFO - Beginning Data Import
+2015-02-23 03:30:50,856 - models - INFO - Beginning Data Import
+2015-02-23 03:30:50,856 - models - INFO - Beginning Data Import
+2015-02-23 03:30:50,856 - models - INFO - Beginning Data Import
+2015-02-23 03:30:50,856 - models - INFO - Beginning Data Import
+2015-02-23 03:30:50,856 - models - INFO - Beginning Data Import
+2015-02-23 03:30:50,856 - models - INFO - Beginning Data Import
+2015-02-23 03:30:51,075 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:30:51,075 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:30:51,075 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:30:51,075 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:30:51,075 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:30:51,075 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:30:51,075 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:30:51,075 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:30:51,075 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:30:51,075 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:30:51,075 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:30:51,075 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:30:51,075 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:31:23,242 - models - INFO - Logger initialized
+2015-02-23 03:31:23,242 - models - INFO - Logger initialized
+2015-02-23 03:31:23,242 - models - INFO - Logger initialized
+2015-02-23 03:31:23,242 - models - INFO - Logger initialized
+2015-02-23 03:31:23,242 - models - INFO - Logger initialized
+2015-02-23 03:31:23,242 - models - INFO - Logger initialized
+2015-02-23 03:31:23,242 - models - INFO - Logger initialized
+2015-02-23 03:31:23,242 - models - INFO - Logger initialized
+2015-02-23 03:31:23,242 - models - INFO - Logger initialized
+2015-02-23 03:31:23,242 - models - INFO - Logger initialized
+2015-02-23 03:31:23,242 - models - INFO - Logger initialized
+2015-02-23 03:31:23,242 - models - INFO - Logger initialized
+2015-02-23 03:31:23,242 - models - INFO - Logger initialized
+2015-02-23 03:31:23,242 - models - INFO - Logger initialized
+2015-02-23 03:31:23,244 - models - INFO - Beginning Data Import
+2015-02-23 03:31:23,244 - models - INFO - Beginning Data Import
+2015-02-23 03:31:23,244 - models - INFO - Beginning Data Import
+2015-02-23 03:31:23,244 - models - INFO - Beginning Data Import
+2015-02-23 03:31:23,244 - models - INFO - Beginning Data Import
+2015-02-23 03:31:23,244 - models - INFO - Beginning Data Import
+2015-02-23 03:31:23,244 - models - INFO - Beginning Data Import
+2015-02-23 03:31:23,244 - models - INFO - Beginning Data Import
+2015-02-23 03:31:23,244 - models - INFO - Beginning Data Import
+2015-02-23 03:31:23,244 - models - INFO - Beginning Data Import
+2015-02-23 03:31:23,244 - models - INFO - Beginning Data Import
+2015-02-23 03:31:23,244 - models - INFO - Beginning Data Import
+2015-02-23 03:31:23,244 - models - INFO - Beginning Data Import
+2015-02-23 03:31:23,244 - models - INFO - Beginning Data Import
+2015-02-23 03:31:23,463 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:31:23,463 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:31:23,463 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:31:23,463 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:31:23,463 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:31:23,463 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:31:23,463 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:31:23,463 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:31:23,463 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:31:23,463 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:31:23,463 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:31:23,463 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:31:23,463 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:31:23,463 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:46:49,592 - models - INFO - Logger initialized
+2015-02-23 03:46:49,592 - models - INFO - Logger initialized
+2015-02-23 03:46:49,592 - models - INFO - Logger initialized
+2015-02-23 03:46:49,592 - models - INFO - Logger initialized
+2015-02-23 03:46:49,592 - models - INFO - Logger initialized
+2015-02-23 03:46:49,592 - models - INFO - Logger initialized
+2015-02-23 03:46:49,592 - models - INFO - Logger initialized
+2015-02-23 03:46:49,592 - models - INFO - Logger initialized
+2015-02-23 03:46:49,592 - models - INFO - Logger initialized
+2015-02-23 03:46:49,592 - models - INFO - Logger initialized
+2015-02-23 03:46:49,592 - models - INFO - Logger initialized
+2015-02-23 03:46:49,592 - models - INFO - Logger initialized
+2015-02-23 03:46:49,592 - models - INFO - Logger initialized
+2015-02-23 03:46:49,592 - models - INFO - Logger initialized
+2015-02-23 03:46:49,592 - models - INFO - Logger initialized
+2015-02-23 03:46:49,594 - models - INFO - Beginning Data Import
+2015-02-23 03:46:49,594 - models - INFO - Beginning Data Import
+2015-02-23 03:46:49,594 - models - INFO - Beginning Data Import
+2015-02-23 03:46:49,594 - models - INFO - Beginning Data Import
+2015-02-23 03:46:49,594 - models - INFO - Beginning Data Import
+2015-02-23 03:46:49,594 - models - INFO - Beginning Data Import
+2015-02-23 03:46:49,594 - models - INFO - Beginning Data Import
+2015-02-23 03:46:49,594 - models - INFO - Beginning Data Import
+2015-02-23 03:46:49,594 - models - INFO - Beginning Data Import
+2015-02-23 03:46:49,594 - models - INFO - Beginning Data Import
+2015-02-23 03:46:49,594 - models - INFO - Beginning Data Import
+2015-02-23 03:46:49,594 - models - INFO - Beginning Data Import
+2015-02-23 03:46:49,594 - models - INFO - Beginning Data Import
+2015-02-23 03:46:49,594 - models - INFO - Beginning Data Import
+2015-02-23 03:46:49,594 - models - INFO - Beginning Data Import
+2015-02-23 03:46:49,821 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:46:49,821 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:46:49,821 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:46:49,821 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:46:49,821 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:46:49,821 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:46:49,821 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:46:49,821 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:46:49,821 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:46:49,821 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:46:49,821 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:46:49,821 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:46:49,821 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:46:49,821 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:46:49,821 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:51:03,944 - models - INFO - Logger initialized
+2015-02-23 03:51:03,944 - models - INFO - Logger initialized
+2015-02-23 03:51:03,944 - models - INFO - Logger initialized
+2015-02-23 03:51:03,944 - models - INFO - Logger initialized
+2015-02-23 03:51:03,944 - models - INFO - Logger initialized
+2015-02-23 03:51:03,944 - models - INFO - Logger initialized
+2015-02-23 03:51:03,944 - models - INFO - Logger initialized
+2015-02-23 03:51:03,944 - models - INFO - Logger initialized
+2015-02-23 03:51:03,944 - models - INFO - Logger initialized
+2015-02-23 03:51:03,944 - models - INFO - Logger initialized
+2015-02-23 03:51:03,944 - models - INFO - Logger initialized
+2015-02-23 03:51:03,944 - models - INFO - Logger initialized
+2015-02-23 03:51:03,944 - models - INFO - Logger initialized
+2015-02-23 03:51:03,944 - models - INFO - Logger initialized
+2015-02-23 03:51:03,944 - models - INFO - Logger initialized
+2015-02-23 03:51:03,944 - models - INFO - Logger initialized
+2015-02-23 03:51:03,946 - models - INFO - Beginning Data Import
+2015-02-23 03:51:03,946 - models - INFO - Beginning Data Import
+2015-02-23 03:51:03,946 - models - INFO - Beginning Data Import
+2015-02-23 03:51:03,946 - models - INFO - Beginning Data Import
+2015-02-23 03:51:03,946 - models - INFO - Beginning Data Import
+2015-02-23 03:51:03,946 - models - INFO - Beginning Data Import
+2015-02-23 03:51:03,946 - models - INFO - Beginning Data Import
+2015-02-23 03:51:03,946 - models - INFO - Beginning Data Import
+2015-02-23 03:51:03,946 - models - INFO - Beginning Data Import
+2015-02-23 03:51:03,946 - models - INFO - Beginning Data Import
+2015-02-23 03:51:03,946 - models - INFO - Beginning Data Import
+2015-02-23 03:51:03,946 - models - INFO - Beginning Data Import
+2015-02-23 03:51:03,946 - models - INFO - Beginning Data Import
+2015-02-23 03:51:03,946 - models - INFO - Beginning Data Import
+2015-02-23 03:51:03,946 - models - INFO - Beginning Data Import
+2015-02-23 03:51:03,946 - models - INFO - Beginning Data Import
+2015-02-23 03:51:04,160 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:51:04,160 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:51:04,160 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:51:04,160 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:51:04,160 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:51:04,160 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:51:04,160 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:51:04,160 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:51:04,160 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:51:04,160 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:51:04,160 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:51:04,160 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:51:04,160 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:51:04,160 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:51:04,160 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:51:04,160 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:52:06,300 - models - INFO - Logger initialized
+2015-02-23 03:52:06,300 - models - INFO - Logger initialized
+2015-02-23 03:52:06,300 - models - INFO - Logger initialized
+2015-02-23 03:52:06,300 - models - INFO - Logger initialized
+2015-02-23 03:52:06,300 - models - INFO - Logger initialized
+2015-02-23 03:52:06,300 - models - INFO - Logger initialized
+2015-02-23 03:52:06,300 - models - INFO - Logger initialized
+2015-02-23 03:52:06,300 - models - INFO - Logger initialized
+2015-02-23 03:52:06,300 - models - INFO - Logger initialized
+2015-02-23 03:52:06,300 - models - INFO - Logger initialized
+2015-02-23 03:52:06,300 - models - INFO - Logger initialized
+2015-02-23 03:52:06,300 - models - INFO - Logger initialized
+2015-02-23 03:52:06,300 - models - INFO - Logger initialized
+2015-02-23 03:52:06,300 - models - INFO - Logger initialized
+2015-02-23 03:52:06,300 - models - INFO - Logger initialized
+2015-02-23 03:52:06,300 - models - INFO - Logger initialized
+2015-02-23 03:52:06,300 - models - INFO - Logger initialized
+2015-02-23 03:52:06,302 - models - INFO - Beginning Data Import
+2015-02-23 03:52:06,302 - models - INFO - Beginning Data Import
+2015-02-23 03:52:06,302 - models - INFO - Beginning Data Import
+2015-02-23 03:52:06,302 - models - INFO - Beginning Data Import
+2015-02-23 03:52:06,302 - models - INFO - Beginning Data Import
+2015-02-23 03:52:06,302 - models - INFO - Beginning Data Import
+2015-02-23 03:52:06,302 - models - INFO - Beginning Data Import
+2015-02-23 03:52:06,302 - models - INFO - Beginning Data Import
+2015-02-23 03:52:06,302 - models - INFO - Beginning Data Import
+2015-02-23 03:52:06,302 - models - INFO - Beginning Data Import
+2015-02-23 03:52:06,302 - models - INFO - Beginning Data Import
+2015-02-23 03:52:06,302 - models - INFO - Beginning Data Import
+2015-02-23 03:52:06,302 - models - INFO - Beginning Data Import
+2015-02-23 03:52:06,302 - models - INFO - Beginning Data Import
+2015-02-23 03:52:06,302 - models - INFO - Beginning Data Import
+2015-02-23 03:52:06,302 - models - INFO - Beginning Data Import
+2015-02-23 03:52:06,302 - models - INFO - Beginning Data Import
+2015-02-23 03:52:06,524 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:52:06,524 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:52:06,524 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:52:06,524 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:52:06,524 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:52:06,524 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:52:06,524 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:52:06,524 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:52:06,524 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:52:06,524 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:52:06,524 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:52:06,524 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:52:06,524 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:52:06,524 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:52:06,524 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:52:06,524 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:52:06,524 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:55:16,606 - models - INFO - Logger initialized
+2015-02-23 03:55:16,606 - models - INFO - Logger initialized
+2015-02-23 03:55:16,606 - models - INFO - Logger initialized
+2015-02-23 03:55:16,606 - models - INFO - Logger initialized
+2015-02-23 03:55:16,606 - models - INFO - Logger initialized
+2015-02-23 03:55:16,606 - models - INFO - Logger initialized
+2015-02-23 03:55:16,606 - models - INFO - Logger initialized
+2015-02-23 03:55:16,606 - models - INFO - Logger initialized
+2015-02-23 03:55:16,606 - models - INFO - Logger initialized
+2015-02-23 03:55:16,606 - models - INFO - Logger initialized
+2015-02-23 03:55:16,606 - models - INFO - Logger initialized
+2015-02-23 03:55:16,606 - models - INFO - Logger initialized
+2015-02-23 03:55:16,606 - models - INFO - Logger initialized
+2015-02-23 03:55:16,606 - models - INFO - Logger initialized
+2015-02-23 03:55:16,606 - models - INFO - Logger initialized
+2015-02-23 03:55:16,606 - models - INFO - Logger initialized
+2015-02-23 03:55:16,606 - models - INFO - Logger initialized
+2015-02-23 03:55:16,606 - models - INFO - Logger initialized
+2015-02-23 03:55:16,607 - models - INFO - Beginning Data Import
+2015-02-23 03:55:16,607 - models - INFO - Beginning Data Import
+2015-02-23 03:55:16,607 - models - INFO - Beginning Data Import
+2015-02-23 03:55:16,607 - models - INFO - Beginning Data Import
+2015-02-23 03:55:16,607 - models - INFO - Beginning Data Import
+2015-02-23 03:55:16,607 - models - INFO - Beginning Data Import
+2015-02-23 03:55:16,607 - models - INFO - Beginning Data Import
+2015-02-23 03:55:16,607 - models - INFO - Beginning Data Import
+2015-02-23 03:55:16,607 - models - INFO - Beginning Data Import
+2015-02-23 03:55:16,607 - models - INFO - Beginning Data Import
+2015-02-23 03:55:16,607 - models - INFO - Beginning Data Import
+2015-02-23 03:55:16,607 - models - INFO - Beginning Data Import
+2015-02-23 03:55:16,607 - models - INFO - Beginning Data Import
+2015-02-23 03:55:16,607 - models - INFO - Beginning Data Import
+2015-02-23 03:55:16,607 - models - INFO - Beginning Data Import
+2015-02-23 03:55:16,607 - models - INFO - Beginning Data Import
+2015-02-23 03:55:16,607 - models - INFO - Beginning Data Import
+2015-02-23 03:55:16,607 - models - INFO - Beginning Data Import
+2015-02-23 03:55:16,828 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:55:16,828 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:55:16,828 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:55:16,828 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:55:16,828 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:55:16,828 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:55:16,828 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:55:16,828 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:55:16,828 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:55:16,828 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:55:16,828 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:55:16,828 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:55:16,828 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:55:16,828 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:55:16,828 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:55:16,828 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:55:16,828 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 03:55:16,828 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 13:38:52,301 - models - INFO - Logger initialized
+2015-02-23 13:38:52,302 - models - INFO - Beginning Data Import
+2015-02-23 13:38:52,507 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 13:39:56,986 - models - INFO - Logger initialized
+2015-02-23 13:39:56,986 - models - INFO - Logger initialized
+2015-02-23 13:39:56,986 - models - INFO - Beginning Data Import
+2015-02-23 13:39:56,986 - models - INFO - Beginning Data Import
+2015-02-23 13:40:13,945 - models - INFO - Logger initialized
+2015-02-23 13:40:13,945 - models - INFO - Logger initialized
+2015-02-23 13:40:13,945 - models - INFO - Logger initialized
+2015-02-23 13:40:13,945 - models - INFO - Beginning Data Import
+2015-02-23 13:40:13,945 - models - INFO - Beginning Data Import
+2015-02-23 13:40:13,945 - models - INFO - Beginning Data Import
+2015-02-23 13:40:13,949 - models - INFO - Data Import successful - Stuff.csv
+2015-02-23 13:40:13,949 - models - INFO - Data Import successful - Stuff.csv
+2015-02-23 13:40:13,949 - models - INFO - Data Import successful - Stuff.csv
+2015-02-23 14:01:01,122 - models - INFO - Logger initialized
+2015-02-23 14:01:01,122 - models - INFO - Beginning Data Import
+2015-02-23 14:01:01,330 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 14:01:46,140 - models - INFO - Logger initialized
+2015-02-23 14:01:46,140 - models - INFO - Logger initialized
+2015-02-23 14:01:46,141 - models - INFO - Beginning Data Import
+2015-02-23 14:01:46,141 - models - INFO - Beginning Data Import
+2015-02-23 14:01:46,346 - models - INFO - Data Import successful - ftp_or.csv
+2015-02-23 14:01:46,346 - models - INFO - Data Import successful - ftp_or.csv
+2015-02-23 14:02:11,834 - models - INFO - Logger initialized
+2015-02-23 14:02:11,834 - models - INFO - Logger initialized
+2015-02-23 14:02:11,834 - models - INFO - Logger initialized
+2015-02-23 14:02:11,834 - models - INFO - Beginning Data Import
+2015-02-23 14:02:11,834 - models - INFO - Beginning Data Import
+2015-02-23 14:02:11,834 - models - INFO - Beginning Data Import
+2015-02-23 14:02:12,048 - models - INFO - Data Import successful - ftp_or.csv
+2015-02-23 14:02:12,048 - models - INFO - Data Import successful - ftp_or.csv
+2015-02-23 14:02:12,048 - models - INFO - Data Import successful - ftp_or.csv
+2015-02-23 14:04:53,302 - models - INFO - Logger initialized
+2015-02-23 14:04:53,302 - models - INFO - Logger initialized
+2015-02-23 14:04:53,302 - models - INFO - Logger initialized
+2015-02-23 14:04:53,302 - models - INFO - Logger initialized
+2015-02-23 14:04:53,303 - models - INFO - Beginning Data Import
+2015-02-23 14:04:53,303 - models - INFO - Beginning Data Import
+2015-02-23 14:04:53,303 - models - INFO - Beginning Data Import
+2015-02-23 14:04:53,303 - models - INFO - Beginning Data Import
+2015-02-23 14:04:53,506 - models - INFO - Data Import successful - ftp_or.csv
+2015-02-23 14:04:53,506 - models - INFO - Data Import successful - ftp_or.csv
+2015-02-23 14:04:53,506 - models - INFO - Data Import successful - ftp_or.csv
+2015-02-23 14:04:53,506 - models - INFO - Data Import successful - ftp_or.csv
+2015-02-23 14:06:09,299 - models - INFO - Logger initialized
+2015-02-23 14:06:09,300 - models - INFO - Beginning Data Import
+2015-02-23 14:06:09,509 - models - INFO - Data Import successful - ftp_or.csv
+2015-02-23 14:07:07,914 - models - INFO - Logger initialized
+2015-02-23 14:07:07,915 - models - INFO - Beginning Data Import
+2015-02-23 14:07:08,121 - models - INFO - Data Import successful - ftp_or.csv
+2015-02-23 14:08:11,386 - models - INFO - Logger initialized
+2015-02-23 14:08:11,386 - models - INFO - Beginning Data Import
+2015-02-23 14:08:11,499 - models - ERROR - Expected object or value
+2015-02-23 14:08:58,716 - models - INFO - Logger initialized
+2015-02-23 14:08:58,716 - models - INFO - Logger initialized
+2015-02-23 14:08:58,716 - models - INFO - Beginning Data Import
+2015-02-23 14:08:58,716 - models - INFO - Beginning Data Import
+2015-02-23 14:08:58,825 - models - ERROR - Expected object or value
+2015-02-23 14:08:58,825 - models - ERROR - Expected object or value
+2015-02-23 14:17:56,811 - models - INFO - Logger initialized
+2015-02-23 14:17:56,811 - models - INFO - Beginning Data Import
+2015-02-23 14:18:41,377 - models - INFO - Logger initialized
+2015-02-23 14:18:41,377 - models - INFO - Beginning Data Import
+2015-02-23 14:23:34,357 - models - INFO - Logger initialized
+2015-02-23 14:23:34,357 - models - INFO - Logger initialized
+2015-02-23 14:23:34,358 - models - INFO - Beginning Data Import
+2015-02-23 14:23:34,358 - models - INFO - Beginning Data Import
+2015-02-23 14:24:07,347 - models - INFO - Logger initialized
+2015-02-23 14:24:07,347 - models - INFO - Beginning Data Import
+2015-02-23 14:24:50,869 - models - INFO - Logger initialized
+2015-02-23 14:24:50,869 - models - INFO - Beginning Data Import
+2015-02-23 14:26:07,310 - models - INFO - Logger initialized
+2015-02-23 14:26:07,310 - models - INFO - Logger initialized
+2015-02-23 14:26:07,311 - models - INFO - Beginning Data Import
+2015-02-23 14:26:07,311 - models - INFO - Beginning Data Import
+2015-02-23 14:26:52,408 - models - INFO - Logger initialized
+2015-02-23 14:26:52,408 - models - INFO - Beginning Data Import
+2015-02-23 14:27:13,602 - models - INFO - Logger initialized
+2015-02-23 14:27:13,602 - models - INFO - Beginning Data Import
+2015-02-23 14:27:13,807 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 14:39:59,333 - models - INFO - Logger initialized
+2015-02-23 14:39:59,333 - models - INFO - Logger initialized
+2015-02-23 14:39:59,333 - models - INFO - Beginning Data Import
+2015-02-23 14:39:59,333 - models - INFO - Beginning Data Import
+2015-02-23 14:39:59,558 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 14:39:59,558 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 14:41:04,872 - models - INFO - Logger initialized
+2015-02-23 14:41:04,872 - models - INFO - Logger initialized
+2015-02-23 14:41:04,872 - models - INFO - Logger initialized
+2015-02-23 14:41:04,873 - models - INFO - Beginning Data Import
+2015-02-23 14:41:04,873 - models - INFO - Beginning Data Import
+2015-02-23 14:41:04,873 - models - INFO - Beginning Data Import
+2015-02-23 14:41:05,118 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 14:41:05,118 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 14:41:05,118 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 15:10:18,538 - models - INFO - Logger initialized
+2015-02-23 15:10:18,538 - models - INFO - Beginning Data Import
+2015-02-23 15:13:18,890 - models - INFO - Logger initialized
+2015-02-23 15:13:18,890 - models - INFO - Logger initialized
+2015-02-23 15:13:18,890 - models - INFO - Beginning Data Import
+2015-02-23 15:13:18,890 - models - INFO - Beginning Data Import
+2015-02-23 15:18:39,247 - models - INFO - Logger initialized
+2015-02-23 15:18:39,247 - models - INFO - Beginning Data Import
+2015-02-23 15:43:41,618 - models - INFO - Logger initialized
+2015-02-23 15:43:41,618 - models - INFO - Logger initialized
+2015-02-23 15:43:41,618 - models - INFO - Beginning Data Import
+2015-02-23 15:43:41,618 - models - INFO - Beginning Data Import
+2015-02-23 15:44:33,329 - models - INFO - Logger initialized
+2015-02-23 15:44:33,329 - models - INFO - Beginning Data Import
+2015-02-23 15:45:55,045 - models - INFO - Logger initialized
+2015-02-23 15:45:55,045 - models - INFO - Beginning Data Import
+2015-02-23 15:45:55,258 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 15:49:11,145 - models - INFO - Logger initialized
+2015-02-23 15:49:11,146 - models - INFO - Beginning Data Import
+2015-02-23 15:54:22,330 - models - INFO - Logger initialized
+2015-02-23 15:54:22,330 - models - INFO - Logger initialized
+2015-02-23 15:54:22,331 - models - INFO - Beginning Data Import
+2015-02-23 15:54:22,331 - models - INFO - Beginning Data Import
+2015-02-23 15:54:49,308 - models - INFO - Logger initialized
+2015-02-23 15:54:49,308 - models - INFO - Beginning Data Import
+2015-02-23 15:54:49,509 - models - INFO - Data Import successful - ftp.csv
+2015-02-23 15:55:05,883 - models - INFO - Logger initialized
+2015-02-23 15:55:05,883 - models - INFO - Logger initialized
+2015-02-23 15:55:05,883 - models - INFO - Beginning Data Import
+2015-02-23 15:55:05,883 - models - INFO - Beginning Data Import
+2015-02-23 15:55:06,085 - models - INFO - Data Import successful - ftp_or.csv
+2015-02-23 15:55:06,085 - models - INFO - Data Import successful - ftp_or.csv

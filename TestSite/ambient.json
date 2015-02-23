@@ -1,0 +1,14 @@
+{
+    "Ambient_Conditions": {
+        "T_AMB_MAX": "30",
+        "T_AMB_MIN": "20",
+        "P_AMB_MAX": "103.325",
+        "P_AMB_MIN": "80",
+        "T_INLET_MAX": "30",
+        "T_INLET_MIN": "20",
+        "P_INLET_MAX": "80",
+        "P_INLET_MIN": "103.325",
+        "M_RELHU_MAX": "10",
+        "M_RELHU_MIN": "50"
+    }
+}

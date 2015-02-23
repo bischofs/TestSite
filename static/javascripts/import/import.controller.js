@@ -9,21 +9,57 @@
   .module('TestSite.import.controllers' )
   .controller('ImportController', ImportController);
 
-  ImportController.$inject = ['$scope', 'FileUploader'];
+  ImportController.$inject = ['$scope', 'FileUploader','toastr'];
 
   /**
   * @namespace UploadController
   */
-  function ImportController($scope, FileUploader) {
-    $scope.uploader = new FileUploader();
-    $scope.uploader.url = 'api/v1/data/import/'
-    $scope.uploader.method = 'PUT'
+  function ImportController($scope, FileUploader, toastr) {
 
-    $scope.uploader.onSuccessItem = onSuccessItem;
+      $scope.uploader = new FileUploader();
+      $scope.uploader.url = 'api/v1/data/import/'
+      $scope.uploader.method = 'PUT'
 
-    function onSuccessItem(item, response, status, headers) {
-      console.log(response);
-    }
+      $scope.uploader.onSuccessItem = onSuccessItem;
+      $scope.uploader.onErrorItem = onErrorItem;
+
+
+      function onSuccessItem(item, response, status, headers) {
+
+	  if (response.indexOf("Meta-Data missing") > -1){
+	      $scope.metaDataPresent = false;
+	  } else { $scope.metaDataPresent = true; }
+
+	  if(response.indexOf("units are not") > -1 || response.indexOf("Cannot find") > -1){
+              $scope.requiredChannels = false;
+	  } else { $scope.requiredChannels = true; }
+
+	  if (response.indexOf("out of range") > -1){
+              $scope.ambientConditions = false;
+	  } else { $scope.ambientConditions= true; }
+
+
+
+
+
+
+
+	//$scope.metaDataMissing
+
+
+
+      }
+
+
+
+      function onErrorItem (item, response, status, headers) {
+        toastr.error(response.message , 'Error');
+	  console.log()
+
+      }
+
+
+
 
   }
 
