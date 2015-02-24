@@ -20,10 +20,9 @@ class DataIO:
                                   "E_O2D":"%","E_O2D2":"%","E_THCW":"ppm","E_THCW2":"ppm",
                                   "T_AMB": "°C","P_AMB":"bar","T_INLET":"°C","P_INLET":"bar",
                                   "E_NOXW":"ppm","E_NOXW2":"ppm","E_NOW":"ppm","E_NOW2":"ppm",
-                                  "E_COHW":"%","E_COHW2":"%","E_CO2W":"ppm","E_CO2W2":"ppm",
-                                  "M_RELHUM":"%","M_FRAIRW":"Kg/hr","M_FRFUEL":"Kg/hr","C_BHP":"bhp",
-                                  "C_TRQENG":"Nm","C_SPDDYN":"rpm","UDPi_SpeedDemand":"rpm","UDPi_TorqueDemand":"Nm",
-                                  "UDPi_Throttle":"%"}
+                                  "E_COHW":"%","E_COHW2":"%","E_CO2W":"%","E_CO2W2":"%",
+                                  "M_RELHUM":"%","M_FRAIRW":"kg/hr","M_FRFUEL":"kg/hr","C_BHP":"bhp",
+                                  "C_TRQENG":"Nm","C_SPDDYN":"rpm","UDPi_SpeedDemand":"rpm","UDPi_TorqueDemand":"Nm"}
 
         self.logDict = {} # key value pair for logging errors to be serialized and sent to client
 
@@ -39,15 +38,28 @@ class DataIO:
 
         self.data = pd.read_csv(filename)                                                   # Read Data into DataFrame
         self.meta_data = self.load_meta_data(self.data, filename)                           # Read Meta data
-        self.check_channels(self.data)                                                         # Check Units based on dictionary
+        self.check_channels(self.data, filename)                                            # Check Units based on dictionary
         self.data = self.data.convert_objects(convert_numeric=True)                         # Convert all data to numeric
         self.data = self.data.dropna()                                                      # Drop NaN values from data
+        self.convert_bar_to_kpa()
         self.check_ambient_conditions()
 
 
         # self.logger.info("Data Import successful - %s" % filename)
 
 
+
+    #######################################################
+    # # @name convert_bar_to_kpa                          #
+    # # @desc converts bar to kpa for 1065 calculations   #
+    # # @memberOf IO.DataIO                               #
+    #######################################################
+
+
+    def convert_bar_to_kpa(self):
+        
+        self.data.P_AMB = self.data.P_AMB * 100
+        self.data.P_INLET = self.data.P_INLET * 100
 
 
 
@@ -60,7 +72,7 @@ class DataIO:
     def check_analyzer_maximums(self):
 
 
-           self.ranges = pd.read_json("ranges.json")
+        self.ranges = pd.read_json("ranges.json")
             # self.logger.info("Checking Data Ranges")
 
 
@@ -80,16 +92,60 @@ class DataIO:
 
     def check_ambient_conditions(self):
 
-
         self.cond = pd.read_json("ambient.json")
 
         boolean_cond = self.data.T_AMB > self.cond.Ambient_Conditions.T_AMB_MAX
         if (boolean_cond.any()):
-            self.logDict['error'] = "T_AMB out of range"
+            self.logDict['error'] = "T_AMB above required maximum"
+            raise Exception("T_AMB above required maximum")
 
         boolean_cond = self.data.T_AMB < self.cond.Ambient_Conditions.T_AMB_MIN
         if (boolean_cond.any()):
-            self.logDict['error'] = "T_AMB out of range"
+            self.logDict['error'] = "T_AMB below required minimum"
+            raise Exception("T_AMB below required minimum")
+
+        boolean_cond = self.data.P_AMB > self.cond.Ambient_Conditions.P_AMB_MAX
+        if (boolean_cond.any()):
+            self.logDict['error'] = "P_AMB above required maximum"
+            raise Exception("P_AMB above required maximum")
+
+        boolean_cond = self.data.P_AMB < self.cond.Ambient_Conditions.P_AMB_MIN
+        if (boolean_cond.any()):
+            self.logDict['error'] = "P_AMB below required minimum"
+            raise Exception("P_AMB below required minimum")
+
+        boolean_cond = self.data.T_INLET > self.cond.Ambient_Conditions.T_INLET_MAX
+        if (boolean_cond.any()):
+            self.logDict['error'] = "T_INLET above required maximum"
+            raise Exception("T_INLET above required maximum")
+
+        boolean_cond = self.data.T_INLET < self.cond.Ambient_Conditions.T_INLET_MIN
+        if (boolean_cond.any()):
+            self.logDict['error'] = "T_INLET below required minimum"
+            raise Exception("T_INLET below required minimum")
+            
+        boolean_cond = self.data.P_INLET > self.cond.Ambient_Conditions.P_INLET_MAX
+        if (boolean_cond.any()):
+            self.logDict['error'] = "P_INLET above required maximum"
+            raise Exception("P_INLET above required maximum")
+
+        boolean_cond = self.data.P_INLET < self.cond.Ambient_Conditions.P_INLET_MIN
+        if (boolean_cond.any()):
+            self.logDict['error'] = "P_INLET below required minimum"
+            raise Exception("P_INLET below required minimum")
+
+        boolean_cond = self.data.M_RELHUM > self.cond.Ambient_Conditions.M_RELHUM_MAX
+        if (boolean_cond.any()):
+            self.logDict['error'] = "M_RELHUM above required maximum"
+            raise Exception("M_RELHUM above required maximum")
+
+        boolean_cond = self.data.M_RELHUM < self.cond.Ambient_Conditions.M_RELHUM_MIN
+        if (boolean_cond.any()):
+            self.logDict['error'] = "M_RELHUM below required minimum"
+            raise Exception("M_RELHUM below required minimum")
+
+
+
 
 
 
@@ -100,10 +156,10 @@ class DataIO:
     # # @memberOf IO.DataIO                                               #
     #######################################################################
 
-    def check_channels(self, data):
+    def check_channels(self, data, filename):
 
         for species, unit in self.speciesColumnDict.items():
-            self.check_units_util(data, species, unit)
+            self.check_units_util(data, species, unit, filename)
 
 
 
@@ -132,12 +188,16 @@ class DataIO:
 
     #### UTILITY METHODS
 
-    def check_units_util(self, data, species, unit):
+    def check_units_util(self, data, species, unit, filename):
 
-        # try:
-        boolean = data[species].str.contains(unit)
+        try:
+            boolean = data[species].str.contains(unit)
+
+        except Exception as e:
+            self.logDict['error'] = "Cannot find %s in file %s" % (e, filename)
+            raise Exception("Cannot find %s in file %s" % (e,filename))
+
         if not(boolean.any()):
             self.logDict['warning'] = "%s units are not in %s" % (species, unit)
-        # except Exception as e:
-            self.logDict['error'] = "Cannot find %s in data" % e
+            raise Exception("%s units are not in %s" % (species, unit))
 

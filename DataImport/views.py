@@ -3,7 +3,7 @@ import json
 from django.shortcuts import render
 from rest_framework import permissions, viewsets, status, views
 from rest_framework.response import Response
-from rest_framework.parsers import FileUploadParser, MultiPartParser
+from rest_framework.parsers import FileUploadParser, MultiPartParser, FormParser
 from rest_framework.renderers import JSONRenderer
 
 from DataImport.models import DataIO
@@ -12,22 +12,26 @@ from DataImport.models import DataIO
 
 class FileUploadView(views.APIView):
 
-    parser_classes = (MultiPartParser,)
+    parser_classes = (FormParser, MultiPartParser,)
 
     def put(self, request, format=None):
 
         file_obj = request.FILES['file']
-        cycle_type = request.DATA
+
+        #import pdb; pdb.set_trace()
 
         try:
 
+            if not (bool(request.data.dicts[0])):
+                raise Exception("Please select a cycle type")
+
+            cycle_type = request.DATA
             data = DataIO()
             data.load_data(file_obj)
             jsonLog = json.dumps(data.logDict)
             return Response(jsonLog, status=200)
 
         except Exception as e:
-             # import pdb; pdb.set_trace()
 
              return Response({
                 'status': 'Bad request',
