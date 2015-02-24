@@ -16,12 +16,17 @@
   */
   function ImportController($scope, FileUploader, toastr) {
 
-      $scope.uploader = new FileUploader();
-      $scope.uploader.url = 'api/v1/data/import/'
-      $scope.uploader.method = 'PUT'
+    $scope.uploader = new FileUploader();
+    $scope.uploader.url = 'api/v1/data/import/'
+    $scope.uploader.method = 'PUT'
 
-      $scope.uploader.onSuccessItem = onSuccessItem;
-      $scope.uploader.onErrorItem = onErrorItem;
+    $scope.uploader.onSuccessItem = onSuccessItem;
+    $scope.uploader.onErrorItem = onErrorItem;
+    $scope.uploader.onBeforeUploadItem = onBeforeUploadItem;
+
+      function  onBeforeUploadItem (item) {
+	  console.log();
+      }
 
 
       function onSuccessItem(item, response, status, headers) {
@@ -31,29 +36,18 @@
 	  } else { $scope.metaDataPresent = true; }
 
 	  if(response.indexOf("units are not") > -1 || response.indexOf("Cannot find") > -1){
-              $scope.requiredChannels = false;
+	      $scope.requiredChannels = false;
 	  } else { $scope.requiredChannels = true; }
 
 	  if (response.indexOf("out of range") > -1){
-              $scope.ambientConditions = false;
+	      $scope.ambientConditions = false;
 	  } else { $scope.ambientConditions= true; }
-
-
-
-
-
-
-
-	//$scope.metaDataMissing
-
 
 
       }
 
-
-
       function onErrorItem (item, response, status, headers) {
-        toastr.error(response.message , 'Error');
+	  toastr.error(response.message , 'Error');
 	  console.log()
 
       }
@@ -61,6 +55,6 @@
 
 
 
-  }
+}
 
 })();
