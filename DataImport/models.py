@@ -65,7 +65,7 @@ class DataIO:
 
     ########################################################################################
     # # @name check_analyzer_maximums                                                      #
-    # # @desc Load json ranges and check imported data for out of range data ( equipement) #
+    # # @desc Load json ranges and check imported data for out of range data (equipment)   #
     # # @memberOf IO.DataIO                                                                #
     ########################################################################################
 
@@ -73,6 +73,32 @@ class DataIO:
 
 
         self.ranges = pd.read_json("ranges.json")
+        
+        boolean_cond = self.data.E_COHD > self.ranges.Measuring_Maximums.CO_HIGH_MAX
+        if(boolean_cond.any()):
+            self.logDict['error'] = "E_COHD above maximum equipment measuring range"
+            raise Exception("E_COHD above maximum equipment measuring range")
+
+        boolean_cond = self.data.E_COHD2 > self.ranges.Measuring_Maximums.CO_HIGH_MAX
+        if(boolean_cond.any()):
+            self.logDict['error'] = "E_COHD2 above maximum equipment measuring range"
+            raise Exception("E_COHD2 above maximum equipment measuring range")
+
+        boolean_cond = self.data.E_COHD < 0
+        if(boolean_cond.any()):
+            self.logDict['error'] = "E_COHD below 0"
+            raise Exception("E_COHD below 0")
+
+        boolean_cond = self.data.E_COHD2 < 0
+        if(boolean_cond.any()):
+            self.logDict['error'] = "E_COHD2 below 0"
+            raise Exception("E_COHD2 below 0")
+
+
+
+
+        
+
             # self.logger.info("Checking Data Ranges")
 
 
@@ -186,7 +212,7 @@ class DataIO:
 
 
 
-    #### UTILITY METHODS
+    #### PRIVATE UTILITY METHODS
 
     def check_units_util(self, data, species, unit, filename):
 

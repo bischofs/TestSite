@@ -1,0 +1,224 @@
+{
+  "1065_Species": {
+    "Carbon_Monoxide_High_Dry": {
+      "unit": "%",
+      "maximum_value": "6",
+      "minimum_value": "-1",
+      "channel_names": [
+        "E_COHD",
+        "E_COHD2"
+      ]
+    },
+    "Carbon_Monoxide_High_Wet": {
+      "unit": "%",
+      "maximum_value": "6",
+      "minimum_value": "-1",
+      "channel_names": [
+        "E_COHW",
+        "E_COHW2"
+      ]
+    },
+    "Carbon_Monoxide_Low_Dry": {
+      "unit": "ppm",
+      "maximum_value": "5000",
+      "minimum_value": "-1",
+      "channel_names": [
+        "E_COLD",
+        "E_COLD2"
+      ]
+    },
+    "Carbon_Dioxide_Dry": {
+      "unit": "%",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "E_CO2D",
+        "E_CO2D2"
+      ]
+    },
+    "Carbon_Dioxide_Wet": {
+      "unit": "ppm",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "E_CO2W",
+        "E_CO2W2"
+      ]
+    },
+    "Thorium_Carbide_Wet": {
+      "unit": "ppm",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "E_THCW",
+        "E_THCW2"
+      ]
+    },
+    "Methane_Wet": {
+      "unit": "ppm",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "E_CH4W",
+        "E_CH4W2"
+      ]
+    },
+    "Oxygen_Wet": {
+      "unit": "%",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "E_O2D",
+        "E_O2D2"
+      ]
+    },
+    "Nitrogen_Monoxide_Wet": {
+      "unit": "ppm",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "E_NOW2",
+        "E_NOW"
+      ]
+    },
+    "Nitrogen_Monoxide_Dry": {
+      "unit": "ppm",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "E_NOD2",
+        "E_NOD"
+      ]
+    },
+    "Nitrogen_X_Wet": {
+      "unit": "ppm",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "E_NOXW2",
+        "E_NOXW"
+      ]
+    },
+    "Nitrogen_X_Dry": {
+      "unit": "ppm",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "E_NOXD2",
+        "E_NOXD"
+      ]
+    },
+    "Air_Inlet_Pressure": {
+      "unit": "bar",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "P_INLET"
+      ]
+    },
+    "Air_Inlet_Temperature": {
+      "unit": "°C",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "T_INLET"
+      ]
+    },
+    "Air_Ambient_Pressure": {
+      "unit": "bar",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "P_AMB"
+      ]
+    },
+    "Air_Ambient_Temperature": {
+      "unit": "°C",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "T_AMB"
+      ]
+    },
+    "Relative_Humidity": {
+      "unit": "%",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "M_RELHUM"
+      ]
+    },
+    "Fuel_Flow_Rate": {
+      "unit": "kg/hr",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "M_FRFUEL"
+      ]
+    },
+    "Air_Flow_Rate": {
+      "unit": "kg/hr",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "M_FRAIRW"
+      ]
+    },
+    "Engine_Power": {
+      "unit": "kW",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "U_BPOW"
+      ]
+    },
+    "Engine_Horsepower": {
+      "unit": "bhp",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "C_BHP"
+      ]
+    },
+    "Engine_Torque": {
+      "unit": "Nm",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "C_TRQENG"
+      ]
+    },
+    "Commanded_Torque": {
+      "unit": "Nm",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "UDPi_TorqueDemand"
+      ]
+    },
+    "Engine_Speed": {
+      "unit": "rpm",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "C_SPDDYN"
+      ]
+    },
+    "Commanded_Speed": {
+      "unit": "rpm",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "UDPi_SpeedDemand"
+      ]
+    },
+    "Commanded_Throttle": {
+      "unit": "%",
+      "maximum_value": "*",
+      "minimum_value": "*",
+      "channel_names": [
+        "UDPi_Throttle"
+      ]
+    }
+  }
+}
