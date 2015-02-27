@@ -4,30 +4,37 @@
 
   <div class="col-xs-3">
 
-   <h3>Select Cycle</h3>
+    <div class="form-group">
+      <h4>Select Cycle</h4>
+      <select class="form-control" ng-model="uploader.formData[0].cycle" value="FTP">
+	<option value="FTP">FTP</option>
+	<option value="Otto">Otto</option>
+      </select>
 
-   <div class="form-group">
-     <select class="form-control" ng-model="uploader.formData">
-      <option value="FTP">FTP</option>
-      <option value="Otto">Otto</option>
-    </select>
+      <h4>Number of Benches</h4>
+      <select class="form-control" ng-model="uploader.formData[1].bench">
+	<option selected="selected" value="1">1</option>
+	<option value="2">2</option>
+      </select>
+
+
+    </div>
+
   </div>
 
-  <h3>Select Files</h3>
-
-  Multiple
-  <input type="file" name="file" nv-file-select="" uploader="uploader" multiple  /><br/>
-
-  Single
-  <input type="file" name="file" nv-file-select="" uploader="uploader" />
-
-
-</div>
 
 <div class="col-xs-6" style="margin-bottom: 40px">
 
-  <h3>Upload queue</h3>
-  <p>Queue length: {{ uploader.queue.length }}</p>
+  <!--   <h3>Upload queue</h3>
+       <p>Queue length: {{ uploader.queue.length }}</p> -->
+
+  <h4>Select Files</h4>
+
+  <!-- Multiple
+  <input type="file" name="file" nv-file-select="" uploader="uploader" multiple  /><br/> -->
+
+  <input type="file" name="file" nv-file-select="" uploader="uploader" />
+
 
   <table class="table">
     <thead>
@@ -89,20 +96,13 @@
 </div>
 
 <div class="col-xs-3">
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title">1065 Requirements</h3>
-    </div>
-    <div class="panel-body">
-      Cycle Correct  <input type="text" ng-model="ambientConditions">
-     Meta-Data present <input type="text" ng-model="metaDataPresent">
-     Required channels <input type="text" ng-model="requiredChannels">
-     Ambient conditions <input type="text" ng-model="ambientConditions">
-     Equipment bounds <input type="text" ng-model="ambientConditions">
 
-   </div>
- </div>
+  <h4>1065 Requirements</h4>
 
-</div>
+  Cycle Correct  <input type="text" ng-model="ambientConditions">
+  Meta-Data present <input type="text" ng-model="metaDataPresent">
+  Required channels <input type="text" ng-model="requiredChannels">
+  Ambient conditions <input type="text" ng-model="ambientConditions">
+  Equipment bounds <input type="text" ng-model="ambientConditions">
 
 </div>

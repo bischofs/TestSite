@@ -12,22 +12,20 @@ from DataImport.models import DataIO
 
 class FileUploadView(views.APIView):
 
-    parser_classes = (FormParser, MultiPartParser,)
+    parser_classes = (FormParser,MultiPartParser)
 
-    def put(self, request, format=None):
-
-        file_obj = request.FILES['file']
-
-        #import pdb; pdb.set_trace()
+    def post(self, request, format=None):
 
         try:
 
-            if not (bool(request.data.dicts[0])):
+            if (bool(request.data['cycle'] == ' ')):
                 raise Exception("Please select a cycle type")
-
-            cycle_type = request.DATA
-            data = DataIO()
-            data.load_data(file_obj)
+                
+            if (bool(request.data['bench'] == ' ')):
+                raise Exception("Please select the number of benches used")
+                    
+            data = DataIO(request.data['cycle'], request.data['bench'])
+            data.load_data(request.data['file'])
             jsonLog = json.dumps(data.logDict)
             return Response(jsonLog, status=200)
 

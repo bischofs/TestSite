@@ -7,12 +7,14 @@ import logging
 
 class DataIO:
 
-    def __init__(self):
+    def __init__(self, cycle, bench):
 
         #################################################################################################
         # Main channel reference, this key value pair is used to locate and check channels in the data  #
         #################################################################################################
 
+        self.bench = bench 
+        self.cycle = cycle 
         self.speciesColumnDict = {"E_CH4W":"ppm","E_CH4W2":"ppm","E_CO2D":"%",
                                   "E_CO2D2":"%","E_COHD":"%","E_COHD2":"%",
                                   "E_COLD":"ppm","E_COLD2":"ppm","E_NOD":"ppm",
@@ -36,9 +38,14 @@ class DataIO:
 
     def load_data(self,filename):
 
+        self.filename = filename
+
+        self.speciesData = pd.read_json("spec.json")
         self.data = pd.read_csv(filename)                                                   # Read Data into DataFrame
         self.meta_data = self.load_meta_data(self.data, filename)                           # Read Meta data
-        self.check_channels(self.data, filename)                                            # Check Units based on dictionary
+        self.check_channels()                                            # Check Units based on dictionary
+
+
         self.data = self.data.convert_objects(convert_numeric=True)                         # Convert all data to numeric
         self.data = self.data.dropna()                                                      # Drop NaN values from data
         self.convert_bar_to_kpa()
@@ -177,15 +184,41 @@ class DataIO:
 
 
     #######################################################################
-    # # @name _check_channels                                                #
+    # # @name _check_channels                                             #
     # # @desc using reference key value dict, check units of all channels #
     # # @memberOf IO.DataIO                                               #
     #######################################################################
 
-    def check_channels(self, data, filename):
+    def check_channels(self):
 
-        for species, unit in self.speciesColumnDict.items():
-            self.check_units_util(data, species, unit, filename)
+        def check_channels_util(species, channel_names, multiple_benches, data, filename):
+            
+            for name in channel_names:
+                if (multiple_benches == True ) and (self.bench == '2'):
+                    if (name in data.columns) and ((name + "2") in data.columns):
+                        break
+                else:
+                    if (name in data.columns):
+                        break
+            else:
+               if (multiple_benches == True): 
+                   channel_names.append(channel_names[0] + "2")   
+                   raise Exception("Cannot find %s channel names %s in file %s" % (species.replace("_"," "), channel_names, filename))    
+               else:
+                   raise Exception("Cannot find %s channel %s in file %s" % (species.replace("_"," "), channel_names, filename))    
+                   
+
+        for species in self.speciesData.Species.items():
+
+            if (species[1]['multiple_benches'] == True):
+                check_channels_util(species[0], species[1]['channel_names'], True, self.data, self.filename)
+            else:
+                check_channels_util(species[0], species[1]['channel_names'], False, self.data, self.filename)
+ 
+
+
+        #for species, unit in self.speciesColumnDict.items():
+         #   self.check_units_util(data, species, unit, filename)
 
 
 
@@ -214,16 +247,18 @@ class DataIO:
 
     #### PRIVATE UTILITY METHODS
 
-    def check_units_util(self, data, species, unit, filename):
+#    def check_units_util(self, species, data, filename):
 
-        try:
-            boolean = data[species].str.contains(unit)
 
-        except Exception as e:
-            self.logDict['error'] = "Cannot find %s in file %s" % (e, filename)
-            raise Exception("Cannot find %s in file %s" % (e,filename))
 
-        if not(boolean.any()):
-            self.logDict['warning'] = "%s units are not in %s" % (species, unit)
-            raise Exception("%s units are not in %s" % (species, unit))
 
+        # try:
+        #     boolean = data[species].str.contains(unit)
+
+        # except Exception as e:
+        #     self.logDict['error'] = "Cannot find %s in file %s" % (e, filename)
+        #     raise Exception("Cannot find %s in file %s" % (e,filename))
+
+        # if not(boolean.any()):
+        #     self.logDict['warning'] = "%s units are not in %s" % (species, unit)
+        #     raise Exception("%s units are not in %s" % (species, unit))

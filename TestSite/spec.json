@@ -1,83 +1,83 @@
 {
-  "1065_Species": {
+  "Species": {
     "Carbon_Monoxide_High_Dry": {
       "unit": "%",
       "maximum_value": "6",
       "minimum_value": "-1",
+      "multiple_benches": true,
       "channel_names": [
-        "E_COHD",
-        "E_COHD2"
+        "E_COHD"
       ]
     },
     "Carbon_Monoxide_High_Wet": {
       "unit": "%",
       "maximum_value": "6",
       "minimum_value": "-1",
+      "multiple_benches": true,
       "channel_names": [
-        "E_COHW",
-        "E_COHW2"
+        "E_COHW"
       ]
     },
     "Carbon_Monoxide_Low_Dry": {
       "unit": "ppm",
       "maximum_value": "5000",
       "minimum_value": "-1",
+      "multiple_benches": true,
       "channel_names": [
-        "E_COLD",
-        "E_COLD2"
+        "E_COLD"
       ]
     },
     "Carbon_Dioxide_Dry": {
       "unit": "%",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": true,
       "channel_names": [
-        "E_CO2D",
-        "E_CO2D2"
+        "E_CO2D"
       ]
     },
     "Carbon_Dioxide_Wet": {
       "unit": "ppm",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": true,
       "channel_names": [
-        "E_CO2W",
-        "E_CO2W2"
+        "E_CO2W"
       ]
     },
     "Thorium_Carbide_Wet": {
       "unit": "ppm",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": true,
       "channel_names": [
-        "E_THCW",
-        "E_THCW2"
+        "E_THCW"
       ]
     },
     "Methane_Wet": {
       "unit": "ppm",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": true,
       "channel_names": [
-        "E_CH4W",
-        "E_CH4W2"
+        "E_CH4W"
       ]
     },
     "Oxygen_Wet": {
       "unit": "%",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": true,
       "channel_names": [
-        "E_O2D",
-        "E_O2D2"
+        "E_O2D"
       ]
     },
     "Nitrogen_Monoxide_Wet": {
       "unit": "ppm",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": true,
       "channel_names": [
-        "E_NOW2",
         "E_NOW"
       ]
     },
@@ -85,8 +85,8 @@
       "unit": "ppm",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": true,
       "channel_names": [
-        "E_NOD2",
         "E_NOD"
       ]
     },
@@ -94,8 +94,8 @@
       "unit": "ppm",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": true,
       "channel_names": [
-        "E_NOXW2",
         "E_NOXW"
       ]
     },
@@ -103,8 +103,8 @@
       "unit": "ppm",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": true,
       "channel_names": [
-        "E_NOXD2",
         "E_NOXD"
       ]
     },
@@ -112,6 +112,7 @@
       "unit": "bar",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": false,
       "channel_names": [
         "P_INLET"
       ]
@@ -120,6 +121,7 @@
       "unit": "°C",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": false,
       "channel_names": [
         "T_INLET"
       ]
@@ -128,6 +130,7 @@
       "unit": "bar",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": false,
       "channel_names": [
         "P_AMB"
       ]
@@ -136,6 +139,7 @@
       "unit": "°C",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": false,
       "channel_names": [
         "T_AMB"
       ]
@@ -144,6 +148,7 @@
       "unit": "%",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": false,
       "channel_names": [
         "M_RELHUM"
       ]
@@ -152,6 +157,7 @@
       "unit": "kg/hr",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": false,
       "channel_names": [
         "M_FRFUEL"
       ]
@@ -160,6 +166,7 @@
       "unit": "kg/hr",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": false,
       "channel_names": [
         "M_FRAIRW"
       ]
@@ -168,6 +175,7 @@
       "unit": "kW",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": false,
       "channel_names": [
         "U_BPOW"
       ]
@@ -176,6 +184,7 @@
       "unit": "bhp",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": false,
       "channel_names": [
         "C_BHP"
       ]
@@ -184,6 +193,7 @@
       "unit": "Nm",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": false,
       "channel_names": [
         "C_TRQENG"
       ]
@@ -192,6 +202,7 @@
       "unit": "Nm",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": false,
       "channel_names": [
         "UDPi_TorqueDemand"
       ]
@@ -200,6 +211,7 @@
       "unit": "rpm",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": false,
       "channel_names": [
         "C_SPDDYN"
       ]
@@ -208,6 +220,7 @@
       "unit": "rpm",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": false,
       "channel_names": [
         "UDPi_SpeedDemand"
       ]
@@ -216,8 +229,10 @@
       "unit": "%",
       "maximum_value": "*",
       "minimum_value": "*",
+      "multiple_benches": false,
       "channel_names": [
-        "UDPi_Throttle"
+        "UDPi_Throttle",
+	"SP_Thro"
       ]
     }
   }
