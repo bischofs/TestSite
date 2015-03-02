@@ -27,10 +27,8 @@
     $scope.uploader.onErrorItem = onErrorItem;
     $scope.uploader.onBeforeUploadItem = onBeforeUploadItem;
 
-    function  onBeforeUploadItem (item) {
-
-      console.log();
-
+    function onBeforeUploadItem (item) {
+	item.formData = $scope.uploader.formData
     }
 
 

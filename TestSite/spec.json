@@ -45,7 +45,7 @@
         "E_CO2W"
       ]
     },
-    "Thorium_Carbide_Wet": {
+    "Total_Hydrocarbons_Wet": {
       "unit": "ppm",
       "maximum_value": "*",
       "minimum_value": "*",
@@ -63,7 +63,7 @@
         "E_CH4W"
       ]
     },
-    "Oxygen_Wet": {
+    "Oxygen_Dry": {
       "unit": "%",
       "maximum_value": "*",
       "minimum_value": "*",
