@@ -1,22 +1,18 @@
 from django.db import models
 import pandas as pd
 import logging
-#from Logger import *
-
-#reate your models here.
 
 class DataIO:
 
-    def __init__(self, cycle, bench):
 
-        #################################################################################################
-        # Main channel reference, this key value pair is used to locate and check channels in the data  #
-        #################################################################################################
+    ## CONSTRUCTOR ##
+
+    def __init__(self, cycle, bench):
 
         self.bench = bench 
         self.cycle = cycle
-        self.mapDict = {} # Dictionary that maps species to channel name in uploaded file
-        self.logDict = {} # key value pair for logging errors to be serialized and sent to client
+        self.mapDict = {} # Dictionary that contains mapped species to channel name in uploaded file
+        self.logDict = {} # Dictionary for logging errors to be serialized and sent to client
 
 
 
@@ -30,16 +26,17 @@ class DataIO:
 
         self.filename = filename
 
+
         self.speciesData = pd.read_json("spec.json")
         self.data = pd.read_csv(filename)                                                   # Read Data into DataFrame
-        self.meta_data = self.load_meta_data(self.data, filename)                           # Read Meta data
+        self.meta_data = self.load_metadata(self.data, filename)                           # Read Meta data
         self.check_channels()                                      # Check Units based on dictionary
         self.check_ranges()
+        self.check_units()
 
         self.data = self.data.convert_objects(convert_numeric=True)                         # Convert all data to numeric
         self.data = self.data.dropna()                                                      # Drop NaN values from data
         self.convert_bar_to_kpa()
-        self.check_ambient_conditions()
 
 
         # self.logger.info("Data Import successful - %s" % filename)
@@ -61,50 +58,19 @@ class DataIO:
 
 
     ########################################################################################
-    # # @name check_analyzer_maximums                                                      #
+    # # @name check_units                                                                  #
     # # @desc Load json ranges and check imported data for out of range data (equipment)   #
     # # @memberOf IO.DataIO                                                                #
     ########################################################################################
 
-    def check_analyzer_maximums(self):
+    def check_units(self):
 
-
-        self.ranges = pd.read_json("ranges.json")
-        
-        boolean_cond = self.data.E_COHD > self.ranges.Measuring_Maximums.CO_HIGH_MAX
-        if(boolean_cond.any()):
-            self.logDict['error'] = "E_COHD above maximum equipment measuring range"
-            raise Exception("E_COHD above maximum equipment measuring range")
-
-        boolean_cond = self.data.E_COHD2 > self.ranges.Measuring_Maximums.CO_HIGH_MAX
-        if(boolean_cond.any()):
-            self.logDict['error'] = "E_COHD2 above maximum equipment measuring range"
-            raise Exception("E_COHD2 above maximum equipment measuring range")
-
-        boolean_cond = self.data.E_COHD < 0
-        if(boolean_cond.any()):
-            self.logDict['error'] = "E_COHD below 0"
-            raise Exception("E_COHD below 0")
-
-        boolean_cond = self.data.E_COHD2 < 0
-        if(boolean_cond.any()):
-            self.logDict['error'] = "E_COHD2 below 0"
-            raise Exception("E_COHD2 below 0")
-
-
-
-
-        
-
-            # self.logger.info("Checking Data Ranges")
-
-
-            # self.logger.error(e)
-
-            #boolean_data = self.data.E_CO2D2 <  self.ranges.EngineOut_Max.CO2
-
-            #if boolean_data.all()
-
+        for species in self.mapDict:
+            unit = self.speciesData.Species[species]['unit']
+            boolean_cond = data[self.mapDict[species]].str.contains(unit)
+            if not (boolean_cond.any()):
+                self.logDict['error'] = "%s units are not in %s" % (self.mapDict[species], unit)
+                raise Exception("%s units are not in %s" % (self.mapDict[species], unit))
 
 
     #####################################################################################
@@ -172,7 +138,7 @@ class DataIO:
     # # @memberOf IO.DataIO                                                             #
     #####################################################################################
 
-    def load_meta_data(self, data, filename):
+    def load_metadata(self, data, filename):
 
         meta_data = data[:2]
         if 'proj' in meta_data.columns:

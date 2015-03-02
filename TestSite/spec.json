@@ -209,8 +209,8 @@
     },
     "Engine_Speed": {
       "unit": "rpm",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "maximum_value": "8000",
+      "minimum_value": "0",
       "multiple_benches": false,
       "channel_names": [
         "C_SPDDYN"
@@ -218,8 +218,8 @@
     },
     "Commanded_Speed": {
       "unit": "rpm",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "maximum_value": "8000",
+      "minimum_value": "0",
       "multiple_benches": false,
       "channel_names": [
         "UDPi_SpeedDemand"
@@ -227,8 +227,8 @@
     },
     "Commanded_Throttle": {
       "unit": "%",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "maximum_value": "100",
+      "minimum_value": "0",
       "multiple_benches": false,
       "channel_names": [
         "UDPi_Throttle",

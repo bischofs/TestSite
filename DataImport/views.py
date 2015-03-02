@@ -23,12 +23,13 @@ class FileUploadView(views.APIView):
                 
             if (bool(request.data['bench'] == ' ')):
                 raise Exception("Please select the number of benches used")
-                    
+                
             data = DataIO(request.data['cycle'], request.data['bench'])
             data.load_data(request.data['file'])
             jsonLog = json.dumps(data.logDict)
-            return Response(jsonLog, status=200)
 
+            return Response(jsonLog, status=200)
+    
         except Exception as e:
 
              return Response({
