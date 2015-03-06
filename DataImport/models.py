@@ -29,13 +29,14 @@ class DataIO:
 
         self.speciesData = pd.read_json("spec.json")
         self.data = pd.read_csv(filename)                                                   # Read Data into DataFrame
-        self.meta_data = self.load_metadata(self.data, filename)                           # Read Meta data
-        self.check_channels()                                      # Check Units based on dictionary
-        self.check_ranges()
+        self.meta_data = self.load_metadata(self.data, filename)                            # Read Meta data
+        self.check_channels()                                                               # Check Units based on dictionary
         self.check_units()
-
         self.data = self.data.convert_objects(convert_numeric=True)                         # Convert all data to numeric
         self.data = self.data.dropna()                                                      # Drop NaN values from data
+        self.check_ranges()
+     #   self.check_cycle()
+
         self.convert_bar_to_kpa()
 
 
@@ -50,10 +51,17 @@ class DataIO:
     #######################################################
 
 
-    def convert_bar_to_kpa(self):
+    def convert_bar_to_kpa(self): #FIX DIS
         
         self.data.P_AMB = self.data.P_AMB * 100
         self.data.P_INLET = self.data.P_INLET * 100
+
+
+
+    #def check_cycle(self):
+        
+
+
 
 
 
@@ -66,8 +74,9 @@ class DataIO:
     def check_units(self):
 
         for species in self.mapDict:
+
             unit = self.speciesData.Species[species]['unit']
-            boolean_cond = data[self.mapDict[species]].str.contains(unit)
+            boolean_cond = self.data[self.mapDict[species]].str.contains(unit)
             if not (boolean_cond.any()):
                 self.logDict['error'] = "%s units are not in %s" % (self.mapDict[species], unit)
                 raise Exception("%s units are not in %s" % (self.mapDict[species], unit))
@@ -86,14 +95,14 @@ class DataIO:
             max_value = self.speciesData.Species[species]['maximum_value']
             min_value = self.speciesData.Species[species]['minimum_value']
 
-            boolean_cond = self.data[self.mapDict[species]] > max_value
+            boolean_cond = self.data[self.mapDict[species]] > float(max_value)
             if(boolean_cond.any()):
-                self.logDict['error'] = "%s is above required maximum of %s %s" % (self.mapDict[species], max_value, self.speciesData.Species[species]['unit'])
-                raise Exception ("%s is above required maximum of %s %s" % (self.mapDict[species], max_value, self.speciesData.Species[species]['unit']))
-            boolean_cond = self.data[self.mapDict[species]] < min_value
+                self.logDict['error'] = "%s is above required maximum of %s %s" % (self.mapDict[species], str(max_value), self.speciesData.Species[species]['unit'])
+                raise Exception ("%s is above required maximum of %s %s" % (self.mapDict[species], str(max_value), self.speciesData.Species[species]['unit']))
+            boolean_cond = self.data[self.mapDict[species]] < float(min_value)
             if(boolean_cond.any()):
-                self.logDict['error'] = "%s is below required minimum of %s %s" % (self.mapDict[species], min_value, self.speciesData.Species[species]['unit'])
-                raise Exception ("%s is below required minimum of %s %s" % (self.mapDict[species], min_value, self.speciesData.Species[species]['unit']))
+                self.logDict['error'] = "%s is below required minimum of %s %s" % (self.mapDict[species], str(min_value), self.speciesData.Species[species]['unit'])
+                raise Exception ("%s is below required minimum of %s %s" % (self.mapDict[species], str(min_value), self.speciesData.Species[species]['unit']))
 
 
     #######################################################################
@@ -124,7 +133,6 @@ class DataIO:
                    
 
         for species in self.speciesData.Species.items():
-
             if (species[1]['multiple_benches'] == True):
                 check_channels_util(species[0], species[1]['channel_names'], True, self.data, self.filename)
             else:

@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'djangular',
     'Authentication',
     'Project',
+    'CycleValidation',
     'rest_framework',
     'compressor',
     'django.contrib.contenttypes',

@@ -19,9 +19,9 @@
       ]
     },
     "Carbon_Monoxide_Low_Dry": {
-      "unit": "ppm",
+	"unit": "ppm",
       "maximum_value": "5000",
-      "minimum_value": "-1",
+      "minimum_value": "-5",
       "multiple_benches": true,
       "channel_names": [
         "E_COLD"
@@ -29,17 +29,17 @@
     },
     "Carbon_Dioxide_Dry": {
       "unit": "%",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "maximum_value": "5000",
+      "minimum_value": "-1",
       "multiple_benches": true,
       "channel_names": [
         "E_CO2D"
       ]
     },
     "Carbon_Dioxide_Wet": {
-      "unit": "ppm",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "unit": "%",
+      "maximum_value": "20",
+      "minimum_value": "-1",
       "multiple_benches": true,
       "channel_names": [
         "E_CO2W"
@@ -47,8 +47,8 @@
     },
     "Total_Hydrocarbons_Wet": {
       "unit": "ppm",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "maximum_value": "9700",
+      "minimum_value": "-5",
       "multiple_benches": true,
       "channel_names": [
         "E_THCW"
@@ -56,8 +56,8 @@
     },
     "Methane_Wet": {
       "unit": "ppm",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "maximum_value": "2500",
+      "minimum_value": "-5",
       "multiple_benches": true,
       "channel_names": [
         "E_CH4W"
@@ -65,8 +65,8 @@
     },
     "Oxygen_Dry": {
       "unit": "%",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "maximum_value": "25",
+      "minimum_value": "-1",
       "multiple_benches": true,
       "channel_names": [
         "E_O2D"
@@ -74,8 +74,8 @@
     },
     "Nitrogen_Monoxide_Wet": {
       "unit": "ppm",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "maximum_value": "2001",
+      "minimum_value": "-5",
       "multiple_benches": true,
       "channel_names": [
         "E_NOW"
@@ -83,8 +83,8 @@
     },
     "Nitrogen_Monoxide_Dry": {
       "unit": "ppm",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "maximum_value": "2001",
+      "minimum_value": "-5",
       "multiple_benches": true,
       "channel_names": [
         "E_NOD"
@@ -92,8 +92,8 @@
     },
     "Nitrogen_X_Wet": {
       "unit": "ppm",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "maximum_value": "2000",
+      "minimum_value": "-5",
       "multiple_benches": true,
       "channel_names": [
         "E_NOXW"
@@ -101,8 +101,8 @@
     },
     "Nitrogen_X_Dry": {
       "unit": "ppm",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "maximum_value": "2000",
+      "minimum_value": "-5",
       "multiple_benches": true,
       "channel_names": [
         "E_NOXD"
@@ -110,8 +110,8 @@
     },
     "Air_Inlet_Pressure": {
       "unit": "bar",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "maximum_value": "1.0325",
+      "minimum_value": "0.80",
       "multiple_benches": false,
       "channel_names": [
         "P_INLET"
@@ -119,8 +119,8 @@
     },
     "Air_Inlet_Temperature": {
       "unit": "°C",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "maximum_value": "30",
+      "minimum_value": "20",
       "multiple_benches": false,
       "channel_names": [
         "T_INLET"
@@ -128,8 +128,8 @@
     },
     "Air_Ambient_Pressure": {
       "unit": "bar",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "maximum_value": "1.0325",
+      "minimum_value": "0.80",
       "multiple_benches": false,
       "channel_names": [
         "P_AMB"
@@ -137,8 +137,8 @@
     },
     "Air_Ambient_Temperature": {
       "unit": "°C",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "maximum_value": "30",
+      "minimum_value": "20",
       "multiple_benches": false,
       "channel_names": [
         "T_AMB"
@@ -146,8 +146,8 @@
     },
     "Relative_Humidity": {
       "unit": "%",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "maximum_value": "50",
+      "minimum_value": "10",
       "multiple_benches": false,
       "channel_names": [
         "M_RELHUM"
@@ -155,8 +155,8 @@
     },
     "Fuel_Flow_Rate": {
       "unit": "kg/hr",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "maximum_value": "100000",
+      "minimum_value": "-1",
       "multiple_benches": false,
       "channel_names": [
         "M_FRFUEL"
@@ -164,8 +164,8 @@
     },
     "Air_Flow_Rate": {
       "unit": "kg/hr",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "maximum_value": "100000",
+      "minimum_value": "-1",
       "multiple_benches": false,
       "channel_names": [
         "M_FRAIRW"
@@ -173,8 +173,8 @@
     },
     "Engine_Power": {
       "unit": "kW",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "maximum_value": "10000",
+      "minimum_value": "-10000",
       "multiple_benches": false,
       "channel_names": [
         "U_BPOW"
@@ -182,8 +182,8 @@
     },
     "Engine_Horsepower": {
       "unit": "bhp",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "maximum_value": "10000",
+      "minimum_value": "-10000",
       "multiple_benches": false,
       "channel_names": [
         "C_BHP"
@@ -191,8 +191,8 @@
     },
     "Engine_Torque": {
       "unit": "Nm",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "maximum_value": "10000",
+      "minimum_value": "-10000",
       "multiple_benches": false,
       "channel_names": [
         "C_TRQENG"
@@ -200,8 +200,8 @@
     },
     "Commanded_Torque": {
       "unit": "Nm",
-      "maximum_value": "*",
-      "minimum_value": "*",
+      "maximum_value": "10000",
+      "minimum_value": "-10000",
       "multiple_benches": false,
       "channel_names": [
         "UDPi_TorqueDemand"
@@ -210,7 +210,7 @@
     "Engine_Speed": {
       "unit": "rpm",
       "maximum_value": "8000",
-      "minimum_value": "0",
+      "minimum_value": "-8000",
       "multiple_benches": false,
       "channel_names": [
         "C_SPDDYN"
@@ -219,7 +219,7 @@
     "Commanded_Speed": {
       "unit": "rpm",
       "maximum_value": "8000",
-      "minimum_value": "0",
+      "minimum_value": "-8000",
       "multiple_benches": false,
       "channel_names": [
         "UDPi_SpeedDemand"
@@ -228,7 +228,7 @@
     "Commanded_Throttle": {
       "unit": "%",
       "maximum_value": "100",
-      "minimum_value": "0",
+      "minimum_value": "-1",
       "multiple_benches": false,
       "channel_names": [
         "UDPi_Throttle",
