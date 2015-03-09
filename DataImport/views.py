@@ -35,7 +35,6 @@ class FileUploadView(views.APIView):
             jsonLog = json.dumps(data.logDict)
             
 
-            import pdb; pdb.set_trace()
             return Response(jsonLog, status=200)
             
         except Exception as e:

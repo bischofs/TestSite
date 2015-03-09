@@ -1,0 +1,26 @@
+
+
+
+In [74]: data = data.convert_objects(convert_numeric=True)
+
+
+n [74]: data = data.dropna()
+
+
+
+In [39]: model = sm.OLS.from_formula("UDPi_TorqueDemand ~ C_TRQENG", data)
+
+In [40]: model = model.fit()
+
+In [41]: model.summary
+Out[41]: <bound method OLSResults.summary of <statsmodels.regression.linear_model.OLSResults object at 0x7effd59c9f10>>
+
+In [42]: model.summary()
+
+
+In [108]: model.params
+Out[108]: 
+Intercept            6.637597
+UDPi_TorqueDemand    0.963799
+dtype: float64
+

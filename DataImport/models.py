@@ -1,9 +1,9 @@
 from django.db import models
 import pandas as pd
+import statsmodels.api as sm
 import logging
 
 class DataIO:
-
 
     ## CONSTRUCTOR ##
 
@@ -13,7 +13,6 @@ class DataIO:
         self.cycle = cycle
         self.mapDict = {} # Dictionary that contains mapped species to channel name in uploaded file
         self.logDict = {} # Dictionary for logging errors to be serialized and sent to client
-
 
 
     #######################################################
@@ -41,7 +40,6 @@ class DataIO:
 
 
         # self.logger.info("Data Import successful - %s" % filename)
-
 
 
     #######################################################
@@ -155,5 +153,59 @@ class DataIO:
         else:
             self.logDict['warning'] = "Meta-Data missing in import file %s" % filename
 
+
+
+
+
+
+ class CycleValidation:
+    
+
+    def __init__(self, data, mapDict):
+        
+        self.data = data
+        self.mapDict = mapDict
+
+
+        com_power = (self.data[self.mapDict['Commanded_Torque']] * self.data[self.mapDict['Commanded_Speed']] / 9.5488) / 1000
+
+        self.data['Commanded_Power'] = com_power
+
+        self.dataDict = {'Speed': [self.mapDict['Commanded_Speed'], self.mapDict['Engine_Speed']]
+                         ,'Torque': [self.mapDict['Commanded_Torque'], self.mapDict['Engine_Torque']]
+                         ,'Power': ["Commanded_Power", self.mapDict['Engine_Power']]}
+
+        
+        
+    def regression(self):
+
+        def regression_util(self, Y, X):
+
+            model = sm.OLS.from_formula("%s ~ %s" % (Y, X), self.data).fit()
+            
+
+        for select in self.data.Dict:
+            regression_util(select[0], select[1])
+            
+
+            
+            
+
+
+    
+
+
+
+
+
+
+
+    
+    
+
+
+
+
+         
 
 
