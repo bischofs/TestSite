@@ -1,0 +1,30 @@
+
+
+
+**PYTHON CODE**
+
+server = Server('Usw001.fev.com')
+ c = Connection(server, authentication=AUTH_SIMPLE, user='fev\\bischoff_S', password='Vwgtu2010', check_names=True, lazy=False, client_strategy=STRATEGY_SYNC, raise_exceptions=False)
+
+
+
+
+
+
+
+
+This lists all users in luella  
+ldapsearch -LLL -H ldap://usw001.fev.com -x -D 'FEV\Srv_ldapquery' -w '2query_LDAP' -E pr=2000/noprompt -b 'ou=L,ou=US,ou=User Accounts,dc=FEV,dc=COM' -s one dn
+
+This lists all users in glenmeade  
+ldapsearch -LLL -H ldap://usw001.fev.com -x -D 'FEV\Srv_ldapquery' -w '2query_LDAP' -E pr=2000/noprompt -b 'ou=G,ou=US,ou=User Accounts,dc=FEV,dc=COM' -s one dn
+
+***FEV US****
+G.US.UserAccounts.fev.com 
+L.US.UserAccounts.fev.com
+
+***FEV INTERNATIONAL***
+UserAccounts.fev.com
+
+***FEV INTERNATIONAL RESOURCES***
+fev.com

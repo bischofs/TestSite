@@ -34,10 +34,10 @@ AUTH_USER_MODEL = 'Authentication.Account'
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
+    'django_python3_ldap',
     'djangular',
     'Authentication',
     'Project',
-    'CycleValidation',
     'rest_framework',
     'compressor',
     'django.contrib.contenttypes',
@@ -115,6 +115,36 @@ REST_FRAMEWORK = {
      ]
 }
 
+AUTHENTICATION_BACKENDS = ("django_python3_ldap.auth.LDAPBackend",)
+
+
+# The URL of the LDAP server.
+LDAP_AUTH_URL = "ldap://usw001.fev.com:389"
+
+# The LDAP search base for looking up users.
+LDAP_AUTH_SEARCH_BASE = "ou=US,ou=User Accounts,dc=fev,dc=com"
+
+# The LDAP class that represents a user.
+LDAP_AUTH_OBJECT_CLASS = "inetOrgPerson"
+
+# User model fields mapped to the LDAP
+# attributes that represent them.
+LDAP_AUTH_USER_FIELDS = {
+    "username": "uid",
+    "first_name": "givenName",
+    "last_name": "sn",
+    "email": "mail",
+}
+
+# A tuple of fields used to uniquely identify a user.
+LDAP_AUTH_USER_LOOKUP_FIELDS = ("email",)
+
+# Callable that transforms the user data loaded from
+# LDAP into a form suitable for creating a user.
+# Override this to set custom field formatting for your
+# user model.
+from django_python3_ldap import utils
+LDAP_AUTH_CLEAN_USER_DATA = utils.clean_user_data
 
 LOGGING = {
     'version': 1,

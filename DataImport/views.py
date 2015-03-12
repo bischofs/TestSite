@@ -10,6 +10,7 @@ from rest_framework.renderers import JSONRenderer
 
 
 from DataImport.models import DataIO
+from DataImport.models import CycleValidation
 
 # Create your views here.
 
@@ -26,13 +27,17 @@ class FileUploadView(views.APIView):
             if (bool(request.data['bench'] == ' ')):
                 raise Exception("Please select the number of benches used")
             
-            data = DataIO(request.data['cycle'], request.data['bench'])
-            data.load_data(request.data['file'])
+            data_io = DataIO(request.data['cycle'], request.data['bench'])
+            raw_data, map_dict, log_dict = data_io.load_data(request.data['file'])
             
+            data_valid = CycleValidation(raw_data, map_dict)
+            data_valid.regression() 
+            
+
             cache = caches['default']
             cache.set(request.session._get_session_key, data)
 
-            jsonLog = json.dumps(data.logDict)
+            jsonLog = json.dumps(log_dict)
             
 
             return Response(jsonLog, status=200)

@@ -2,6 +2,8 @@ from django.db import models
 import pandas as pd
 import statsmodels.api as sm
 import logging
+import math
+
 
 class DataIO:
 
@@ -40,6 +42,10 @@ class DataIO:
 
 
         # self.logger.info("Data Import successful - %s" % filename)
+
+        return self.data, self.mapDict, self.logDict
+
+
 
 
     #######################################################
@@ -158,7 +164,7 @@ class DataIO:
 
 
 
- class CycleValidation:
+class CycleValidation:
     
 
     def __init__(self, data, mapDict):
@@ -171,21 +177,47 @@ class DataIO:
 
         self.data['Commanded_Power'] = com_power
 
-        self.dataDict = {'Speed': [self.mapDict['Commanded_Speed'], self.mapDict['Engine_Speed']]
-                         ,'Torque': [self.mapDict['Commanded_Torque'], self.mapDict['Engine_Torque']]
-                         ,'Power': ["Commanded_Power", self.mapDict['Engine_Power']]}
+        self.dataDict = {'Speed': [self.mapDict['Commanded_Speed'], self.mapDict['Engine_Speed']],
+                         'Torque': [self.mapDict['Commanded_Torque'], self.mapDict['Engine_Torque']],
+                         'Power': ["Commanded_Power", self.mapDict['Engine_Power']]}
 
         
         
     def regression(self):
 
-        def regression_util(self, Y, X):
+        self.reg_results = { 'Speed': { 'slope': " ", 'intercept': " ", 'standard_error': " ", 'rsquared': " " },
+                             'Torque': { 'slope': " ", 'intercept': " ", 'standard_error': " ", 'rsquared': " " },
+                             'Power': { 'slope': " ", 'intercept': " ", 'standard_error': " ", 'rsquared': " " }}
+
+        def regression_util(channel, X, Y):
 
             model = sm.OLS.from_formula("%s ~ %s" % (Y, X), self.data).fit()
             
+            self.reg_results[channel]['slope'] = model.params[X]
+            self.reg_results[channel]['intercept'] = model.params['Intercept']
+            self.reg_results[channel]['intercept'] = model.params['Intercept']
+            
+            sume = 0 
 
-        for select in self.data.Dict:
-            regression_util(select[0], select[1])
+
+            intercept = math.mean
+
+
+            for x, y in zip(self.data[X], self.data[Y]):
+                sumat = sumat + ((x - 6.63702 - (0.9638 * y)) ** 2)
+
+            see = sumat / (self.data[X].size - 2)
+            see = math.sqrt(see)
+
+
+
+
+            import pdb; pdb.set_trace()
+            
+
+
+        for channel in self.dataDict.items():
+            regression_util(channel[0], channel[1][0], channel[1][1])
             
 
             
