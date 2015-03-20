@@ -50,6 +50,7 @@
 	      $scope.ambientConditions = false;
 	  } else { $scope.ambientConditions= true; }
 	  
+
 	  
       }
 

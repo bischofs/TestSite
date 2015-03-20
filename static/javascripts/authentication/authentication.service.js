@@ -9,13 +9,13 @@
   .module('TestSite.authentication.services')
   .factory('Authentication', Authentication);
 
-  Authentication.$inject = ['$cookies', '$http'];
+  Authentication.$inject = ['$cookies', '$http','toastr'];
 
   /**
   * @namespace Authentication
   * @returns {Factory}
   */
-  function Authentication($cookies, $http) {
+  function Authentication($cookies, $http, toastr) {
     /**
     * @name Authentication
     * @desc The Factory to be returned
@@ -82,7 +82,8 @@
 	   * @desc Log "Epic failure!" to the console
 	   */
     function loginErrorFn(data, status, headers, config) {
-     console.error('Epic failure!');
+	toastr.error("Username or password is incorrect", 'Error')
+	console.error('Epic failure!');
    }
 
  }

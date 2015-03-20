@@ -30,19 +30,17 @@ class DataIO:
 
         self.speciesData = pd.read_json("spec.json")
         self.data = pd.read_csv(filename)                                                   # Read Data into DataFrame
-        self.meta_data = self.load_metadata(self.data, filename)                            # Read Meta data
-        self.check_channels()                                                               # Check Units based on dictionary
-        self.check_units()
+        self.meta_data = self._load_metadata(self.data, filename)                            # Read Meta data
+        self._check_channels()                                                               # Check Units based on dictionary
+        self._check_units()
         self.data = self.data.convert_objects(convert_numeric=True)                         # Convert all data to numeric
         self.data = self.data.dropna()                                                      # Drop NaN values from data
-        self.check_ranges()
-     #   self.check_cycle()
+        self._check_ranges()
 
-        self.convert_bar_to_kpa()
+        self._convert_bar_to_kpa()
 
 
-        # self.logger.info("Data Import successful - %s" % filename)
-
+       
         return self.data, self.mapDict, self.logDict
 
 
@@ -55,7 +53,7 @@ class DataIO:
     #######################################################
 
 
-    def convert_bar_to_kpa(self): #FIX DIS
+    def _convert_bar_to_kpa(self): #FIX DIS
         
         self.data.P_AMB = self.data.P_AMB * 100
         self.data.P_INLET = self.data.P_INLET * 100
@@ -75,7 +73,7 @@ class DataIO:
     # # @memberOf IO.DataIO                                                                #
     ########################################################################################
 
-    def check_units(self):
+    def _check_units(self):
 
         for species in self.mapDict:
 
@@ -92,7 +90,7 @@ class DataIO:
     # # @memberOf IO.DataIO                                                             #
     #####################################################################################
 
-    def check_ranges(self):
+    def _check_ranges(self):
         
         for species in self.mapDict:
 
@@ -115,9 +113,9 @@ class DataIO:
     # # @memberOf IO.DataIO                                               #
     #######################################################################
 
-    def check_channels(self):
+    def _check_channels(self):
 
-        def check_channels_util(species, channel_names, multiple_benches, data, filename):
+        def _check_channels_util(species, channel_names, multiple_benches, data, filename):
             
             for name in channel_names:
                 if (multiple_benches == True ) and (self.bench == '2'):
@@ -138,9 +136,9 @@ class DataIO:
 
         for species in self.speciesData.Species.items():
             if (species[1]['multiple_benches'] == True):
-                check_channels_util(species[0], species[1]['channel_names'], True, self.data, self.filename)
+                _check_channels_util(species[0], species[1]['channel_names'], True, self.data, self.filename)
             else:
-                check_channels_util(species[0], species[1]['channel_names'], False, self.data, self.filename)
+                _check_channels_util(species[0], species[1]['channel_names'], False, self.data, self.filename)
  
 
 
@@ -150,7 +148,7 @@ class DataIO:
     # # @memberOf IO.DataIO                                                             #
     #####################################################################################
 
-    def load_metadata(self, data, filename):
+    def _load_metadata(self, data, filename):
 
         meta_data = data[:2]
         if 'proj' in meta_data.columns:
@@ -172,52 +170,97 @@ class CycleValidation:
         self.data = data
         self.mapDict = mapDict
 
-
         com_power = (self.data[self.mapDict['Commanded_Torque']] * self.data[self.mapDict['Commanded_Speed']] / 9.5488) / 1000
-
         self.data['Commanded_Power'] = com_power
 
         self.dataDict = {'Speed': [self.mapDict['Commanded_Speed'], self.mapDict['Engine_Speed']],
                          'Torque': [self.mapDict['Commanded_Torque'], self.mapDict['Engine_Torque']],
                          'Power': ["Commanded_Power", self.mapDict['Engine_Power']]}
+        
+        self._pre_regression_filter()
+        self._regression()
+
 
         
-        
-    def regression(self):
+    def _pre_regression_filter(self):
 
+        indeces = self.data[(self.data[self.mapDict['Commanded_Throttle']] == 0) & (self.data[self.mapDict['Commanded_Torque']] < 0)].index
+
+        self.data = self.data.drop(indeces)
+            
+        
+        indeces = self.data[(self.data[self.mapDict['Commanded_Throttle']] == 0) & (self.data[self.mapDict['Commanded_Speed']] == Curbidle) &
+                            ((self.data[self.mapDict['Commanded_Torque']] - (0.02 * self.data[self.mapDict['Commanded_Torque']].max())) < self.data[self.mapDict['Engine_Torque']] ) & 
+                            ((self.data[self.mapDict['Commanded_Torque']] + (0.02 * self.data[self.mapDict['Commanded_Torque']].max())) > self.data[self.mapDict['Engine_Torque']] )].index
+
+        self.data = self.data.drop(indeces)
+
+
+
+
+
+        #indeces = self.data
+
+
+        import pdb; pdb.set_trace()
+        
+        
+        
+
+    def _regression(self):
+        
         self.reg_results = { 'Speed': { 'slope': " ", 'intercept': " ", 'standard_error': " ", 'rsquared': " " },
                              'Torque': { 'slope': " ", 'intercept': " ", 'standard_error': " ", 'rsquared': " " },
                              'Power': { 'slope': " ", 'intercept': " ", 'standard_error': " ", 'rsquared': " " }}
-
-        def regression_util(channel, X, Y):
-
-            model = sm.OLS.from_formula("%s ~ %s" % (Y, X), self.data).fit()
-            
-            self.reg_results[channel]['slope'] = model.params[X]
-            self.reg_results[channel]['intercept'] = model.params['Intercept']
-            self.reg_results[channel]['intercept'] = model.params['Intercept']
-            
-            sume = 0 
-
-
-            intercept = math.mean
-
-
-            for x, y in zip(self.data[X], self.data[Y]):
-                sumat = sumat + ((x - 6.63702 - (0.9638 * y)) ** 2)
-
-            see = sumat / (self.data[X].size - 2)
-            see = math.sqrt(see)
-
-
-
-
-            import pdb; pdb.set_trace()
-            
-
-
+        
         for channel in self.dataDict.items():
-            regression_util(channel[0], channel[1][0], channel[1][1])
+           self._regression_util(channel[0], channel[1][0], channel[1][1])
+ 
+
+
+    def _regression_util(channel, X, Y):
+
+        ymean = self.data[Y].mean()
+        xmean = self.data[X].mean()
+
+        # -- Regression Slope -- EPA 1065.602-9 
+        numerator, denominator = 0.0, 0.0
+        for x, y in zip(self.data[X], self.data[Y]):
+            numerator = numerator + ((x - xmean) * (y - ymean))
+
+        for x, y in zip(self.data[X], self.data[Y]):
+            denominator = denominator + ((y - ymean) ** 2)
+                
+        slope = numerator / denominator 
+
+
+        # -- Regression Intercept -- EPA 1065.602-10 
+        intercept = (xmean - (slope * ymean))
+            
+
+        # -- Regression Standard Error of Estimate -- EPA 1065.602-11 
+        sumat = 0.0
+        for x, y in zip(self.data[X], self.data[Y]):
+            sumat = sumat + ((x - intercept - (slope * y)) ** 2)
+            
+        see = sumat / (self.data[X].size - 2)
+        standerror = math.sqrt(see)
+
+        # -- Regression Coefficient of determination -- EPA 1065.602-12
+        numerator, denominator = 0.0, 0.0
+        for x, y in zip(self.data[X], self.data[Y]):
+            numerator = numerator + ((x - intercept - (slope * y)) ** 2)
+
+        for x, y in zip(self.data[X], self.data[Y]):
+            denominator = denominator + ((x - ymean) ** 2)
+                
+        r2 = 1 - (numerator / denominator)
+
+
+        self.reg_results[channel]['slope'] = slope
+        self.reg_results[channel]['intercept'] = intercept
+        self.reg_results[channel]['standard_error'] = standerror
+        self.reg_results[channel]['rsquared'] = r2
             
 
             

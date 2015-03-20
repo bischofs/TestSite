@@ -8,7 +8,8 @@
       'TestSite.project',
       'TestSite.import',
       'TestSite.layout',
-      'TestSite.config'
+      'TestSite.config',
+      'ngAnimate'
     ]);
 
   angular

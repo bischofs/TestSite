@@ -11,7 +11,7 @@ server = Server('Usw001.fev.com')
 
 
 
-
+$ ldapsearch -LLL  -H ldap://usw001.fev.com -x  -D 'FEV\Srv_ldapquery' -w '2query_LDAP' -E pr=1000/noprompt -b 'ou=US,ou=User Accounts,dc=FEV,dc=COM' '(sAMAccountName=Bischoff_S)'
 
 This lists all users in luella  
 ldapsearch -LLL -H ldap://usw001.fev.com -x -D 'FEV\Srv_ldapquery' -w '2query_LDAP' -E pr=2000/noprompt -b 'ou=L,ou=US,ou=User Accounts,dc=FEV,dc=COM' -s one dn
