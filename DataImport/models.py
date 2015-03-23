@@ -184,25 +184,24 @@ class CycleValidation:
         
     def _pre_regression_filter(self):
 
+
+        curbidle = 600
+
         indeces = self.data[(self.data[self.mapDict['Commanded_Throttle']] == 0) & (self.data[self.mapDict['Commanded_Torque']] < 0)].index
 
         self.data = self.data.drop(indeces)
             
         
-        indeces = self.data[(self.data[self.mapDict['Commanded_Throttle']] == 0) & (self.data[self.mapDict['Commanded_Speed']] == Curbidle) &
+        indeces = self.data[(self.data[self.mapDict['Commanded_Throttle']] == 0) & (self.data[self.mapDict['Commanded_Speed']] == curbidle) &
                             ((self.data[self.mapDict['Commanded_Torque']] - (0.02 * self.data[self.mapDict['Commanded_Torque']].max())) < self.data[self.mapDict['Engine_Torque']] ) & 
                             ((self.data[self.mapDict['Commanded_Torque']] + (0.02 * self.data[self.mapDict['Commanded_Torque']].max())) > self.data[self.mapDict['Engine_Torque']] )].index
 
         self.data = self.data.drop(indeces)
 
 
-
-
-
         #indeces = self.data
 
 
-        import pdb; pdb.set_trace()
         
         
         
@@ -218,7 +217,7 @@ class CycleValidation:
  
 
 
-    def _regression_util(channel, X, Y):
+    def _regression_util(self, channel, X, Y):
 
         ymean = self.data[Y].mean()
         xmean = self.data[X].mean()
@@ -264,11 +263,6 @@ class CycleValidation:
             
 
             
-            
-
-
-    
-
 
 
 

@@ -49,7 +49,26 @@
 	  if (response.indexOf("out of range") > -1){
 	      $scope.ambientConditions = false;
 	  } else { $scope.ambientConditions= true; }
-	  
+
+
+	  var jsonObj = JSON.parse(response);
+
+	  $scope.powerI = jsonObj.regression.Power.intercept
+	  $scope.powerr = jsonObj.regression.Power.rsquared
+	  $scope.powers = jsonObj.regression.Power.slope
+	  $scope.powerse = jsonObj.regression.Power.standard_error
+
+	  $scope.speedI = jsonObj.regression.Speed.intercept
+	  $scope.speedr = jsonObj.regression.Speed.rsquared
+	  $scope.speeds = jsonObj.regression.Speed.slope
+	  $scope.speedse = jsonObj.regression.Speed.standard_error
+
+	  $scope.torqI = jsonObj.regression.Torque.intercept
+	  $scope.torqr = jsonObj.regression.Torque.rsquared
+	  $scope.torqs = jsonObj.regression.Torque.slope
+	  $scope.torqse = jsonObj.regression.Torque.standard_error
+
+
 
 	  
       }

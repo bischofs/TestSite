@@ -32,11 +32,18 @@ class FileUploadView(views.APIView):
             raw_data, map_dict, log_dict = data_io.load_data(request.data['file'])
             
             data_valid = CycleValidation(raw_data, map_dict)
-                       
+            
+            reg_results = data_valid.reg_results
+
             # cache = caches['default']
             # cache.set(request.session._get_session_key, data)
 
-            jsonLog = json.dumps(log_dict)
+
+            jsondict = {'regression':reg_results, 'errors': log_dict}
+
+            jsonLog = json.dumps(jsondict)
+            
+
 
             return Response(jsonLog, status=200)
             
