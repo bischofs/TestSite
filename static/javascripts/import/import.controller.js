@@ -48,7 +48,7 @@
 	  
 	  if (response.indexOf("out of range") > -1){
 	      $scope.ambientConditions = false;
-	  } else { $scope.ambientConditions= true; }
+	  } else { $scope.ambientConditions = true; }
 
 
 	  var jsonObj = JSON.parse(response);
@@ -67,9 +67,6 @@
 	  $scope.torqr = jsonObj.regression.Torque.rsquared
 	  $scope.torqs = jsonObj.regression.Torque.slope
 	  $scope.torqse = jsonObj.regression.Torque.standard_error
-
-
-
 	  
       }
 

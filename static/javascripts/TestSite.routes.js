@@ -7,29 +7,6 @@
 
   config.$inject = ['$stateProvider', '$urlRouterProvider'];
 
-  /**
-  * @name config
-  * @desc Define valid application routes -- DEPRECATED
-  */
- //  function config($routeProvider) {
- //    $routeProvider.when('/register', {
- //      controller: 'RegisterController',
- //      controllerAs: 'vm',
- //      templateUrl: '/static/javascripts/authentication/register.html'
- //    }).when('/login', {
- //     controller: 'LoginController',
- //     controllerAs: 'vm',
- //     templateUrl: '/static/javascripts/authentication/login.html'
- //   }).when('/1065', {
- //     controller: 'StepController',
- //     controllerAs: 'vm',
- //     templateUrl: '/static/javascripts/layout/switch.html'
- //   }).otherwise('/');
-
- // }
-
-
-
  function config($stateProvider, $urlRouterProvider){
 
   $urlRouterProvider.when('', '/index');
@@ -48,16 +25,18 @@
   })
   .state('1065', {
     url: "/1065",
-    templateUrl: "/static/javascripts/layout/1065.html"
+    templateUrl: "/static/javascripts/layout/1065.html",
+    controller: "MetaEvalController"
   })
   .state('1065.Import', {
     url: "/import",
     templateUrl: "/static/javascripts/import/upload.html",
     controller: "ImportController"
   })
-  .state('1065.Regression', {
-    url: "/regression",
-    templateUrl: "/static/javascripts/authentication/login.html"
+  .state('1065.Delay', {
+    url: "/delay",
+    templateUrl: "/static/javascripts/delay/delay.html",
+    controller: "DelayController"
   });
 }
 

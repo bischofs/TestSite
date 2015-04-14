@@ -3,7 +3,7 @@ from django.conf import settings
 
 from Project.views import ProjectViewSet
 from Authentication.views import AccountViewSet, LoginView, LogoutView
-from DataImport.views import FileUploadView
+from DataImport.views import FileUploadView, MetaDataView
 from rest_framework import routers
 
 from django.views.generic.base import TemplateView
@@ -23,6 +23,7 @@ urlpatterns = patterns('',
         url(r'^api/v1/auth/login/$', LoginView.as_view(), name='login'),
         url(r'^api/v1/auth/logout/$', LogoutView.as_view(), name='logout'),
         url(r'^api/v1/data/import/$', FileUploadView.as_view(), name='upload'),
+        url(r'^api/v1/data/metai/$', MetaDataView.as_view(), name='meta'),
         url(r'^', TemplateView.as_view(template_name='index.html')), #I THINK THIS ALWAYS HAS TO BE THE LAST ONE
 
 
