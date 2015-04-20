@@ -20,7 +20,7 @@
       $scope.uploader.url = 'api/v1/data/import/'
       $scope.uploader.method = 'POST'
       
-      $scope.uploader.formData.push({cycle: 'FTP'});
+      //$scope.uploader.formData.push({cycle: 'FTP'});
       $scope.uploader.formData.push({bench: '1'});
       $scope.uploader.onSuccessItem = onSuccessItem;
       $scope.uploader.onErrorItem = onErrorItem;

@@ -9,10 +9,8 @@ class DataIO:
 
     ## CONSTRUCTOR ##
 
-    def __init__(self, cycle, bench):
-
-        self.bench = bench 
-        self.cycle = cycle
+    def __init__(self, bench):
+        self.bench = bench
         self.mapDict = {} # Dictionary that contains mapped species to channel name in uploaded file
         self.logDict = {} # Dictionary for logging errors to be serialized and sent to client
 

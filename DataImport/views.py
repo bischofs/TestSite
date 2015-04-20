@@ -19,13 +19,13 @@ class FileUploadView(views.APIView):
     def post(self, request, format=None):
             
         try:
-            if (bool(request.data['cycle'] == ' ')):
-                raise Exception("Please select a cycle type")
+            #if (bool(request.data['cycle'] == ' ')):
+            #    raise Exception("Please select a cycle type")
             
             if (bool(request.data['bench'] == ' ')):
                 raise Exception("Please select the number of benches used")
             
-            data_container = DataIO(request.data['cycle'], request.data['bench'])
+            data_container = DataIO(request.data['bench'])
             raw_data, map_dict, log_dict = data_container.load_data(request.data['file'])
             data_valid = CycleValidation(raw_data, map_dict)
             reg_results = data_valid.reg_results
