@@ -5,7 +5,7 @@
     .module('TestSite', [
       'TestSite.routes',
       'TestSite.1065',
-	'TestSite.delay',
+      'TestSite.delay',
       'TestSite.authentication',
       'TestSite.project',
       'TestSite.import',
