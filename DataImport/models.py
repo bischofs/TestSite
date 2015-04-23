@@ -4,15 +4,44 @@ import statsmodels.api as sm
 import logging
 import math
 
+ class RawDataHandler:
 
-class DataIO:
+     def __init__(self):
+         self._log = {}
+         
+
+     def _import_test_data(num_benches, data_file):
+         
+         _test_data_wrap = TestData(num_benches, self._log) 
+         self._test_data, self._log, self.mapDict = _test_data_wrap.load_data(data_file)
+         
+    
+#     def _pre_zero_span():
+
+    
+#     def _post_zero_span():
+
+
+#     def _full_load():
+
+
+#     def _data_container():
+
+#Files must arrive in a certain order to check things
+#Full load -> regression
+#zero and spans can be in any order 
+
+
+
+
+class TestData:
 
     ## CONSTRUCTOR ##
 
-    def __init__(self, bench):
+    def __init__(self, bench, log):
         self.bench = bench
         self.mapDict = {} # Dictionary that contains mapped species to channel name in uploaded file
-        self.logDict = {} # Dictionary for logging errors to be serialized and sent to client
+        self.logDict = log # Dictionary for logging errors to be serialized and sent to client
 
 
     #######################################################
