@@ -1,202 +1,209 @@
 <div class="row">
-
-
-  <div class="col-md-3">
-    <div class="panel panel-default">
-      
-      <div class="panel-heading">
-	<h3 class="panel-title">Full load Curve</h3>
-      </div>
-      
-      <div class="panel-body">
-
-	<input type="file" name="file" nv-file-select="" uploader="uploader" />
-	<table class="table">
-	  <thead>
-	    <tr>
-              <th width="50%">Name</th>
-              <th ng-show="uploader.isHTML5">Size</th>
-              <th>Success</th>
-              <th>Actions</th>
-	    </tr>
-	  </thead>
-	  <tbody>
-	    <tr ng-repeat="item in uploader.queue">
-              <td><strong>{{ item.file.name }}</strong></td>
-              <td ng-show="uploader.isHTML5" nowrap>{{ item.file.size/1024/1024|number:2 }} MB</td>
-              <td class="text-center">
-		<span ng-show="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
-		<span ng-show="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
-		<span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
-              </td>
-              <td nowrap>
-		<button type="button" class="btn btn-success btn-xs" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
-		  <span class="glyphicon glyphicon-upload"></span> Upload
-		</button>
-		<button type="button" class="btn btn-success btn-xs" ng-click="item.remove()">
-		  <span class="glyphicon glyphicon-trash"></span> Remove
-		</button>
-              </td>
-	    </tr>
-	  </tbody>
-	</table>
-	
-      </div>
-      
-      
-    </div>   
-  </div>
-
-
-  <div class="col-md-3">
-    <div class="panel panel-default">
-    
-      <div class="panel-heading">
-	<h3 class="panel-title">Pre Zero/Span Run</h3>
-      </div>
-    
-      <div class="panel-body">
-
-	<input type="file" name="file" nv-file-select="" uploader="uploader" />
-	<table class="table">
-	  <thead>
-	    <tr>
-              <th width="50%">Name</th>
-              <th ng-show="uploader.isHTML5">Size</th>
-              <th>Success</th>
-              <th>Actions</th>
-	    </tr>
-	  </thead>
-	  <tbody>
-	    <tr ng-repeat="item in uploader.queue">
-              <td><strong>{{ item.file.name }}</strong></td>
-              <td ng-show="uploader.isHTML5" nowrap>{{ item.file.size/1024/1024|number:2 }} MB</td>
-              <td class="text-center">
-		<span ng-show="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
-		<span ng-show="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
-		<span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
-              </td>
-              <td nowrap>
-		<button type="button" class="btn btn-success btn-xs" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
-		  <span class="glyphicon glyphicon-upload"></span> Upload
-		</button>
-		<button type="button" class="btn btn-success btn-xs" ng-click="item.remove()">
-		  <span class="glyphicon glyphicon-trash"></span> Remove
-		</button>
-              </td>
-	    </tr>
-	  </tbody>
-	</table>
-      
-      </div>
-      
-    
-    </div>   
-  </div>
-
-
-
-  <div class="col-md-3">
-    <div class="panel panel-default">
-      
-      <div class="panel-heading">
-	<h3 class="panel-title">Post Zero/Span Run</h3>
-      </div>
-    
-      <div class="panel-body">
-
-	<input type="file" name="file" nv-file-select="" uploader="uploader" />
-	<table class="table">
-	  <thead>
-	    <tr>
-              <th width="50%">Name</th>
-              <th ng-show="uploader.isHTML5">Size</th>
-              <th>Success</th>
-              <th>Actions</th>
-	    </tr>
-	  </thead>
-	  <tbody>
-	    <tr ng-repeat="item in uploader.queue">
-              <td><strong>{{ item.file.name }}</strong></td>
-              <td ng-show="uploader.isHTML5" nowrap>{{ item.file.size/1024/1024|number:2 }} MB</td>
-              <td class="text-center">
-		<span ng-show="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
-		<span ng-show="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
-		<span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
-              </td>
-              <td nowrap>
-		<button type="button" class="btn btn-success btn-xs" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
-		  <span class="glyphicon glyphicon-upload"></span> Upload
-		</button>
-		<button type="button" class="btn btn-success btn-xs" ng-click="item.remove()">
-		  <span class="glyphicon glyphicon-trash"></span> Remove
-		</button>
-              </td>
-	    </tr>
-	  </tbody>
-	</table>
-      
-      </div>
-    
-    
-    </div>   
-  
-  </div>
-  
-
-</div> 
-<div >
-   <!--  <a ui-sref=".import">Show List</a> -->
-
-   <div style="padding: 15px; padding-left: 0px;">
-     
-     <button type="button" class="btn btn-default" ui-sref=".Import">Data Upload</button>
-     <span  style="font-size: 1.0em; padding: 10px" class="glyphicon glyphicon-arrow-right"></span>
-     
-     <button id="reg" type="button" class="btn btn-default " ui-sref=".Delay">Data Alignment</button>
-     <span  style="font-size: 1.0em; padding: 10px" class="glyphicon glyphicon-arrow-right"></span>
-     
-     <button id="reg" type="button" class="btn btn-default " ui-sref=".Regression">Results and Download</button>
-  
-   </div>
-
-
-</div>
-
-<div class="panel panel-default">
-  
-  <div class="panel-heading">
-    <h3 class="panel-title">Test Data</h3>
-  </div>
-  
-  <div ui-view class="panel-body">
-    
-    
-    <div class="col-md-12">
-      
+    <div class="panel panel-default  col-md-2">
+        <div class="panel-body">
+            <ol class="treeview">
+                <li> Full Load
+                    <ul>
+                        <li>Channels</li>
+                        <li>Correct Cycle</li>
+                    </ul>
+                </li>
+                <li>Pre Zero/Span
+                    <ul>
+                        <li>Channels</li>
+                        <li>Correct Cycle</li>
+                    </ul>
+                </li>
+                <li>Post Zero/Span
+                    <ul>
+                        <li>Channels</li>
+                        <li>Correct Cycle</li>
+                    </ul>
+                </li>
+                <li> Test Data
+                    <ul>
+                        <li>Channels</li>
+                        <li>Correct Cycle</li>
+                        <li>Ambient Conditions</li>
+                        <li>MetaData Present</li>
+                        <li>Data Ranges</li>
+                    </ul>
+                </li>
+            </ol>
+            <!-- <div>
+                <h4>1065 Requirements</h4>
+                <dl class="dl-horizontal">
+                    <dt>Cycle Correct</dt>
+                    <dd ng-show="uploadSuccess">
+                        <span><i class="glyphicon glyphicon-ok"></i></span>
+                    </dd>
+                    <dt>Required Channels</dt>
+                    <dd ng-show="uploadSuccess">
+                        <span><i class="glyphicon glyphicon-ok"></i></span>
+                    </dd>
+                    <dt>Ambient Conditions</dt>
+                    <dd ng-show="uploadSuccess">
+                        <span><i class="glyphicon glyphicon-ok"></i></span>
+                    </dd>
+                    <dt>Metadata Present</dt>
+                    <dd ng-show="uploadSuccess">
+                        <span ng-show="metaDataPresent"><i class="glyphicon glyphicon-ok"></i></span>
+                        <span ng-hide="metaDataPresent"><i class="glyphicon glyphicon-remove"></i></span>
+                    </dd>
+                    <dt>Equipment Ranges</dt>
+                    <dd ng-show="uploadSuccess">
+                        <span><i class="glyphicon glyphicon-ok"></i></span>
+                    </dd>
+                </dl>
+            </div> -->
+        </div>
     </div>
-    
-  </div>
+    <div class="col-md-10">
+        <div class="row">
+            <div class="col-md-4" ng-controller="ImportController">
+                <div style="visibility: hidden;">{{filetype='full'}}</div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Full load</h3>
+                    </div>
+                    <div class="panel-body">
+                        <input type="file" name="file" nv-file-select="" uploader="uploader" />
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <!-- <th width="50%">Name</th>-->
+                                    <th>Success</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in uploader.queue">
+                                    <!-- <td><strong>{{ item.file.name }}</strong></td>-->
+                                    <td class="text-center">
+                                        <span ng-show="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
+                                        <span ng-show="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
+                                        <span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
+                                    </td>
+                                    <td nowrap>
+                                        <button type="button" class="btn btn-success btn-xs" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
+                                            <span class="glyphicon glyphicon-upload"></span> Upload
+                                        </button>
+                                        <button type="button" class="btn btn-success btn-xs" ng-click="item.remove()">
+                                            <span class="glyphicon glyphicon-trash"></span> Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4" ng-controller="ImportController">
+                <div style="visibility: hidden;">{{filetype="pre"}}</div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Pre Zero/Span Run</h3>
+                    </div>
+                    <div class="panel-body">
+                        <input type="file" name="file" nv-file-select="" uploader="uploader" />
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <!-- <th width="50%">Name</th> -->
+                                    <th>Success</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in uploader.queue">
+                                    <!-- <td><strong>{{ item.file.name }}</strong></td> -->
+                                    <td class="text-center">
+                                        <span ng-show="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
+                                        <span ng-show="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
+                                        <span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
+                                    </td>
+                                    <td nowrap>
+                                        <button type="button" class="btn btn-success btn-xs" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
+                                            <span class="glyphicon glyphicon-upload"></span> Upload
+                                        </button>
+                                        <button type="button" class="btn btn-success btn-xs" ng-click="item.remove()">
+                                            <span class="glyphicon glyphicon-trash"></span> Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4" ng-controller="ImportController">
+                <div style="visibility: hidden;">{{filetype='post'}}</div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Post Zero/Span Run</h3>
+                    </div>
+                    <div class="panel-body">
+                        <input type="file" name="file" nv-file-select="" uploader="uploader" />
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <!-- <th width="50%">Name</th> -->
+                                    <th>Success</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in uploader.queue">
+                                    <!-- <td><strong>{{ item.file.name }}</strong></td> -->
+                                    <td class="text-center">
+                                        <span ng-show="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
+                                        <span ng-show="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
+                                        <span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
+                                    </td>
+                                    <td nowrap>
+                                        <button type="button" class="btn btn-success btn-xs" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
+                                            <span class="glyphicon glyphicon-upload"></span> Upload
+                                        </button>
+                                        <button type="button" class="btn btn-success btn-xs" ng-click="item.remove()">
+                                            <span class="glyphicon glyphicon-trash"></span> Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--  <a ui-sref=".import">Show List</a> -->
+        <div style="padding: 15px; padding-left: 0px;">
+            <button type="button" class="btn btn-default" ui-sref=".Import">Data Upload</button>
+            <span style="font-size: 1.0em; padding: 10px" class="glyphicon glyphicon-arrow-right"></span>
+            <button id="reg" type="button" class="btn btn-default " ui-sref=".Delay">Data Alignment</button>
+            <span style="font-size: 1.0em; padding: 10px" class="glyphicon glyphicon-arrow-right"></span>
+            <button id="reg" type="button" class="btn btn-default " ui-sref=".Regression">Results and Download</button>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Test Data</h3>
+            </div>
+            <div ui-view class="panel-body">
+                <div class="col-md-12">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style type="text/css">
+.panel-heading {
+    padding: 6px 9px;
+}
 
-
-  
-  <style type="text/css"> 
-    
-    
-
-    .panel-heading {
-      padding: 6px 9px;
-    }
-    .panel-title {
+.panel-title {
     font-size: 13px;
-    
-    }
-    
+}
 
-    
-    
-
-    
-  </style>
-  
-  
+.treeview {
+    padding-left: 2px;
+}
+</style>

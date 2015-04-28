@@ -20,17 +20,16 @@
     * @name Authentication
     * @desc The Factory to be returned
     */
-    var Authentication = {
-     getAuthenticatedAccount: getAuthenticatedAccount,
-     setAuthenticatedAccount: setAuthenticatedAccount,
-     isAuthenticated: isAuthenticated,
-     login:login,
-     logout:logout,
-     register: register,
-     unauthenticate: unauthenticate
-   };
-
-   return Authentication;
+      var Authentication = {
+	  getAuthenticatedAccount: getAuthenticatedAccount,
+	  setAuthenticatedAccount: setAuthenticatedAccount,
+	  isAuthenticated: isAuthenticated,
+	  login:login,
+	  logout:logout,
+	  register: register,
+	  unauthenticate: unauthenticate
+      };
+      return Authentication;
 
     ////////////////////
 
@@ -43,15 +42,15 @@
     * @returns {Promise}
     * @memberOf TestSite.authentication.services.Authentication
     */
-    function register(email, password, username) {
-     return $http.post('/api/v1/accounts/', {
-      username: username,
-      password: password,
-      email: email
-    });
-   }
+      function register(email, password, username) {
+	  return $http.post('/api/v1/accounts/', {
+	      username: username,
+	      password: password,
+	      email: email
+	  });
+      }
 
-
+      
 
       /**
        * @name login
@@ -61,30 +60,30 @@
        * @returns {Promise}
        * @memberOf TestSite.authentication.services.Authentication
        */
-
-       function login(email, password) {
-         return $http.post('/api/v1/auth/login/', {
-           email: email, password: password
-         }).then(loginSuccessFn,loginErrorFn);
-
+      
+      function login(email, password) {
+          return $http.post('/api/v1/auth/login/', {
+              email: email, password: password
+          }).then(loginSuccessFn,loginErrorFn);
+	  
 	  /**
 	   * @name loginSuccessFn
 	   * @desc Set the authenticated account and redirect to index
 	   */
-    function loginSuccessFn(data, status, headers, config) {
-     Authentication.setAuthenticatedAccount(data.data);
+	  function loginSuccessFn(data, status, headers, config) {
+	      Authentication.setAuthenticatedAccount(data.data);
 
-     window.location = '/';
-   }
-
+	      window.location = '/';
+	  }
+	  
 	  /**
 	   * @name loginErrorFn
 	   * @desc Log "Epic failure!" to the console
 	   */
-    function loginErrorFn(data, status, headers, config) {
-	toastr.error("Username or password is incorrect", 'Error')
-	console.error('Epic failure!');
-   }
+	  function loginErrorFn(data, status, headers, config) {
+	      toastr.error("Username or password is incorrect", 'Error')
+	      console.error('Epic failure!');
+	  }
 
  }
 

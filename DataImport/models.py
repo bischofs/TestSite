@@ -4,26 +4,23 @@ import statsmodels.api as sm
 import logging
 import math
 
- class RawDataHandler:
+class RawDataHandler:
 
      def __init__(self):
          self._log = {}
          
+     def _import_test_data(self, num_benches, data_file):
+         test_data_wrap = TestData(num_benches, self._log) 
+         self.testData, self.mapDict, self._log = test_data_wrap.load_data(data_file)
+             
+     def import_pre_zero_span(self, data_file):
+          self.preZeroSpan = data_file
 
-     def _import_test_data(num_benches, data_file):
-         
-         _test_data_wrap = TestData(num_benches, self._log) 
-         self._test_data, self._log, self.mapDict = _test_data_wrap.load_data(data_file)
-         
-    
-#     def _pre_zero_span():
+     def import_post_zero_span(self, data_file):
+          self.postZeroSpan = data_file
 
-    
-#     def _post_zero_span():
-
-
-#     def _full_load():
-
+     def import_full_load(self, data_file):
+          self.fullLoad = data_file
 
 #     def _data_container():
 
