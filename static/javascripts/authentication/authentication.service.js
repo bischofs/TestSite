@@ -50,7 +50,7 @@
 	  });
       }
 
-      
+
 
       /**
        * @name login
@@ -60,12 +60,12 @@
        * @returns {Promise}
        * @memberOf TestSite.authentication.services.Authentication
        */
-      
+
       function login(email, password) {
           return $http.post('/api/v1/auth/login/', {
               email: email, password: password
           }).then(loginSuccessFn,loginErrorFn);
-	  
+
 	  /**
 	   * @name loginSuccessFn
 	   * @desc Set the authenticated account and redirect to index
@@ -75,7 +75,7 @@
 
 	      window.location = '/';
 	  }
-	  
+
 	  /**
 	   * @name loginErrorFn
 	   * @desc Log "Epic failure!" to the console

@@ -26,7 +26,7 @@
   .state('1065', {
     url: "/1065",
     templateUrl: "/static/javascripts/layout/1065.html",
-    controller: "MetaEvalController"
+    controller: "InfoboxController"
   })
   .state('1065.Import', {
     url: "/import",

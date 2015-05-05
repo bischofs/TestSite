@@ -9,15 +9,6 @@
         "E_COHD"
       ]
     },
-    "Carbon_Monoxide_High_Wet": {
-      "unit": "%",
-      "maximum_value": "6",
-      "minimum_value": "-1",
-      "multiple_benches": true,
-      "channel_names": [
-        "E_COHW"
-      ]
-    },
     "Carbon_Monoxide_Low_Dry": {
 	"unit": "ppm",
       "maximum_value": "5000",
@@ -34,15 +25,6 @@
       "multiple_benches": true,
       "channel_names": [
         "E_CO2D"
-      ]
-    },
-    "Carbon_Dioxide_Wet": {
-      "unit": "%",
-      "maximum_value": "20",
-      "minimum_value": "-1",
-      "multiple_benches": true,
-      "channel_names": [
-        "E_CO2W"
       ]
     },
     "Total_Hydrocarbons_Wet": {
@@ -72,15 +54,6 @@
         "E_O2D"
       ]
     },
-    "Nitrogen_Monoxide_Wet": {
-      "unit": "ppm",
-      "maximum_value": "2001",
-      "minimum_value": "-5",
-      "multiple_benches": true,
-      "channel_names": [
-        "E_NOW"
-      ]
-    },
     "Nitrogen_Monoxide_Dry": {
       "unit": "ppm",
       "maximum_value": "2001",
@@ -88,15 +61,6 @@
       "multiple_benches": true,
       "channel_names": [
         "E_NOD"
-      ]
-    },
-    "Nitrogen_X_Wet": {
-      "unit": "ppm",
-      "maximum_value": "2000",
-      "minimum_value": "-5",
-      "multiple_benches": true,
-      "channel_names": [
-        "E_NOXW"
       ]
     },
     "Nitrogen_X_Dry": {

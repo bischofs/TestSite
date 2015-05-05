@@ -1,0 +1,14 @@
+
+
+
+1. Regression
+   - Need to omit the first five seconds
+   - Need to finish the filtering
+   - Pull the data criteria from the full load curve and show warning in view
+2. Test Data
+   - Need to check the data for frequency ( 1HZ) and show in the meta view
+   - After initial data checks remove the channels that are not required from the data
+   - Figure out a way to read values from header data and apply as criteria to the test data
+   - File ordering, form the header data I need to get what the file is and if test data what is test cycle
+3. Workflow
+   - Optimize so you cannot load test data before preceding files

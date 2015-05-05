@@ -1,0 +1,5 @@
+
+
+internal varibles and objects  = camelCase
+private functions = _leading_underscore
+public functions = no_leading_underscore
