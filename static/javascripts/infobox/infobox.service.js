@@ -11,16 +11,23 @@
 
     function infoboxService() {
 
-        var myList = [];
+        var myList = ["some", "data"];
 
-        var getList = function() {
+        function getList() {
             return myList;
         }
 
+        function addItem(newObj) {
+            myList.push(newObj);
+        }
+
+        return {
+            addItem: addItem,
+            getList: getList
+        };
+
+
 
     }
-
-
-
 
 })();

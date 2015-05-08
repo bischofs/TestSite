@@ -12,12 +12,12 @@
      */
     function InfoboxController($scope, FileUploader, toastr, infoboxService) {
 
-        $scope.testDataName = "Test Data"
 
-         $scope.lists = infoboxService.getList;
+        $scope.myList = infoboxService.getList();
 
+        $scope.testDataName = $scope.myList[2];
 
-
+        //$scope.testDataName = 'sttuff';
 
 
 

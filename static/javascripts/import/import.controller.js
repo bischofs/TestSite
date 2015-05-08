@@ -22,8 +22,6 @@
         $scope.filetype = '';
 
 
-        $scope.lists = infoboxService.getList;
-
         //$scope.uploader.formData.push({cycle: 'FTP'});
         $scope.uploader.formData.push({
             bench: '1'
@@ -77,6 +75,9 @@
             } else {
                 $scope.ambientConditions = true;
             }
+
+
+            infoboxService.addItem("true");
 
 
             var jsonObj = JSON.parse(response);

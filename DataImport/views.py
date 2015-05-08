@@ -2,15 +2,13 @@ import json
 
 from django.core.cache import caches
 from django.shortcuts import render
+
 from rest_framework import permissions, viewsets, status, views
 from rest_framework.response import Response
 from rest_framework.parsers import FileUploadParser, MultiPartParser, FormParser
 from rest_framework.renderers import JSONRenderer
 
-#from DataImport.models import DataIO
 from DataImport.models import CycleValidator, RawDataHandler
-
-# Create your views here.
 
 class FileUploadView(views.APIView):
 
@@ -32,6 +30,8 @@ class FileUploadView(views.APIView):
                 raise Exception("Please select the number of benches used")
 
             cache = caches['default']
+
+            import pdb; pdb.set_trace()
 
             if(not cache.get(request.session._get_session_key())):
                 dataHandler = RawDataHandler()
@@ -71,6 +71,6 @@ class MetaDataView(views.APIView):
 
     
     def get(self, request, *args, **kwargs):
-        import pdb; pdb.set_trace()
+
 
         return HttpResponse('Hello, World!')
