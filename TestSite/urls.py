@@ -7,7 +7,8 @@ from DataImport.views import FileUploadView, MetaDataView
 from rest_framework import routers
 
 from django.views.generic.base import TemplateView
-
+from django.contrib import admin
+admin.autodiscover()
 
 
 # Routers provide an easy way of automatically determining the URL conf.
@@ -20,6 +21,7 @@ router.register(r'projects', ProjectViewSet)
 
 urlpatterns = patterns('',
         url(r'^api/v1/', include(router.urls)),
+        url(r'^admin/', include(admin.site.urls)),
         url(r'^api/v1/auth/login/$', LoginView.as_view(), name='login'),
         url(r'^api/v1/auth/logout/$', LogoutView.as_view(), name='logout'),
         url(r'^api/v1/data/import/$', FileUploadView.as_view(), name='upload'),
