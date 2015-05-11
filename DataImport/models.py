@@ -10,9 +10,9 @@ class RawDataHandler:
          # need required channels for each file
          self.log = {}
          
-     def import_test_data(self, num_benches, data_file):
-         testDataWrap = TestData(num_benches, self.log) 
-         self.testData, self.mapDict, self.log = testDataWrap.load_data(data_file)
+     def import_test_data(self, num_benches, dataFile):
+         testData = TestData(dataFile) 
+         self.testData, self.mapDict, self.log = testData.load_data(data_file)
              
      def import_pre_zero_span(self, data_file):
           self.preZeroSpan = pd.read_csv(data_file)
@@ -32,38 +32,43 @@ class RawDataHandler:
 
 class Data:
 
-     def __init__():
+     def __init__(self, fileName, data, num_benches):
+          self.data = data
+          self.fileName = fileName
+          self.fileType = self.__class__.__name__
           self.speciesData = pd.read_json("spec.json")
           
 
 
-
-     # def check_channels():
-     
-     #      def _check_channels_util(species, channelNames, multipleBenches, data, filename):
+     def _check_channels_util(species, channelNames, multipleBenches, data, fileName):
             
-     #        for name in channelNames:
-     #            if (multipleBenches == True ) and (self.bench == '2'):
-     #                if (name in data.columns) and ((name + "2") in data.columns):
-     #                    self.mapDict[species] = name
-     #                    break
-     #            else:
-     #                if (name in data.columns):
-     #                    self.mapDict[species] = name
-     #                    break
-     #        else:
-     #           if (multipleBenches == True): 
-     #               channelNames.append(channelNames[0] + "2")   
-     #               raise Exception("Cannot find %s channel names %s in file %s" % (species.replace("_"," "), channelNames, filename))    
-     #           else:
-     #               raise Exception("Cannot find %s channel %s in file %s" % (species.replace("_"," "), channelNames, filename))    
+          for name in channelNames:
+               if (multipleBenches == True ) and (self.bench == '2'):
+                    if (name in data.columns) and ((name + "2") in data.columns):
+                         self.mapDict[species] = name
+                         break
+                    else:
+                         if (name in data.columns):
+                              self.mapDict[species] = name
+                              break
+            else:
+               if (multipleBenches == True): 
+                   channelNames.append(channelNames[0] + "2")   
+                   raise Exception("Cannot find %s channel names %s in file %s" % (species.replace("_"," "), channelNames, filename))    
+               else:
+                   raise Exception("Cannot find %s channel %s in file %s" % (species.replace("_"," "), channelNames, filename))    
                    
 
-     #    for species in self.speciesData.Species.items():
-     #        if (species[1]['multiple_benches'] == True):
-     #            _check_channels_util(species[0], species[1]['channel_names'], True, self.data, self.filename)
-     #        else:
-     #            _check_channels_util(species[0], species[1]['channel_names'], False, self.data, self.filename)
+
+
+     def check_channels(self):
+          
+          for species in self.speciesData.Species.items():
+               if species[1]['files'].__contains__(self.fileType):
+                    if (species[1]['multiple_benches'] == True):
+                         self._check_channels_util(species[0], species[1]['channel_names'], True, self.data, self.fileName)
+                    else:
+                         self._check_channels_util(species[0], species[1]['channel_names'], False, self.data, self.fileName)
 
 
 
