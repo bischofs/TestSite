@@ -10,9 +10,10 @@ class RawDataHandler:
          # need required channels for each file
          self.log = {}
          
-     def import_test_data(self, num_benches, dataFile):
-         testData = TestData(dataFile) 
-         self.testData, self.mapDict, self.log = testData.load_data(data_file)
+     def import_test_data(self, numBenches, dataFile):
+         self.testData = TestData(dataFile, numBenches) 
+         self.testData.load_data()
+         #self.testData, self.mapDict, self.log = testData.load_data(data_file)
              
      def import_pre_zero_span(self, data_file):
           self.preZeroSpan = pd.read_csv(data_file)
@@ -32,36 +33,51 @@ class RawDataHandler:
 
 class Data:
 
-     def __init__(self, fileName, data, num_benches):
-          self.data = data
-          self.fileName = fileName
-          self.fileType = self.__class__.__name__
-          self.speciesData = pd.read_json("spec.json")
+     def __init__(self, dataFile, numBenches):
           
+          self.speciesData = pd.read_json("spec.json")
+          self.data = pd.read_csv(dataFile)
+          #self.metaData = pd.read_csv(dataFile)
+
+          self.mapDict = {}
+          self.logDict = {}
+
+          self.numBenches = numBenches
+          self.dataFile = dataFile
+          self.fileName = dataFile.name
+          self.fileType = self.__class__.__name__
 
 
-     def _check_channels_util(species, channelNames, multipleBenches, data, fileName):
+     def load_data(self):
+          import pdb; pdb.set_trace()
+          self.metaData = self._load_metadata(self.metaData)
+          self._check_channels()
+
+
+
+
+     def _check_channels_util(self, species, channelNames, multipleBenches, data, fileName):
             
           for name in channelNames:
-               if (multipleBenches == True ) and (self.bench == '2'):
+               if (multipleBenches == True ) and (self.numBenches == '2'):
                     if (name in data.columns) and ((name + "2") in data.columns):
                          self.mapDict[species] = name
                          break
-                    else:
-                         if (name in data.columns):
-                              self.mapDict[species] = name
-                              break
-            else:
-               if (multipleBenches == True): 
-                   channelNames.append(channelNames[0] + "2")   
-                   raise Exception("Cannot find %s channel names %s in file %s" % (species.replace("_"," "), channelNames, filename))    
                else:
-                   raise Exception("Cannot find %s channel %s in file %s" % (species.replace("_"," "), channelNames, filename))    
+                    if (name in data.columns):
+                         self.mapDict[species] = name
+                         break
+          else:
+               if (multipleBenches == True):
+                   channelNames.append(channelNames[0] + "2")
+                   raise Exception("Cannot find %s channel names %s in file %s" % (species.replace("_"," "), channelNames, fileName))
+               else:
+                   raise Exception("Cannot find %s channel %s in file %s" % (species.replace("_"," "), channelNames, fileName))
                    
 
 
 
-     def check_channels(self):
+     def _check_channels(self):
           
           for species in self.speciesData.Species.items():
                if species[1]['files'].__contains__(self.fileType):
@@ -72,13 +88,13 @@ class Data:
 
 
 
-     # def load_meta_data():
-     #      metaData = data[:2]
-     #      if 'proj' in metaData.columns:
-     #           self.logDict['info'] = "Meta-Data read from import file %s" % filename
-     #           return metaData
-     #      else:
-     #           self.logDict['warning'] = "Meta-Data missing in import file %s" % filename
+     def _load_metadata(self, data):
+          metaData = data[:1]
+          if 'proj' in metaData.columns:
+               self.logDict['info'] = "Meta-Data read from import file %s" % self.fileName
+               return metaData
+          else:
+               self.logDict['warning'] = "Meta-Data missing in import file %s" % self.fileName
             
 
      # def check_cycle():
@@ -90,27 +106,27 @@ class TestData(Data):
 
      ## CONSTRUCTOR ##
      
-     def __init__(self, bench, log):
-          self.bench = bench
-          self.mapDict = {} # Dictionary that contains mapped species to channel name in uploaded file
-          self.logDict = log # Dictionary for logging errors to be serialized and sent to client
+     # def __init__(self, bench, log):
+     #      self.bench = bench
+     #      self.mapDict = {} # Dictionary that contains mapped species to channel name in uploaded file
+     #      self.logDict = log # Dictionary for logging errors to be serialized and sent to client
 
 
-     def load_data(self,filename):
+     # def load_data(self,filename):
 
-        self.filename = filename
+     #    self.filename = filename
 
-        self.speciesData = pd.read_json("spec.json")
-        self.data = pd.read_csv(filename)                                 # Read Data into DataFrame
-        self.metaData = self._load_metadata(self.data, filename)          # Read Meta data
-        self._check_channels()                                            # Check Units based on dictionary
-        self._check_units()
-        self.data = self.data.convert_objects(convert_numeric=True)       # Convert all data to numeric
-        self.data = self.data.dropna()                                    # Drop NaN values from data
-        self._check_ranges()
-        self._convert_bar_to_kpa()
+     #    self.speciesData = pd.read_json("spec.json")
+     #    self.data = pd.read_csv(filename)                                 # Read Data into DataFrame
+     #    self.metaData = self._load_metadata(self.data, filename)          # Read Meta data
+     #    self._check_channels()                                            # Check Units based on dictionary
+     #    self._check_units()
+     #    self.data = self.data.convert_objects(convert_numeric=True)       # Convert all data to numeric
+     #    self.data = self.data.dropna()                                    # Drop NaN values from data
+     #    self._check_ranges()
+     #    self._convert_bar_to_kpa()
        
-        return self.data, self.mapDict, self.logDict
+     #    return self.data, self.mapDict, self.logDict
 
 
      def _convert_bar_to_kpa(self): #FIX DIS
@@ -147,42 +163,42 @@ class TestData(Data):
                 raise Exception ("%s is below required minimum of %s %s" % (self.mapDict[species], str(minValue), self.speciesData.Species[species]['unit']))
 
 
-     def _check_channels(self):
+     # def _check_channels(self):
 
-        def _check_channels_util(species, channelNames, multipleBenches, data, filename):
+     #    def _check_channels_util(species, channelNames, multipleBenches, data, filename):
             
-            for name in channelNames:
-                if (multipleBenches == True ) and (self.bench == '2'):
-                    if (name in data.columns) and ((name + "2") in data.columns):
-                        self.mapDict[species] = name
-                        break
-                else:
-                    if (name in data.columns):
-                        self.mapDict[species] = name
-                        break
-            else:
-               if (multipleBenches == True): 
-                   channelNames.append(channelNames[0] + "2")   
-                   raise Exception("Cannot find %s channel names %s in file %s" % (species.replace("_"," "), channelNames, filename))    
-               else:
-                   raise Exception("Cannot find %s channel %s in file %s" % (species.replace("_"," "), channelNames, filename))    
+     #        for name in channelNames:
+     #            if (multipleBenches == True ) and (self.bench == '2'):
+     #                if (name in data.columns) and ((name + "2") in data.columns):
+     #                    self.mapDict[species] = name
+     #                    break
+     #            else:
+     #                if (name in data.columns):
+     #                    self.mapDict[species] = name
+     #                    break
+     #        else:
+     #           if (multipleBenches == True): 
+     #               channelNames.append(channelNames[0] + "2")   
+     #               raise Exception("Cannot find %s channel names %s in file %s" % (species.replace("_"," "), channelNames, filename))    
+     #           else:
+     #               raise Exception("Cannot find %s channel %s in file %s" % (species.replace("_"," "), channelNames, filename))    
                    
 
-        for species in self.speciesData.Species.items():
-            if (species[1]['multiple_benches'] == True):
-                _check_channels_util(species[0], species[1]['channel_names'], True, self.data, self.filename)
-            else:
-                _check_channels_util(species[0], species[1]['channel_names'], False, self.data, self.filename)
+     #    for species in self.speciesData.Species.items():
+     #        if (species[1]['multiple_benches'] == True):
+     #            _check_channels_util(species[0], species[1]['channel_names'], True, self.data, self.filename)
+     #        else:
+     #            _check_channels_util(species[0], species[1]['channel_names'], False, self.data, self.filename)
  
 
-     def _load_metadata(self, data, filename):
+     # def _load_metadata(self, data, filename):
 
-        metaData = data[:2]
-        if 'proj' in metaData.columns:
-            self.logDict['info'] = "Meta-Data read from import file %s" % filename
-            return metaData
-        else:
-            self.logDict['warning'] = "Meta-Data missing in import file %s" % filename
+     #    metaData = data[:2]
+     #    if 'proj' in metaData.columns:
+     #        self.logDict['info'] = "Meta-Data read from import file %s" % filename
+     #        return metaData
+     #    else:
+     #        self.logDict['warning'] = "Meta-Data missing in import file %s" % filename
 
 
 class FullLoad(Data):

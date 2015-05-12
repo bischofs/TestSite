@@ -1,16 +1,19 @@
 
-
-
 1. Regression
    - Need to omit the first five seconds
    - Need to finish the filtering
    - Pull the data criteria from the full load curve and show warning in view
 2. Test Data
+   - Need to verify time stamps on files so that they correlate and correlate with the ebench databse
    - Need to check the data for frequency ( 1HZ) and show in the meta view
    - After initial data checks remove the channels that are not required from the data
    - Figure out a way to read values from header data and apply as criteria to the test data
    - File ordering, form the header data I need to get what the file is and if test data what is test cycle
+   - Grab fuel data From header file and compare it to all files. If it is different error
 3. Zero Span Files
    - Sanity checks on zero span files, check for all required channels and length 
-3. Workflow
-   - Optimize so you cannot load test data before preceding files
+   - Grap zero and floor values for each channel 
+4. Workflow
+   - Modify so you cannot load test data before preceding files
+   - Need to add Detioration factor for each emission species as a input into file upload
+   - Need to output or show every aspect of the calculations 

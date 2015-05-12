@@ -1,3 +1,4 @@
+
 import json
 
 from django.core.cache import caches
@@ -30,8 +31,6 @@ class FileUploadView(views.APIView):
                 raise Exception("Please select the number of benches used")
 
             cache = caches['default']
-
-            import pdb; pdb.set_trace()
 
             if(not cache.get(request.session._get_session_key())):
                 dataHandler = RawDataHandler()

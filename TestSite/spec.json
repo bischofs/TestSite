@@ -134,7 +134,7 @@
             "minimum_value": "0.80",
             "multiple_benches": false,
              "files": [
-                "TestData"
+                "FullLoad"
             ],
 	    "channel_names": [
                 "P_AMB"
