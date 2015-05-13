@@ -9,6 +9,7 @@ class RawDataHandler:
      def __init__(self):
          # need required channels for each file
          self.log = {}
+         self.masterDict = {} 
          
      def import_test_data(self, numBenches, dataFile):
          self.testData = TestData(dataFile, numBenches) 
@@ -25,7 +26,6 @@ class RawDataHandler:
           fullLoadWrap = FullLoad()
           self.fullLoad = fullLoadWrap.load_data(data_file)
           
-
 
 #Files must arrive in a certain order to check things
 #Full load -> regression
@@ -49,30 +49,30 @@ class Data:
 
 
      def load_data(self):
-          import pdb; pdb.set_trace()
-          self.metaData = self._load_metadata(self.metaData)
+          self.metaData, self.data = self._load_metadata(self.data)
           self._check_channels()
-
-
+          self._check_units()
+          
 
 
      def _check_channels_util(self, species, channelNames, multipleBenches, data, fileName):
             
           for name in channelNames:
-               if (multipleBenches == True ) and (self.numBenches == '2'):
-                    if (name in data.columns) and ((name + "2") in data.columns):
-                         self.mapDict[species] = name
-                         break
-               else:
-                    if (name in data.columns):
-                         self.mapDict[species] = name
-                         break
+               if (name in data.columns):
+                    self.mapDict[species] = name
+                    break
+               # if (multipleBenches == True ) and (self.numBenches == '2'):
+               #      if (name in data.columns) and ((name + "2") in data.columns):
+               #           self.mapDict[species] = name
+               #           break
+               # else:
           else:
-               if (multipleBenches == True):
-                   channelNames.append(channelNames[0] + "2")
-                   raise Exception("Cannot find %s channel names %s in file %s" % (species.replace("_"," "), channelNames, fileName))
-               else:
-                   raise Exception("Cannot find %s channel %s in file %s" % (species.replace("_"," "), channelNames, fileName))
+               raise Exception("Cannot find %s channel %s in file %s" % (species.replace("_"," "), channelNames, fileName))
+               # if (multipleBenches == True):
+               #     channelNames.append(channelNames[0] + "2")
+               #     raise Exception("Cannot find %s channel names %s in file %s" % (species.replace("_"," "), channelNames, fileName))
+               # else:
+              
                    
 
 
@@ -80,6 +80,7 @@ class Data:
      def _check_channels(self):
           
           for species in self.speciesData.Species.items():
+
                if species[1]['files'].__contains__(self.fileType):
                     if (species[1]['multiple_benches'] == True):
                          self._check_channels_util(species[0], species[1]['channel_names'], True, self.data, self.fileName)
@@ -88,11 +89,28 @@ class Data:
 
 
 
+     def _check_units(self):
+
+          for species in self.mapDict:
+
+               unit = self.speciesData.Species[species]['unit']
+               booleanCond = self.data[self.mapDict[species]].str.contains(unit)
+
+               if not (booleanCond.any()):
+                    self.logDict['error'] = "%s units are not in %s" % (self.mapDict[species], unit)
+                    raise Exception("%s units are not in %s" % (self.mapDict[species], unit))
+
+
+
      def _load_metadata(self, data):
+
           metaData = data[:1]
+          data.columns = data.loc[1].values
+          data = data[2:]
+
           if 'proj' in metaData.columns:
                self.logDict['info'] = "Meta-Data read from import file %s" % self.fileName
-               return metaData
+               return metaData, data
           else:
                self.logDict['warning'] = "Meta-Data missing in import file %s" % self.fileName
             

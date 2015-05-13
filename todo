@@ -17,3 +17,15 @@
    - Modify so you cannot load test data before preceding files
    - Need to add Detioration factor for each emission species as a input into file upload
    - Need to output or show every aspect of the calculations 
+
+
+5. File Upload
+   - Channel check - Hit ebench database to find out which channels are "active"
+   - Header check 
+   - Unit check
+   - Range check
+   - Build channel mapping dictionary from all files
+   - Correlate Time stamps so that pre and post are before and after
+   - Correlate frequency to 1HZ for all files 
+   - Correlate fuel data for all files
+ 
