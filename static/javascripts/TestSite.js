@@ -3,14 +3,14 @@
 
   angular
     .module('TestSite', [
-      'TestSite.routes',
-      'TestSite.infobox',
-      'TestSite.delay',
-      'TestSite.authentication',
-      'TestSite.import',
-      'TestSite.layout',
-      'TestSite.config',
-      'ngAnimate'
+	'TestSite.routes',
+	'TestSite.infobox',
+	'TestSite.delay',
+	'TestSite.authentication',
+	'TestSite.import',
+	'TestSite.layout',
+	'TestSite.config',
+	'ngAnimate',
     ]);
 
   angular

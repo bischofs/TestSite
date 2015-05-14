@@ -93,6 +93,16 @@ app.controller('foo', function($scope, toastr) {
 
 ![No Title](http://i.imgur.com/GnwWFo4.png)
 
+#### Closing toasts programmatically:
+
+```javascript
+app.controller('foo', function($scope, toastr) {
+  toastr.clear([toast]);
+});
+```
+
+If no toast is passed in, all toasts will be closed.
+
 ### Toastr customization
 
 You can customize the entire library like:

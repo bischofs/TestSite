@@ -1,4 +1,6 @@
 (function() {
+  'use strict';
+
   angular.module('toastr', [])
     .factory('toastr', toastr);
 
@@ -115,9 +117,9 @@
       container.addClass(options.positionClass);
       container.css({'pointer-events': 'auto'});
 
-      var target = document.querySelector(options.target);
+      var target = angular.element(document.querySelector(options.target));
 
-      if ( ! target) {
+      if ( ! target || ! target.length) {
         throw 'Target for toasts doesn\'t exist';
       }
 
@@ -217,6 +219,8 @@
 }());
 
 (function() {
+  'use strict';
+
   angular.module('toastr')
     .constant('toastrConfig', {
       allowHtml: false,
@@ -245,6 +249,8 @@
 }());
 
 (function() {
+  'use strict';
+
   angular.module('toastr')
     .directive('toast', toast);
 
