@@ -1,30 +1,33 @@
 from django.db import models
+from Ebench.models import Ebench
+
 import pandas as pd
 import statsmodels.api as sm
 import logging
 import math
 
-class RawDataHandler:
+class DataHandler:
 
      def __init__(self):
          # need required channels for each file
-         self.log = {}
-         self.masterDict = {} 
-         
+          self.log = {}
+          self.masterDict = {} 
+          self.ebenches = Ebench.objects.all()
+   
      def import_test_data(self, numBenches, dataFile):
-         self.testData = TestData(dataFile, numBenches) 
-         self.testData.load_data()
-         #self.testData, self.mapDict, self.log = testData.load_data(data_file)
-             
-     def import_pre_zero_span(self, data_file):
-          self.preZeroSpan = pd.read_csv(data_file)
+          self.testData = TestData(dataFile, numBenches) 
+          self.testData.load_data(dataFile)
+         
+     def import_pre_zero_span(self, dataFile):
+          self.preZeroSpan = pd.read_csv(dataFile)
 
-     def import_post_zero_span(self, data_file):
-          self.postZeroSpan = pd.read_csv(data_file)
+     def import_post_zero_span(self, dataFile):
+          self.postZeroSpan = pd.read_csv(dataFile)
 
-     def import_full_load(self, data_file):
-          fullLoadWrap = FullLoad()
-          self.fullLoad = fullLoadWrap.load_data(data_file)
+     def import_full_load(self, dataFile):
+          self.fullLoad = FullLoad(dataFile)
+          self.fullLoad.load_data(dataFile)
+
           
 
 #Files must arrive in a certain order to check things
@@ -33,24 +36,24 @@ class RawDataHandler:
 
 class Data:
 
-     def __init__(self, dataFile, numBenches):
+     def __init__(self, dataFile):
           
-          self.speciesData = pd.read_json("spec.json")
-          self.data = pd.read_csv(dataFile)
-          #self.metaData = pd.read_csv(dataFile)
-
           self.mapDict = {}
           self.logDict = {}
 
-          self.numBenches = numBenches
           self.dataFile = dataFile
           self.fileName = dataFile.name
           self.fileType = self.__class__.__name__
 
 
-     def load_data(self):
+     def load_data(self, dataFile):
+          
+          #import pdb; pdb.set_trace()          
+          self.speciesData = pd.read_json("spec.json")
+          self.data = pd.read_csv(dataFile)
           self.metaData, self.data = self._load_metadata(self.data)
-          self._check_channels()
+          
+          #self._check_channels()
           self._check_units()
           
 
@@ -58,7 +61,7 @@ class Data:
      def _check_channels_util(self, species, channelNames, multipleBenches, data, fileName):
             
           for name in channelNames:
-               if (name in data.columns):
+               if name in data.columns:
                     self.mapDict[species] = name
                     break
                # if (multipleBenches == True ) and (self.numBenches == '2'):
@@ -75,8 +78,6 @@ class Data:
               
                    
 
-
-
      def _check_channels(self):
           
           for species in self.speciesData.Species.items():
@@ -92,13 +93,12 @@ class Data:
      def _check_units(self):
 
           for species in self.mapDict:
-
                unit = self.speciesData.Species[species]['unit']
-               booleanCond = self.data[self.mapDict[species]].str.contains(unit)
-
-               if not (booleanCond.any()):
-                    self.logDict['error'] = "%s units are not in %s" % (self.mapDict[species], unit)
-                    raise Exception("%s units are not in %s" % (self.mapDict[species], unit))
+               if self.speciesData.Species[species]['header_data'] == False: 
+                    booleanCond = self.data[self.mapDict[species]].str.contains(unit)
+                    if not (booleanCond.any()):
+                         self.logDict['error'] = "%s units are not in %s" % (self.mapDict[species], unit)
+                         raise Exception("%s units are not in %s" % (self.mapDict[species], unit))
 
 
 
@@ -108,26 +108,31 @@ class Data:
           data.columns = data.loc[1].values
           data = data[2:]
 
-          if 'proj' in metaData.columns:
-               self.logDict['info'] = "Meta-Data read from import file %s" % self.fileName
-               return metaData, data
-          else:
-               self.logDict['warning'] = "Meta-Data missing in import file %s" % self.fileName
-            
+          for channel in self.speciesData.Species.items():
 
-     # def check_cycle():
-     #      self.stuff = 1
+               if channel[1]['header_data'] == True:
+                                             
+                    for channelName in channel[1]['channel_names']:
+                         if channelName in metaData.columns:
+                              self.logDict['info'] = "Meta-Data read from import file %s" % self.fileName
+                             
+                         else:
+                              self.logDict['warning'] = "Meta-Data missing in import file %s" % self.fileName
+                              raise Exception("Cannot find %s channel in header data of file %s" % (channelName, self.fileName))
+
+          return metaData, data
 
 
 
 class TestData(Data):
 
+
      ## CONSTRUCTOR ##
      
-     # def __init__(self, bench, log):
-     #      self.bench = bench
-     #      self.mapDict = {} # Dictionary that contains mapped species to channel name in uploaded file
-     #      self.logDict = log # Dictionary for logging errors to be serialized and sent to client
+     def __init__(self, dataFile, numBenches):
+          super().__init__(dataFile)
+          self.numBenches = numBenches
+
 
 
      # def load_data(self,filename):
@@ -153,15 +158,15 @@ class TestData(Data):
         self.data.P_INLET = self.data.P_INLET * 100
 
 
-     def _check_units(self):
+     # def _check_units(self):
 
-        for species in self.mapDict:
+     #    for species in self.mapDict:
 
-            unit = self.speciesData.Species[species]['unit']
-            booleanCond = self.data[self.mapDict[species]].str.contains(unit)
-            if not (booleanCond.any()):
-                self.logDict['error'] = "%s units are not in %s" % (self.mapDict[species], unit)
-                raise Exception("%s units are not in %s" % (self.mapDict[species], unit))
+     #        unit = self.speciesData.Species[species]['unit']
+     #        booleanCond = self.data[self.mapDict[species]].str.contains(unit)
+     #        if not (booleanCond.any()):
+     #            self.logDict['error'] = "%s units are not in %s" % (self.mapDict[species], unit)
+     #            raise Exception("%s units are not in %s" % (self.mapDict[species], unit))
 
 
      def _check_ranges(self):
@@ -221,9 +226,8 @@ class TestData(Data):
 
 class FullLoad(Data):
 
-     def load_data(self, dataFile):
-          self.data = pd.read_csv(dataFile)
-          self.metaData = self.load_meta_data()
+     def __init__(self, dataFile):
+          super().__init__(dataFile)
 
      
 

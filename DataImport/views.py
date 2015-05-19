@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import FileUploadParser, MultiPartParser, FormParser
 from rest_framework.renderers import JSONRenderer
 
-from DataImport.models import CycleValidator, RawDataHandler
+from DataImport.models import CycleValidator, DataHandler
 
 class FileUploadView(views.APIView):
 
@@ -33,7 +33,7 @@ class FileUploadView(views.APIView):
             cache = caches['default']
 
             if(not cache.get(request.session._get_session_key())):
-                dataHandler = RawDataHandler()
+                 dataHandler = DataHandler()
             else:
                 dataHandler = cache.get(request.session._get_session_key())
 
@@ -48,17 +48,18 @@ class FileUploadView(views.APIView):
                 jsonDict = {'errors': dataHandler.log}
             elif(request.data['ftype'] == 'test'):#file is test data
                 dataHandler.import_test_data(request.data['bench'], request.data['file'])
-                dataValid = CycleValidator(dataHandler.testData, dataHandler.mapDict)
-                regResults = dataValid.reg_results
+                #dataValid = CycleValidator(dataHandler.testData, dataHandler.mapDict)
+                #regResults = dataValid.reg_results
+                regResults = "stuff"
                 jsonDict = {'regression':regResults, 'errors': dataHandler.log}
 
             cache.set(request.session._get_session_key(), dataHandler)
-                
+            
             jsonLog = json.dumps(jsonDict)
             return Response(jsonLog, status=200)
             
         except Exception as e:
-
+         
             return Response({
                 'status': 'Bad request',
                 'message': str(e)
