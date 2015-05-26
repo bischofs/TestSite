@@ -28,7 +28,16 @@ class DataHandler:
           self.fullLoad = FullLoad(dataFile)
           self.fullLoad.load_data(dataFile)
 
+     # def _corr_frequencies(self):
           
+
+     # def _corr_time_stamps(self):
+
+
+     # def _corr_fuel_data(self):
+
+
+
 
 #Files must arrive in a certain order to check things
 #Full load -> regression
@@ -48,14 +57,18 @@ class Data:
 
      def load_data(self, dataFile):
           
-          #import pdb; pdb.set_trace()          
+          
           self.speciesData = pd.read_json("spec.json")
           self.data = pd.read_csv(dataFile)
           self.metaData, self.data = self._load_metadata(self.data)
+
+          self.data = self.data.convert_objects(convert_numeric=True)       # Convert all data to numeric
+          #self.data = self.data.dropna()                                    # Drop NaN values from data
+
           
           #self._check_channels()
-          self._check_units()
-          
+          #self._check_units()
+          self._check_frequency_rate()
 
 
      def _check_channels_util(self, species, channelNames, multipleBenches, data, fileName):
@@ -99,6 +112,18 @@ class Data:
                     if not (booleanCond.any()):
                          self.logDict['error'] = "%s units are not in %s" % (self.mapDict[species], unit)
                          raise Exception("%s units are not in %s" % (self.mapDict[species], unit))
+
+
+
+     # def _check_frequency_rate(self):
+          
+     #      #import ipdb; ipdb.set_trace()
+
+
+
+
+
+
 
 
 
