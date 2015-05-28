@@ -11,7 +11,7 @@
 
     ImportController.$inject = ['$scope', 'FileUploader', 'toastr', 'infoboxService'];
 
-    /**
+    /*
      * @namespace UploadController
      */
     function ImportController($scope, FileUploader, toastr, infoboxService) {

@@ -20,6 +20,7 @@
 
 
 5. File Upload
+   - Cycle length check 
    - Channel check - Hit ebench database to find out which channels are "active"
    - Header check 
    - Unit check

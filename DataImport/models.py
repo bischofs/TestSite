@@ -16,7 +16,7 @@ class DataHandler:
    
      def import_test_data(self, numBenches, dataFile):
           self.testData = TestData(dataFile, numBenches) 
-          self.testData.load_data(dataFile)
+          self.testDataMapDict = self.testData.load_data(dataFile)
          
      def import_pre_zero_span(self, dataFile):
           self.preZeroSpan = pd.read_csv(dataFile)
@@ -26,7 +26,7 @@ class DataHandler:
 
      def import_full_load(self, dataFile):
           self.fullLoad = FullLoad(dataFile)
-          self.fullLoad.load_data(dataFile)
+          self.fullLoadMapDict = self.fullLoad.load_data(dataFile)
 
      # def _corr_frequencies(self):
           
@@ -50,25 +50,26 @@ class Data:
           self.mapDict = {}
           self.logDict = {}
 
+
           self.dataFile = dataFile
           self.fileName = dataFile.name
           self.fileType = self.__class__.__name__
 
 
      def load_data(self, dataFile):
-          
-          
+
+
           self.speciesData = pd.read_json("spec.json")
           self.data = pd.read_csv(dataFile)
           self.metaData, self.data = self._load_metadata(self.data)
 
+          self.data = self.data.dropna(how="all",axis=(1))
+          self._check_units()
           self.data = self.data.convert_objects(convert_numeric=True)       # Convert all data to numeric
-          #self.data = self.data.dropna()                                    # Drop NaN values from data
+          self.data = self.data.dropna()
+          self._check_channels()
 
-          
-          #self._check_channels()
-          #self._check_units()
-          self._check_frequency_rate()
+          return self.mapDict
 
 
      def _check_channels_util(self, species, channelNames, multipleBenches, data, fileName):
@@ -115,13 +116,14 @@ class Data:
 
 
 
-     # def _check_frequency_rate(self):
+     #def _check_cycle_length(self):
           
-     #      #import ipdb; ipdb.set_trace()
+          
 
 
 
 
+          
 
 
 
@@ -129,13 +131,17 @@ class Data:
 
      def _load_metadata(self, data):
 
+
+
           metaData = data[:1]
           data.columns = data.loc[1].values
           data = data[2:]
 
           for channel in self.speciesData.Species.items():
 
-               if channel[1]['header_data'] == True:
+              import ipdb; ipdb.set_trace() 
+
+              if channel[1]['header_data'] == True:
                                              
                     for channelName in channel[1]['channel_names']:
                          if channelName in metaData.columns:
