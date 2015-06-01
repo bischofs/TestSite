@@ -13,7 +13,8 @@ class DataHandler:
           self.log = {}
           self.masterDict = {} 
           self.ebenches = Ebench.objects.all()
-   
+          self.allFilesUploaded = False
+
      def import_test_data(self, numBenches, dataFile):
           self.testData = TestData(dataFile, numBenches) 
           self.testDataMapDict = self.testData.load_data(dataFile)
@@ -27,7 +28,7 @@ class DataHandler:
      def import_full_load(self, dataFile):
           self.fullLoad = FullLoad(dataFile)
           self.fullLoadMapDict = self.fullLoad.load_data(dataFile)
-
+          import ipdb; ipdb.set_trace()
      # def _corr_frequencies(self):
           
 
@@ -68,6 +69,7 @@ class Data:
           self.data = self.data.convert_objects(convert_numeric=True)       # Convert all data to numeric
           self.data = self.data.dropna()
           self._check_channels()
+          
 
           return self.mapDict
 
@@ -96,7 +98,7 @@ class Data:
           
           for species in self.speciesData.Species.items():
 
-               if species[1]['files'].__contains__(self.fileType):
+               if species[1]['files'].__contains__(self.fileType) and species[1]['header_data'] == False:
                     if (species[1]['multiple_benches'] == True):
                          self._check_channels_util(species[0], species[1]['channel_names'], True, self.data, self.fileName)
                     else:
@@ -131,18 +133,12 @@ class Data:
 
      def _load_metadata(self, data):
 
-
-
           metaData = data[:1]
           data.columns = data.loc[1].values
           data = data[2:]
 
           for channel in self.speciesData.Species.items():
-
-              import ipdb; ipdb.set_trace() 
-
               if channel[1]['header_data'] == True:
-                                             
                     for channelName in channel[1]['channel_names']:
                          if channelName in metaData.columns:
                               self.logDict['info'] = "Meta-Data read from import file %s" % self.fileName

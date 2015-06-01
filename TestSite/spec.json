@@ -1,9 +1,4 @@
 {
-    "Cycles": {
-	   "Heavy_Duty_Diesel_Transient": {
-	    "cycle_length": "1369"
-	    }
-    },
     "Species": {
         "Mass_Fraction_Carbon": {
             "unit": "%",
