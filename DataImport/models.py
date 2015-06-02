@@ -5,7 +5,9 @@ import pandas as pd
 import statsmodels.api as sm
 import logging
 import math
-#tuff
+import itertools
+
+
 class DataHandler:
 
      def __init__(self):
@@ -13,22 +15,59 @@ class DataHandler:
           self.log = {}
           self.masterDict = {} 
           self.ebenches = Ebench.objects.all()
-          self.allFilesUploaded = False
+          self.allFilesLoaded = False
 
      def import_test_data(self, numBenches, dataFile):
           self.testData = TestData(dataFile, numBenches) 
           self.testDataMapDict = self.testData.load_data(dataFile)
+          self._all_files_loaded()          
          
      def import_pre_zero_span(self, dataFile):
-          self.preZeroSpan = pd.read_csv(dataFile)
-
+          self.preZeroSpan = ZeroSpan(dataFile)
+          self.zeroSpanMapDict = self.preZeroSpan.load_data(dataFile)
+          self._all_files_loaded()
+          
      def import_post_zero_span(self, dataFile):
-          self.postZeroSpan = pd.read_csv(dataFile)
-
+          self.postZeroSpan = ZeroSpan(dataFile)
+          self.zeroSpanMapDict = self.postZeroSpan.load_data(dataFile)
+          self._all_files_loaded()
+          
      def import_full_load(self, dataFile):
           self.fullLoad = FullLoad(dataFile)
           self.fullLoadMapDict = self.fullLoad.load_data(dataFile)
-          import ipdb; ipdb.set_trace()
+          self._all_files_loaded()
+
+     def _all_files_loaded(self):
+          
+          self.attrs = ['fullLoad', 'postZeroSpan', 'preZeroSpan', 'testData']
+
+          for attr in self.attrs:
+               if not hasattr(self, attr):
+                    break
+          else:
+               self.allFilesLoaded = True
+
+          if(self.allFilesLoaded == True):
+               self.files = [self.testData, self.preZeroSpan, self.postZeroSpan, self.fullLoad]
+               self._check_all_metadata()
+               #self._check_time_stamps
+               
+               
+     def _check_all_metadata(self):
+
+          
+
+          for x, y in itertools.combinations(self.files, 2):
+               import ipdb; ipdb.set_trace()                    
+               if not x.metaData.equals(y.metaData):
+                    raise Exception("metadata in file %s does not match file %s" % (x.fileName, y.fileName))
+                              
+
+
+     #def _check_all_time_stamps:
+
+     
+
      # def _corr_frequencies(self):
           
 
@@ -37,6 +76,9 @@ class DataHandler:
 
      # def _corr_fuel_data(self):
 
+
+
+#load all files check each import if all files are uploaded
 
 
 
@@ -50,7 +92,6 @@ class Data:
           
           self.mapDict = {}
           self.logDict = {}
-
 
           self.dataFile = dataFile
           self.fileName = dataFile.name
@@ -118,18 +159,6 @@ class Data:
 
 
 
-     #def _check_cycle_length(self):
-          
-          
-
-
-
-
-          
-
-
-
-
 
      def _load_metadata(self, data):
 
@@ -151,11 +180,21 @@ class Data:
 
 
 
+
+class FullLoad(Data):
+
+     def __init__(self, dataFile):
+          super().__init__(dataFile)
+
+
+class ZeroSpan(Data):
+
+     def __init__(self, dataFile):
+          super().__init__(dataFile)
+
+
 class TestData(Data):
 
-
-     ## CONSTRUCTOR ##
-     
      def __init__(self, dataFile, numBenches):
           super().__init__(dataFile)
           self.numBenches = numBenches
@@ -179,10 +218,10 @@ class TestData(Data):
      #    return self.data, self.mapDict, self.logDict
 
 
-     def _convert_bar_to_kpa(self): #FIX DIS
+     # def _convert_bar_to_kpa(self): #FIX DIS
         
-        self.data.P_AMB = self.data.P_AMB * 100
-        self.data.P_INLET = self.data.P_INLET * 100
+     #    self.data.P_AMB = self.data.P_AMB * 100
+     #    self.data.P_INLET = self.data.P_INLET * 100
 
 
      # def _check_units(self):
@@ -196,21 +235,21 @@ class TestData(Data):
      #            raise Exception("%s units are not in %s" % (self.mapDict[species], unit))
 
 
-     def _check_ranges(self):
+     # def _check_ranges(self):
         
-        for species in self.mapDict:
+     #    for species in self.mapDict:
 
-            maxValue = self.speciesData.Species[species]['maximum_value']
-            minValue = self.speciesData.Species[species]['minimum_value']
+     #        maxValue = self.speciesData.Species[species]['maximum_value']
+     #        minValue = self.speciesData.Species[species]['minimum_value']
 
-            booleanCond = self.data[self.mapDict[species]] > float(maxValue)
-            if(booleanCond.any()):
-                self.logDict['error'] = "%s is above required maximum of %s %s" % (self.mapDict[species], str(maxValue), self.speciesData.Species[species]['unit'])
-                raise Exception ("%s is above required maximum of %s %s" % (self.mapDict[species], str(maxValue), self.speciesData.Species[species]['unit']))
-            booleanCond = self.data[self.mapDict[species]] < float(minValue)
-            if(booleanCond.any()):
-                self.logDict['error'] = "%s is below required minimum of %s %s" % (self.mapDict[species], str(minValue), self.speciesData.Species[species]['unit'])
-                raise Exception ("%s is below required minimum of %s %s" % (self.mapDict[species], str(minValue), self.speciesData.Species[species]['unit']))
+     #        booleanCond = self.data[self.mapDict[species]] > float(maxValue)
+     #        if(booleanCond.any()):
+     #            self.logDict['error'] = "%s is above required maximum of %s %s" % (self.mapDict[species], str(maxValue), self.speciesData.Species[species]['unit'])
+     #            raise Exception ("%s is above required maximum of %s %s" % (self.mapDict[species], str(maxValue), self.speciesData.Species[species]['unit']))
+     #        booleanCond = self.data[self.mapDict[species]] < float(minValue)
+     #        if(booleanCond.any()):
+     #            self.logDict['error'] = "%s is below required minimum of %s %s" % (self.mapDict[species], str(minValue), self.speciesData.Species[species]['unit'])
+     #            raise Exception ("%s is below required minimum of %s %s" % (self.mapDict[species], str(minValue), self.speciesData.Species[species]['unit']))
 
 
      # def _check_channels(self):
@@ -250,13 +289,6 @@ class TestData(Data):
      #    else:
      #        self.logDict['warning'] = "Meta-Data missing in import file %s" % filename
 
-
-class FullLoad(Data):
-
-     def __init__(self, dataFile):
-          super().__init__(dataFile)
-
-     
 
 class CycleValidator:
     

@@ -130,7 +130,7 @@
                 "TestData",
                 "ZeroSpan"
             ],
-	"channel_names": [
+	    "channel_names": [
                 "E_THCW2"
             ]
         },
@@ -289,7 +289,7 @@
             "header_data": false,
 	    "files": [
                 "TestData",
-		"full_load"
+		"FullLoad"
             ],
 	    "channel_names": [
                 "U_BPOW"
@@ -303,7 +303,7 @@
             "header_data": false,
 	    "files": [
                 "TestData",
-		"full_load"
+		"FullLoad"
             ],
 	    "channel_names": [
                 "C_BHP"
@@ -317,7 +317,7 @@
             "header_data": false,
 	    "files": [
                 "TestData",
-		"full_load"
+		"FullLoad"
             ],
 	    "channel_names": [
                 "C_TRQENG"
@@ -331,7 +331,7 @@
             "header_data": false,
 	    "files": [
                 "TestData",
-		"full_load"
+		"FullLoad"
             ],
 	    "channel_names": [
                 "UDPi_TorqueDemand"
@@ -345,7 +345,7 @@
             "header_data": false,
 	    "files": [
                 "TestData",
-		"full_load"
+		"FullLoad"
             ],
 	    "channel_names": [
                 "C_SPDDYN"
