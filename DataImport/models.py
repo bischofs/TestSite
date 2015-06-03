@@ -248,12 +248,17 @@ class CycleValidator:
         self.Speed_Engine = self.data[self.mapDict['Engine_Speed']]
         self.Power_Demand = (self.data[self.mapDict['Commanded_Torque']] * self.data[self.mapDict['Commanded_Speed']] / 9.5488) / 1000
         self.Power_Engine = self.data[self.mapDict['Engine_Power']]
-        #self.data = None
+        self.data = None
 
-        ##### Preparation Minimum and Maximum of Throttle and Torque #####
-        self.Throttle_Max = np.nanmax(self.Throttle)[2]
-        self.Throttle_Min = np.nanmin(self.Throttle)[2]
+        ##### Preparation of Maximum Torque and Maximum and Minimum Throttle Index #####
         self.Torque_Max = np.nanmax(self.Torque_Demand)[2] # !!!! Has to be changed to Maximum Torque of Full Load !!!!
+        self.Index_Min = np.where([self.Throttle==np.nanmin(self.Throttle)[2]])[1]
+        self.Index_Max = np.where([self.Throttle==np.nanmax(self.Throttle)[2]])[1]
+
+        ##### Drop Lists #####
+        self.Torque_Drop = []
+        self.Speed_Drop = []
+        self.Power_Drop = []
 
         self.dataDict = {'Speed': ["Speed_Demand", "Speed_Engine"],
                          'Torque': ["Torque_Demand", "Torque_Engine"],
@@ -264,48 +269,42 @@ class CycleValidator:
         
     def _pre_regression_filter(self):
 
-        # -- Cycle-validation criteria for operation over specified duty cycles -- EPA 1065.514
-        for i in range(1,len(self.Throttle)):
-            
-            ##### Prepare Boolean Values #####
-            self.Speed_Bool = False
-            self.Torque_Bool = False
-            
+        for i in self.Index_Min:
             ##### Check Minimum Throttle ##### -- Table 1 EPA 1065.514
-            if self.Throttle[i] == self.Throttle_Min:
-                if self.Torque_Demand[i]<0:
-                    self.Torque_Bool = True
-                    self.Torque_Below_Zero = True # Used to show the User that negative Torque during motoring is omitted
-                    
-                if (self.Torque_Demand[i]==0) & (self.Speed_Demand[i]==0) & ((self.Torque_Engine[i]-0.02*self.Torque_Max)<self.Torque_Engine[i]) & (self.Torque_Engine[i]<(self.Torque_Engine[i]+0.02*self.Torque_Max)):
-                    self.Speed_Bool = True
-                    
-                if (self.Speed_Engine[i]>self.Speed_Demand[i]) & (self.Speed_Engine[i]<self.Speed_Demand[i]*1.02):
-                    self.Speed_Bool = True
-                    
-                if (self.Torque_Engine[i]>self.Torque_Demand[i]) & ((self.Torque_Engine[i]<(self.Torque_Engine[i]+0.02*self.Torque_Max)) | (self.Torque_Engine[i]<(self.Torque_Engine[i]-0.02*self.Torque_Max))):
-                    self.Torque_Bool = True
-                    
+            if self.Torque_Demand[i]<0:
+                self.Torque_Drop.append(i)
+                self.Power_Drop.append(i)
+                self.Torque_Below_Zero = True # Used to show the User that negative Torque during motoring is omitted                    
+                
+            if (self.Torque_Demand[i]==0) & (self.Speed_Demand[i]==0) & ((self.Torque_Engine[i]-0.02*Torque_Max)<self.Torque_Engine[i]) & (self.Torque_Engine[i]<(self.Torque_Engine[i]+0.02*Torque_Max)):
+                self.Speed_Drop.append(i)
+                self.Power_Drop.append(i)
+                
+            if (self.Speed_Engine[i]>self.Speed_Demand[i]) & (self.Speed_Engine[i]<self.Speed_Demand[i]*1.02):
+                self.Speed_Drop.append(i)
+                self.Power_Drop.append(i)
+                
+            if (self.Torque_Engine[i]>self.Torque_Demand[i]) & ((self.Torque_Engine[i]<(self.Torque_Engine[i]+0.02*Torque_Max)) | (self.Torque_Engine[i]<(self.Torque_Engine[i]-0.02*Torque_Max))):
+                self.Torque_Drop.append(i)
+                self.Power_Drop.append(i)
+            
+        for i in self.Index_Max:
             ##### Check Maximum Throttle ##### -- Table 1 EPA 1065.514
-            if self.Throttle[i] == self.Throttle_Max:
-                if (self.Speed_Engine[i]<self.Speed_Demand[i]) & (self.Speed_Engine[i]>self.Speed_Demand[i]*0.98):
-                    self.Speed_Bool = True
-                    
-                if (self.Torque_Engine[i]<self.Torque_Demand[i]) & (self.Torque_Engine[i]>(self.Torque_Engine[i]-0.02*self.Torque_Max)):
-                    self.Torque_Bool = True
-                    
-            ##### Omit Values #####
-            if self.Speed_Bool: # If True --> Omits the Speed and the Power
-                self.Speed_Engine = self.Speed_Engine.drop(i)
-                self.Speed_Demand = self.Speed_Demand.drop(i)
+            if (self.Speed_Engine[i]<self.Speed_Demand[i]) & (self.Speed_Engine[i]>self.Speed_Demand[i]*0.98):
+                self.Speed_Drop.append(i)
+                self.Power_Drop.append(i)
                 
-            if self.Torque_Bool: # If True --> Omits the Torque and the Power
-                self.Torque_Engine = self.Torque_Engine.drop(i)
-                self.Torque_Demand = self.Torque_Demand.drop(i)
-                
-            if self.Speed_Bool | self.Torque_Bool: # If either Torque or Speed is omitted Power will be omitted as well
-                self.Power_Engine = self.Power_Engine.drop(i)
-                self.Power_Demand = self.Power_Demand.drop(i)
+            if (self.Torque_Engine[i]<self.Torque_Demand[i]) & (self.Torque_Engine[i]>(self.Torque_Engine[i]-0.02*Torque_Max)):
+                self.Torque_Drop.append(i)
+                self.Power_Drop.append(i)            
+
+        ##### Omitting the Data #####
+        self.Speed_Engine = self.Speed_Engine.drop(self.Speed_Drop)
+        self.Speed_Demand = self.Speed_Demand.drop(self.Speed_Drop)
+        self.Torque_Engine = self.Torque_Engine.drop(self.Torque_Drop)
+        self.Torque_Demand = self.Torque_Demand.drop(self.Torque_Drop)
+        self.Power_Engine = self.Power_Engine.drop(self.Power_Drop)
+        self.Power_Demand = self.Power_Demand.drop(self.Power_Drop)            
 
         ##### Reindexing the data #####
         self.Torque_Engine.index = range(0,len(self.Torque_Engine))
@@ -314,6 +313,10 @@ class CycleValidator:
         self.Speed_Demand.index = range(0,len(self.Speed_Demand))
         self.Power_Engine.index = range(0,len(self.Power_Engine))
         self.Power_Demand.index = range(0,len(self.Power_Demand))
+
+        ##### Cleaning Variables #####
+        self.Throttle, self.Torque_Max, self.Index_Min = None, None, None
+        self.Torque_Drop, self.Speed_Drop, self.Power_Drop = None, None, None
        
 
     def _regression(self):
