@@ -47,13 +47,19 @@ class FileUploadView(views.APIView):
                 dataHandler.import_post_zero_span(request.data['file'])
                 jsonDict = {'errors': dataHandler.log}
             elif(request.data['ftype'] == 'test'):#file is test data
-                dataHandler.import_test_data(request.data['bench'], request.data['file'])
-                #dataValid = CycleValidator(dataHandler.testData, dataHandler.mapDict)
-                #regResults = dataValid.reg_results
-                regResults = "stuff"
-                jsonDict = {'regression':regResults, 'errors': dataHandler.log}
+                dataHandler.import_test_data(request.data['bench'], request.data['file'])  
+                jsonDict = {'errors': dataHandler.log}          
+
+            ##### If all files are uploaded --> Regression #####
+            if(dataHandler.allFilesLoaded == True):
+                cycleValidator = CycleValidator(dataHandler.testData, dataHandler.testDataMapDict,
+                                                dataHandler.fullLoad, dataHandler.fullLoad.metaData['n_CurbIdle'])
+                dataHandler.resultsLog['Regression'] = cycleValidator.reg_results
+                dataHandler.resultsLog['Regression_bool'] = cycleValidator.reg_results_bool      
+                jsonDict = {'Regression':cycleValidator.reg_results,'Regression_bool':cycleValidator.reg_results_bool, 'errors': dataHandler.log}
 
             cache.set(request.session._get_session_key(), dataHandler)
+
             
             jsonLog = json.dumps(jsonDict)
             return Response(jsonLog, status=200)
