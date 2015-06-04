@@ -17,6 +17,7 @@ class DataHandler:
           self.masterDict = {} 
           self.ebenches = Ebench.objects.all()
           self.allFilesLoaded = False
+          self.CoHigh = False
 
      def import_test_data(self, numBenches, dataFile):
           self.testData = TestData(dataFile, numBenches) 
@@ -56,10 +57,8 @@ class DataHandler:
                
      def _check_all_metadata(self):
 
-          
-
           for x, y in itertools.combinations(self.files, 2):
-               import ipdb; ipdb.set_trace()                    
+              
                if not x.metaData.equals(y.metaData):
                     raise Exception("metadata in file %s does not match file %s" % (x.fileName, y.fileName))
                               
