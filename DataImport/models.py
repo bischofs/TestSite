@@ -8,15 +8,16 @@ import math
 import itertools
 import numpy as np
 
-
 class DataHandler:
 
      def __init__(self):
          # need required channels for each file
+          self.resultsLog = {'Regression': {},'Regression_bool': {}, 'Data Alignment': {}, 'Calculation': {}} 
           self.log = {}
           self.masterDict = {} 
           self.ebenches = Ebench.objects.all()
           self.allFilesLoaded = False
+          
 
      def import_test_data(self, numBenches, dataFile):
           self.testData = TestData(dataFile, numBenches) 
@@ -55,11 +56,9 @@ class DataHandler:
                
                
      def _check_all_metadata(self):
-
           
-
           for x, y in itertools.combinations(self.files, 2):
-               import ipdb; ipdb.set_trace()                    
+               #import ipdb; ipdb.set_trace()                    
                if not x.metaData.equals(y.metaData):
                     raise Exception("metadata in file %s does not match file %s" % (x.fileName, y.fileName))
                               
@@ -294,10 +293,13 @@ class TestData(Data):
 class CycleValidator:
     
 
-    def __init__(self, data, mapDict):        
-        
-        self.data = data
-        self.mapDict = mapDict   
+    def __init__(self, Testdata, Mapdict, Fullload, Warmidle):
+
+        self.data = Testdata.data
+        self.data_full = Fullload.data
+        self.data_full.index = range(0,len(self.data_full))
+        self.data.index = range(0,len(self.data))
+        self.mapDict = Mapdict
 
         ##### Define Variables #####     
         self.Throttle = self.data[self.mapDict['Commanded_Throttle']]
@@ -309,22 +311,28 @@ class CycleValidator:
         self.Power_Engine = self.data[self.mapDict['Engine_Power']]
         self.data = None
 
-        ##### Preparation of Maximum Torque and Maximum and Minimum Throttle Index #####
-        self.Torque_Max = np.nanmax(self.Torque_Demand)[2] # !!!! Has to be changed to Maximum Torque of Full Load !!!!
-        self.Index_Min = np.where([self.Throttle==np.nanmin(self.Throttle)[2]])[1]
-        self.Index_Max = np.where([self.Throttle==np.nanmax(self.Throttle)[2]])[1]
+        ##### Maximum of Speed, Torque, Power and warm idle #####
+        self.Speed_Max = np.nanmax(self.data_full[self.mapDict['Engine_Speed']])[0]
+        self.Torque_Max = np.nanmax(self.data_full[self.mapDict['Engine_Torque']])[0]
+        self.Power_Max = np.nanmax(self.data_full[self.mapDict['Engine_Power']])[0]
+        self.Warm_Idle = Warmidle[0]
+        self.data_full = None
+
+        ##### Index of Maximum and Minimum Throttle #####
+        self.Index_Min = np.where([self.Throttle==np.nanmin(self.Throttle)[0]])[1]
+        self.Index_Max = np.where([self.Throttle==np.nanmax(self.Throttle)[0]])[1]
+
 
         ##### Drop Lists #####
         self.Torque_Drop = []
         self.Speed_Drop = []
         self.Power_Drop = []
 
-        self.dataDict = {'Speed': ["Speed_Demand", "Speed_Engine"],
-                         'Torque': ["Torque_Demand", "Torque_Engine"],
-                         'Power': ["Power_Demand", "Power_Engine"]}
+        self.dataDict = {'Torque': ['Torque_Demand', 'Torque_Engine'],'Power': ['Power_Demand', 'Power_Engine'], 'Speed': ['Speed_Demand', 'Speed_Engine']}
         
         self._pre_regression_filter()
         self._regression()
+        self._regression_validation()
         
     def _pre_regression_filter(self):
 
@@ -335,7 +343,7 @@ class CycleValidator:
                 self.Power_Drop.append(i)
                 self.Torque_Below_Zero = True # Used to show the User that negative Torque during motoring is omitted                    
                 
-            if (self.Torque_Demand[i]==0) & (self.Speed_Demand[i]==0) & ((self.Torque_Engine[i]-0.02*Torque_Max)<self.Torque_Engine[i]) & (self.Torque_Engine[i]<(self.Torque_Engine[i]+0.02*Torque_Max)):
+            if (self.Torque_Demand[i]==0) & (self.Speed_Demand[i]==0) & ((self.Torque_Engine[i]-0.02*self.Torque_Max)<self.Torque_Engine[i]) & (self.Torque_Engine[i]<(self.Torque_Engine[i]+0.02*self.Torque_Max)):
                 self.Speed_Drop.append(i)
                 self.Power_Drop.append(i)
                 
@@ -343,7 +351,7 @@ class CycleValidator:
                 self.Speed_Drop.append(i)
                 self.Power_Drop.append(i)
                 
-            if (self.Torque_Engine[i]>self.Torque_Demand[i]) & ((self.Torque_Engine[i]<(self.Torque_Engine[i]+0.02*Torque_Max)) | (self.Torque_Engine[i]<(self.Torque_Engine[i]-0.02*Torque_Max))):
+            if (self.Torque_Engine[i]>self.Torque_Demand[i]) & ((self.Torque_Engine[i]<(self.Torque_Engine[i]+0.02*self.Torque_Max)) | (self.Torque_Engine[i]<(self.Torque_Engine[i]-0.02*self.Torque_Max))):
                 self.Torque_Drop.append(i)
                 self.Power_Drop.append(i)
             
@@ -353,7 +361,7 @@ class CycleValidator:
                 self.Speed_Drop.append(i)
                 self.Power_Drop.append(i)
                 
-            if (self.Torque_Engine[i]<self.Torque_Demand[i]) & (self.Torque_Engine[i]>(self.Torque_Engine[i]-0.02*Torque_Max)):
+            if (self.Torque_Engine[i]<self.Torque_Demand[i]) & (self.Torque_Engine[i]>(self.Torque_Engine[i]-0.02*self.Torque_Max)):
                 self.Torque_Drop.append(i)
                 self.Power_Drop.append(i)            
 
@@ -374,30 +382,28 @@ class CycleValidator:
         self.Power_Demand.index = range(0,len(self.Power_Demand))
 
         ##### Cleaning Variables #####
-        self.Throttle, self.Torque_Max, self.Index_Min = None, None, None
+        self.Throttle, self.Index_Min = None, None
         self.Torque_Drop, self.Speed_Drop, self.Power_Drop = None, None, None
        
 
     def _regression(self):
         
-        self.reg_results = { 'Speed': { 'slope': " ", 'intercept': " ", 'standard_error': " ", 'rsquared': " " },
-                             'Torque': { 'slope': " ", 'intercept': " ", 'standard_error': " ", 'rsquared': " " },
-                             'Power': { 'slope': " ", 'intercept': " ", 'standard_error': " ", 'rsquared': " " }}
-
+        self.reg_results = {'Torque': { 'slope': " ", 'intercept': " ", 'standard_error': " ", 'rsquared': " " }, 'Power': { 'slope': " ", 'intercept': " ", 'standard_error': " ", 'rsquared': " " }, 'Speed': { 'slope': " ", 'intercept': " ", 'standard_error': " ", 'rsquared': " " }}
+        
         for channel in self.dataDict.items():
            self._regression_util(channel[0], channel[1][0], channel[1][1])
  
 
     def _regression_util(self, channel, X, Y):
 
-        ymean = self.Y.mean()
-        xmean = self.X.mean()
+        ymean = vars(self)[Y].mean()
+        xmean = vars(self)[X].mean()
 
         # -- Regression Slope -- EPA 1065.602-9 
         numerator, denominator = 0.0, 0.0
-        for x, y in zip(self.X, self.Y):
+        for x, y in zip(vars(self)[X], vars(self)[Y]):
             numerator = numerator + ((x - xmean) * (y - ymean))
-        for x, y in zip(self.X, self.Y):
+        for x, y in zip(vars(self)[X], vars(self)[Y]):
             denominator = denominator + ((y - ymean) ** 2)
                 
         slope = numerator / denominator 
@@ -407,32 +413,90 @@ class CycleValidator:
 
         # -- Regression Standard Error of Estimate -- EPA 1065.602-11 
         sumat = 0.0
-        for x, y in zip(self.X, self.Y):
+        for x, y in zip(vars(self)[X], vars(self)[Y]):
             sumat = sumat + ((x - intercept - (slope * y)) ** 2)
-        see = sumat / (self.X.size - 2)
+        see = sumat / (vars(self)[X].size - 2)
         standerror = math.sqrt(see)
 
         # -- Regression Coefficient of determination -- EPA 1065.602-12
         numerator, denominator = 0.0, 0.0
-        for x, y in zip(self.X, self.Y):
+        for x, y in zip(vars(self)[X], vars(self)[Y]):
             numerator = numerator + ((x - intercept - (slope * y)) ** 2)
-        for x, y in zip(self.X, self.Y):
+        for x, y in zip(vars(self)[X], vars(self)[Y]):
             denominator = denominator + ((x - ymean) ** 2)
                 
         r2 = 1 - (numerator / denominator)
 
-        self.reg_results[channel]['slope'] = slope
-        self.reg_results[channel]['intercept'] = intercept
-        self.reg_results[channel]['standard_error'] = standerror
-        self.reg_results[channel]['rsquared'] = r2
-            
+        self.reg_results[channel]['slope'] = round(slope,2)
+        self.reg_results[channel]['intercept'] = round(intercept,2)
+        self.reg_results[channel]['standard_error'] = round(standerror,2)
+        self.reg_results[channel]['rsquared'] = round(r2,2)
 
 
+    def _regression_validation(self):
 
+        self.reg_results_bool = {'Torque': { 'slope': False, 'intercept': False, 'standard_error': False, 'rsquared': False }, 
+                                  'Power': { 'slope': False, 'intercept': False, 'standard_error': False, 'rsquared': False },
+                                  'Speed': { 'slope': False, 'intercept': False, 'standard_error': False, 'rsquared': False }}
 
+        # Cycle-validation criteria for operation over specified duty cycles -- EPA 1065.514 - Table 2
+        for parameter in self.reg_results:
 
+            ###### Statistical Criteria for Speed #####
+            if parameter == 'Speed':
 
+                # Slope
+                if (self.reg_results[parameter]['slope'] <= 1.03) & (self.reg_results[parameter]['slope'] >= 0.95):
+                    self.reg_results_bool[parameter]['slope'] = True
 
+                # Intercept
+                if (self.reg_results[parameter]['intercept'] <= 0.1*float(self.Warm_Idle)):
+                    self.reg_results_bool[parameter]['intercept'] = True
+
+                # Standard error
+                if self.reg_results[parameter]['standard_error'] <= 0.05*self.Speed_Max:
+                    self.reg_results_bool[parameter]['standard_error'] = True
+
+                # Coefficient of determination
+                if self.reg_results[parameter]['rsquared'] >= 0.97:
+                    self.reg_results_bool[parameter]['rsquared'] = True
+
+            ###### Statistical Criteria for Torque #####
+            if parameter == 'Torque':
+
+                # Slope
+                if (self.reg_results[parameter]['slope'] <= 1.03) & (self.reg_results[parameter]['slope'] >= 0.83):
+                    self.reg_results_bool[parameter]['slope'] = True
+                # Intercept
+                if (self.reg_results[parameter]['intercept'] <= 0.02*self.Torque_Max):
+                    self.reg_results_bool[parameter]['intercept'] = True
+
+                # Standard error
+                if self.reg_results[parameter]['standard_error'] <= 0.1*self.Torque_Max:
+                    self.reg_results_bool[parameter]['standard_error'] = True
+
+                # Coefficient of determination
+                if self.reg_results[parameter]['rsquared'] >= 0.85:
+                    self.reg_results_bool[parameter]['rsquared'] = True
+
+            ###### Statistical Criteria for Power #####
+            if parameter == 'Power':
+
+                # Slope
+                if (self.reg_results[parameter]['slope'] <= 1.03) & (self.reg_results[parameter]['slope'] >= 0.83):
+                    self.reg_results_bool[parameter]['slope'] = True
+
+                # Intercept
+                if (self.reg_results[parameter]['intercept'] <= 0.02*self.Power_Max):
+                    self.reg_results_bool[parameter]['intercept'] = True
+
+                # Standard error
+                if self.reg_results[parameter]['standard_error'] <= 0.1*self.Power_Max:
+                    self.reg_results_bool[parameter]['standard_error'] = True
+
+                # Coefficient of determination
+                if self.reg_results[parameter]['rsquared'] >= 0.91:
+                    self.reg_results_bool[parameter]['rsquared'] = True
 
 
 
