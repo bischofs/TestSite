@@ -56,11 +56,11 @@ class FileUploadView(views.APIView):
                                                 dataHandler.fullLoad, dataHandler.fullLoad.metaData['n_CurbIdle'])
                 dataHandler.resultsLog['Regression'] = cycleValidator.reg_results
                 dataHandler.resultsLog['Regression_bool'] = cycleValidator.reg_results_bool      
-                jsonDict = {'Regression':cycleValidator.reg_results,'Regression_bool':cycleValidator.reg_results_bool, 'errors': dataHandler.log}
+                jsonDict = {'Regression':cycleValidator.reg_results,
+                            'Regression_bool':cycleValidator.reg_results_bool,
+                            'errors': dataHandler.log}
 
-            cache.set(request.session._get_session_key(), dataHandler)
-
-            
+            cache.set(request.session._get_session_key(), dataHandler)            
             jsonLog = json.dumps(jsonDict)
             return Response(jsonLog, status=200)
             

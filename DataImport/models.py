@@ -102,7 +102,7 @@ class Data:
 
 
           self.speciesData = pd.read_json("spec.json")
-          self.data = pd.read_csv(dataFile)
+          self.data = pd.read_csv(dataFile, encoding='windows-1258')
           self.metaData, self.data = self._load_metadata(self.data)
 
           self.data = self.data.dropna(how="all",axis=(1))
@@ -328,7 +328,9 @@ class CycleValidator:
         self.Speed_Drop = []
         self.Power_Drop = []
 
-        self.dataDict = {'Torque': ['Torque_Demand', 'Torque_Engine'],'Power': ['Power_Demand', 'Power_Engine'], 'Speed': ['Speed_Demand', 'Speed_Engine']}
+        self.dataDict = {'Torque': ['Torque_Demand', 'Torque_Engine'],
+                         'Power': ['Power_Demand', 'Power_Engine'], 
+                         'Speed': ['Speed_Demand', 'Speed_Engine']}
         
         self._pre_regression_filter()
         self._regression()
@@ -388,7 +390,9 @@ class CycleValidator:
 
     def _regression(self):
         
-        self.reg_results = {'Torque': { 'slope': " ", 'intercept': " ", 'standard_error': " ", 'rsquared': " " }, 'Power': { 'slope': " ", 'intercept': " ", 'standard_error': " ", 'rsquared': " " }, 'Speed': { 'slope': " ", 'intercept': " ", 'standard_error': " ", 'rsquared': " " }}
+        self.reg_results = {'Torque': { 'slope': " ", 'intercept': " ", 'standard_error': " ", 'rsquared': " " },
+                            'Power': { 'slope': " ", 'intercept': " ", 'standard_error': " ", 'rsquared': " " }, 
+                            'Speed': { 'slope': " ", 'intercept': " ", 'standard_error': " ", 'rsquared': " " }}
         
         for channel in self.dataDict.items():
            self._regression_util(channel[0], channel[1][0], channel[1][1])

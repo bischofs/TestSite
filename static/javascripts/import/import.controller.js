@@ -2,26 +2,24 @@
  * NavbarController
  * @namespace TestSite.import.controllers
  */
-(function() {
+ (function() {
     'use strict';
 
     angular
-        .module('TestSite.import.controllers')
-        .controller('ImportController', ImportController);
+    .module('TestSite.import.controllers')
+    .controller('ImportController', ImportController);
 
     ImportController.$inject = ['$scope', 'FileUploader', 'toastr', 'infoboxService'];
 
     /*
      * @namespace UploadController
      */
-    function ImportController($scope, FileUploader, toastr, infoboxService) {
+     function ImportController($scope, FileUploader, toastr, infoboxService) {
 
         $scope.uploader = new FileUploader();
         $scope.uploader.url = 'api/v1/data/import/'
         $scope.uploader.method = 'POST'
         $scope.filetype = '';
-
-
         //$scope.uploader.formData.push({cycle: 'FTP'});
         $scope.uploader.formData.push({
             bench: '1'
@@ -83,26 +81,28 @@
             var jsonObj = JSON.parse(response);
 
             if (typeof jsonObj.Regression !== 'undefined') {
+
                 /*
-                $scope.powerI = jsonObj.Regression.Power.intercept
-                $scope.powerr = jsonObj.Regression.Power.rsquared
-                $scope.powers = jsonObj.Regression.Power.slope
-                $scope.powerse = jsonObj.Regression.Power.standard_error
+                $scope.powerI = jsonObj.Regression.Power.intercept;
+                $scope.powerr = jsonObj.Regression.Power.rsquared;
+                $scope.powers = jsonObj.Regression.Power.slope;
+                $scope.powerse = jsonObj.Regression.Power.standard_error;
 
-                $scope.speedI = jsonObj.Regression.Speed.intercept
-                $scope.speedr = jsonObj.Regression.Speed.rsquared
-                $scope.speeds = jsonObj.Regression.Speed.slope
-                $scope.speedse = jsonObj.Regression.Speed.standard_error
+                $scope.speedI = jsonObj.Regression.Speed.intercept;
+                $scope.speedr = jsonObj.Regression.Speed.rsquared;
+                $scope.speeds = jsonObj.Regression.Speed.slope;
+                $scope.speedse = jsonObj.Regression.Speed.standard_error;
 
-                $scope.torqI = jsonObj.Regression.Torque.intercept
-                $scope.torqr = jsonObj.Regression.Torque.rsquared
-                $scope.torqs = jsonObj.Regression.Torque.slope
-                $scope.torqse = jsonObj.Regression.Torque.standard_error
+                $scope.torqI = jsonObj.Regression.Torque.intercept;
+                $scope.torqr = jsonObj.Regression.Torque.rsquared;
+                $scope.torqs = jsonObj.Regression.Torque.slope;
+                $scope.torqse = jsonObj.Regression.Torque.standard_error;
                 */
                 
                 // Fill in Regression Data
                 var List_channel = ['Power','Speed','Torque'];
                 var List_regType = ['intercept','rsquared','slope','standard_error'];
+                var result = "";
 
                 // List_reg has all Ids of panels of the Regression
                 var List_reg = [['powerI','powerr','powers','powerse'],['speedI','speedr','speeds','speedse'],['torqueI','torquer','torques','torquese']]               
@@ -114,17 +114,17 @@
                     for (var i = 0; i < List_regType.length; i++) {
 
                         if (jsonObj.Regression_bool[channel][List_regType[i]]) {
-                            document.getElementById(List_label[i]).className = "label label-success";
+                            result = "label label-success";
                         } else {
-                            document.getElementById(List_label[i]).className = "label label-danger"; 
+                            result = "label label-danger";                            
                         }
-                        
+                        document.getElementById(List_label[i]).className = result; 
                         document.getElementById(List_label[i]).innerHTML = jsonObj.Regression[channel][List_regType[i]];
                     };
-                };
+                }; 
             };
         }
-    
+
 
         function onErrorItem(item, response, status, headers) {
             toastr.error(response.message, 'Error');
