@@ -18,6 +18,7 @@ class DataHandler:
           self.ebenches = Ebench.objects.all()
           self.allFilesLoaded = False
           
+          
 
      def import_test_data(self, numBenches, dataFile):
           self.testData = TestData(dataFile, numBenches) 
@@ -293,7 +294,7 @@ class TestData(Data):
 class CycleValidator:
     
 
-    def __init__(self, Testdata, Mapdict, Fullload, Warmidle):
+    def __init__(self, Testdata, Mapdict, Fullload, Warmidle, Filter_bool):
 
         self.data = Testdata.data
         self.data_full = Fullload.data
@@ -331,8 +332,8 @@ class CycleValidator:
         self.dataDict = {'Torque': ['Torque_Demand', 'Torque_Engine'],
                          'Power': ['Power_Demand', 'Power_Engine'], 
                          'Speed': ['Speed_Demand', 'Speed_Engine']}
-        
-        self._pre_regression_filter()
+        if Filter_bool:
+          self._pre_regression_filter()        
         self._regression()
         self._regression_validation()
         

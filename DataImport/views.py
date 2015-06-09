@@ -24,9 +24,10 @@ class FileUploadView(views.APIView):
     parser_classes = (FormParser,MultiPartParser)
 
     def post(self, request, format=None):
-            
-        try:
 
+        
+        try:
+            
             if (bool(request.data['bench'] == ' ')):
                 raise Exception("Please select the number of benches used")
 
@@ -50,16 +51,6 @@ class FileUploadView(views.APIView):
                 dataHandler.import_test_data(request.data['bench'], request.data['file'])  
                 jsonDict = {'errors': dataHandler.log}          
 
-            ##### If all files are uploaded --> Regression #####
-            if(dataHandler.allFilesLoaded == True):
-                cycleValidator = CycleValidator(dataHandler.testData, dataHandler.testDataMapDict,
-                                                dataHandler.fullLoad, dataHandler.fullLoad.metaData['n_CurbIdle'])
-                dataHandler.resultsLog['Regression'] = cycleValidator.reg_results
-                dataHandler.resultsLog['Regression_bool'] = cycleValidator.reg_results_bool      
-                jsonDict = {'Regression':cycleValidator.reg_results,
-                            'Regression_bool':cycleValidator.reg_results_bool,
-                            'errors': dataHandler.log}
-
             cache.set(request.session._get_session_key(), dataHandler)            
             jsonLog = json.dumps(jsonDict)
             return Response(jsonLog, status=200)
@@ -72,11 +63,38 @@ class FileUploadView(views.APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
+    def get(self, request, *args, **kwargs):
+
+        try:
+
+            if request.QUERY_PARAMS['bool'] == 'With Filter':
+                Filter_bool = True
+            else:
+                Filter_bool = False
+            cache = caches['default']
+            dataHandler = cache.get(request.session._get_session_key())
+            cycleValidator = CycleValidator(dataHandler.testData, dataHandler.testDataMapDict,
+                                            dataHandler.fullLoad, dataHandler.fullLoad.metaData['n_CurbIdle'], Filter_bool)
+            dataHandler.resultsLog['Regression'] = cycleValidator.reg_results
+            dataHandler.resultsLog['Regression_bool'] = cycleValidator.reg_results_bool      
+            jsonDict = {'Regression':cycleValidator.reg_results,
+                        'Regression_bool':cycleValidator.reg_results_bool,
+                        'errors': dataHandler.log}
+            cache.set(request.session._get_session_key(), dataHandler)            
+            jsonLog = json.dumps(jsonDict)
+            return Response(jsonLog, status=200)
+
+        except Exception as e:
+         
+            return Response({
+                'status': 'Bad request',
+                'message': str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
+
 
 class MetaDataView(views.APIView):
 
     
     def get(self, request, *args, **kwargs):
-
 
         return HttpResponse('Hello, World!')
