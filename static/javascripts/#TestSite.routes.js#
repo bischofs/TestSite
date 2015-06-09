@@ -23,11 +23,6 @@
                 controller: 'LoginController',
                 controllerAs: 'vm'
             })
-            .state('project', {
-                url: "/project",
-                templateUrl: "/static/javascripts/l/1065.html",
-                controller: "InfoboxController"
-            })
             .state('1065', {
                 url: "/1065",
                 templateUrl: "/static/javascripts/layout/1065.html",

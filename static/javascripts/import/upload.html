@@ -179,7 +179,7 @@
                   <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" ng-style="{ 'width': uploader.progress + '%' }" style="width: 0%;"/>
                 </div>
               </td>
-            </table>  
+            </table> 
             <table class="table">
               <thead>
                 <tr>
@@ -219,42 +219,52 @@
       </div>
     </div>
     <div class="col-md-5">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h2 class="panel-title">Regression</h2>
-        </div>
-        <div class="panel-body">
-          <div class="col-xs-4 ">
-            <h4>Power</h4> Intercept
-            <h4><span id="powerI" class="label label-default">Unknown</span></h4>
-            Rsquared
-            <h4><span id="powerr" class="label label-default">Unknown</span></h4>
-            Slope
-            <h4><span id="powers" class="label label-default">Unknown</span></h4>
-            Standard Error
-            <h4><span id="powerse" class="label label-default">Unknown</span></h4>
+      <div ng-controller="ImportController">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h2 class="panel-title">Regression</h2>
           </div>
-          <div class="col-xs-4">
-            <h4>Speed</h4> Intercept
-            <h4><span id='speedI' class="label label-default">Unknown</span></h4>
-            Rsquared
-            <h4><span id='speedr' class="label label-default">Unknown</span></h4>
-            Slope
-            <h4><span id='speeds' class="label label-default">Unknown</span></h4>
-            Standard Error
-            <h4><span id='speedse' class="label label-default">Unknown</span></h4>
+          <div class="panel-body">
+            <div class="col-xs-4 ">
+              <h4>Power</h4> Intercept
+              <h4><span id="powerI" class="label label-default">Unknown</span></h4>
+              Rsquared
+              <h4><span id="powerr" class="label label-default">Unknown</span></h4>
+              Slope
+              <h4><span id="powers" class="label label-default">Unknown</span></h4>
+              Standard Error
+              <h4><span id="powerse" class="label label-default">Unknown</span></h4>
+            </div>
+            <div class="col-xs-4">
+              <h4>Speed</h4> Intercept
+              <h4><span id='speedI' class="label label-default">Unknown</span></h4>
+              Rsquared
+              <h4><span id='speedr' class="label label-default">Unknown</span></h4>
+              Slope
+              <h4><span id='speeds' class="label label-default">Unknown</span></h4>
+              Standard Error
+              <h4><span id='speedse' class="label label-default">Unknown</span></h4>
+            </div>
+            <div class="col-xs-4">
+              <h4>Torque</h4> Intercept
+              <h4><span id='torqueI' class="label label-default">Unknown</span></h4>
+              Rsquared
+              <h4><span id='torquer' class="label label-default">Unknown</span></h4>
+              Slope
+              <h4><span id='torques' class="label label-default">Unknown</span></h4>
+              Standard Error
+              <h4><span id='torquese' class="label label-default">Unknown</span></h4>
+            </div>            
           </div>
-          <div class="col-xs-4">
-            <h4>Torque</h4> Intercept
-            <h4><span id='torqueI' class="label label-default">Unknown</span></h4>
-            Rsquared
-            <h4><span id='torquer' class="label label-default">Unknown</span></h4>
-            Slope
-            <h4><span id='torques' class="label label-default">Unknown</span></h4>
-            Standard Error
-            <h4><span id='torquese' class="label label-default">Unknown</span></h4>
-          </div>            
         </div>
+        <div class="form-group">
+          <select class="form-control" id="sel1">
+            <option>With Filter</option>
+            <option>Without Filter</option>
+          </select>
+        </div>      
+        <hr>
+        <button type="button" class="btn btn-default" ng-click="Regression()">Regression</button>
       </div>
     </div>
   </div>
