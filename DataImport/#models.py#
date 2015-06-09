@@ -5,6 +5,9 @@ import pandas as pd
 import statsmodels.api as sm
 import logging
 import math
+import itertools
+import numpy as np
+
 
 class DataHandler:
 
@@ -13,23 +16,59 @@ class DataHandler:
           self.log = {}
           self.masterDict = {} 
           self.ebenches = Ebench.objects.all()
-          self.allFilesUploaded = False
+          self.allFilesLoaded = False
+          self.CoHigh = False
 
      def import_test_data(self, numBenches, dataFile):
           self.testData = TestData(dataFile, numBenches) 
           self.testDataMapDict = self.testData.load_data(dataFile)
+          import ipdb; ipdb.start_trace()
+          self._all_files_loaded()          
          
      def import_pre_zero_span(self, dataFile):
-          self.preZeroSpan = pd.read_csv(dataFile)
-
+          self.preZeroSpan = ZeroSpan(dataFile)
+          self.zeroSpanMapDict = self.preZeroSpan.load_data(dataFile)
+          self._all_files_loaded()
+          
      def import_post_zero_span(self, dataFile):
-          self.postZeroSpan = pd.read_csv(dataFile)
-
+          self.postZeroSpan = ZeroSpan(dataFile)
+          self.zeroSpanMapDict = self.postZeroSpan.load_data(dataFile)
+          self._all_files_loaded()
+          
      def import_full_load(self, dataFile):
           self.fullLoad = FullLoad(dataFile)
           self.fullLoadMapDict = self.fullLoad.load_data(dataFile)
-          import ipdb; ipdb.set_trace()
+          self._all_files_loaded()
 
+     def _all_files_loaded(self):
+          
+          self.attrs = ['fullLoad', 'postZeroSpan', 'preZeroSpan', 'testData']
+
+
+          for attr in self.attrs:
+               if not hasattr(self, attr):
+                    break
+          else:
+               self.allFilesLoaded = True
+
+          if(self.allFilesLoaded == True):
+               self.files = [self.testData, self.preZeroSpan, self.postZeroSpan, self.fullLoad]
+               self._check_all_metadata()
+               #self._check_time_stamps
+               
+               
+     def _check_all_metadata(self):
+
+          for x, y in itertools.combinations(self.files, 2):
+              
+               if not x.metaData.equals(y.metaData):
+                    raise Exception("metadata in file %s does not match file %s" % (x.fileName, y.fileName))
+                              
+
+
+     #def _check_all_time_stamps:
+
+     
 
      # def _corr_frequencies(self):
           
@@ -39,6 +78,9 @@ class DataHandler:
 
      # def _corr_fuel_data(self):
 
+
+
+#load all files check each import if all files are uploaded
 
 
 
@@ -52,7 +94,6 @@ class Data:
           
           self.mapDict = {}
           self.logDict = {}
-
 
           self.dataFile = dataFile
           self.fileName = dataFile.name
@@ -120,18 +161,6 @@ class Data:
 
 
 
-     #def _check_cycle_length(self):
-          
-          
-
-
-
-
-          
-
-
-
-
 
      def _load_metadata(self, data):
 
@@ -153,11 +182,21 @@ class Data:
 
 
 
+
+class FullLoad(Data):
+
+     def __init__(self, dataFile):
+          super().__init__(dataFile)
+
+
+class ZeroSpan(Data):
+
+     def __init__(self, dataFile):
+          super().__init__(dataFile)
+
+
 class TestData(Data):
 
-
-     ## CONSTRUCTOR ##
-     
      def __init__(self, dataFile, numBenches):
           super().__init__(dataFile)
           self.numBenches = numBenches
@@ -181,10 +220,10 @@ class TestData(Data):
      #    return self.data, self.mapDict, self.logDict
 
 
-     def _convert_bar_to_kpa(self): #FIX DIS
+     # def _convert_bar_to_kpa(self): #FIX DIS
         
-        self.data.P_AMB = self.data.P_AMB * 100
-        self.data.P_INLET = self.data.P_INLET * 100
+     #    self.data.P_AMB = self.data.P_AMB * 100
+     #    self.data.P_INLET = self.data.P_INLET * 100
 
 
      # def _check_units(self):
@@ -198,21 +237,21 @@ class TestData(Data):
      #            raise Exception("%s units are not in %s" % (self.mapDict[species], unit))
 
 
-     def _check_ranges(self):
+     # def _check_ranges(self):
         
-        for species in self.mapDict:
+     #    for species in self.mapDict:
 
-            maxValue = self.speciesData.Species[species]['maximum_value']
-            minValue = self.speciesData.Species[species]['minimum_value']
+     #        maxValue = self.speciesData.Species[species]['maximum_value']
+     #        minValue = self.speciesData.Species[species]['minimum_value']
 
-            booleanCond = self.data[self.mapDict[species]] > float(maxValue)
-            if(booleanCond.any()):
-                self.logDict['error'] = "%s is above required maximum of %s %s" % (self.mapDict[species], str(maxValue), self.speciesData.Species[species]['unit'])
-                raise Exception ("%s is above required maximum of %s %s" % (self.mapDict[species], str(maxValue), self.speciesData.Species[species]['unit']))
-            booleanCond = self.data[self.mapDict[species]] < float(minValue)
-            if(booleanCond.any()):
-                self.logDict['error'] = "%s is below required minimum of %s %s" % (self.mapDict[species], str(minValue), self.speciesData.Species[species]['unit'])
-                raise Exception ("%s is below required minimum of %s %s" % (self.mapDict[species], str(minValue), self.speciesData.Species[species]['unit']))
+     #        booleanCond = self.data[self.mapDict[species]] > float(maxValue)
+     #        if(booleanCond.any()):
+     #            self.logDict['error'] = "%s is above required maximum of %s %s" % (self.mapDict[species], str(maxValue), self.speciesData.Species[species]['unit'])
+     #            raise Exception ("%s is above required maximum of %s %s" % (self.mapDict[species], str(maxValue), self.speciesData.Species[species]['unit']))
+     #        booleanCond = self.data[self.mapDict[species]] < float(minValue)
+     #        if(booleanCond.any()):
+     #            self.logDict['error'] = "%s is below required minimum of %s %s" % (self.mapDict[species], str(minValue), self.speciesData.Species[species]['unit'])
+     #            raise Exception ("%s is below required minimum of %s %s" % (self.mapDict[species], str(minValue), self.speciesData.Species[species]['unit']))
 
 
      # def _check_channels(self):
@@ -253,45 +292,92 @@ class TestData(Data):
      #        self.logDict['warning'] = "Meta-Data missing in import file %s" % filename
 
 
-class FullLoad(Data):
-
-     def __init__(self, dataFile):
-          super().__init__(dataFile)
-
-     
-
 class CycleValidator:
     
 
-    def __init__(self, data, mapDict):
+    def __init__(self, data, mapDict):        
         
         self.data = data
-        self.mapDict = mapDict
-        com_power = (self.data[self.mapDict['Commanded_Torque']] * self.data[self.mapDict['Commanded_Speed']] / 9.5488) / 1000
-        self.data['Commanded_Power'] = com_power
+        self.mapDict = mapDict   
 
-        self.dataDict = {'Speed': [self.mapDict['Commanded_Speed'], self.mapDict['Engine_Speed']],
-                         'Torque': [self.mapDict['Commanded_Torque'], self.mapDict['Engine_Torque']],
-                         'Power': ["Commanded_Power", self.mapDict['Engine_Power']]}
+        ##### Define Variables #####     
+        self.Throttle = self.data[self.mapDict['Commanded_Throttle']]
+        self.Torque_Demand = self.data[self.mapDict['Commanded_Torque']]
+        self.Torque_Engine = self.data[self.mapDict['Engine_Torque']] 
+        self.Speed_Demand = self.data[self.mapDict['Commanded_Throttle']]
+        self.Speed_Engine = self.data[self.mapDict['Engine_Speed']]
+        self.Power_Demand = (self.data[self.mapDict['Commanded_Torque']] * self.data[self.mapDict['Commanded_Speed']] / 9.5488) / 1000
+        self.Power_Engine = self.data[self.mapDict['Engine_Power']]
+        self.data = None
+
+        ##### Preparation of Maximum Torque and Maximum and Minimum Throttle Index #####
+        self.Torque_Max = np.nanmax(self.Torque_Demand)[2] # !!!! Has to be changed to Maximum Torque of Full Load !!!!
+        self.Index_Min = np.where([self.Throttle==np.nanmin(self.Throttle)[2]])[1]
+        self.Index_Max = np.where([self.Throttle==np.nanmax(self.Throttle)[2]])[1]
+
+        ##### Drop Lists #####
+        self.Torque_Drop = []
+        self.Speed_Drop = []
+        self.Power_Drop = []
+
+        self.dataDict = {'Speed': ["Speed_Demand", "Speed_Engine"],
+                         'Torque': ["Torque_Demand", "Torque_Engine"],
+                         'Power': ["Power_Demand", "Power_Engine"]}
         
         self._pre_regression_filter()
         self._regression()
-
-
         
     def _pre_regression_filter(self):
 
-        curbidle = 600
-        indeces = self.data[(self.data[self.mapDict['Commanded_Throttle']] == 0) & (self.data[self.mapDict['Commanded_Torque']] < 0)].index
-        self.data = self.data.drop(indeces)
-        indeces = self.data[(self.data[self.mapDict['Commanded_Throttle']] == 0) & (self.data[self.mapDict['Commanded_Speed']] == curbidle) &
-                            ((self.data[self.mapDict['Commanded_Torque']] - (0.02 * self.data[self.mapDict['Commanded_Torque']].max())) < self.data[self.mapDict['Engine_Torque']] ) & 
-                            ((self.data[self.mapDict['Commanded_Torque']] + (0.02 * self.data[self.mapDict['Commanded_Torque']].max())) > self.data[self.mapDict['Engine_Torque']] )].index
+        for i in self.Index_Min:
+            ##### Check Minimum Throttle ##### -- Table 1 EPA 1065.514
+            if self.Torque_Demand[i]<0:
+                self.Torque_Drop.append(i)
+                self.Power_Drop.append(i)
+                self.Torque_Below_Zero = True # Used to show the User that negative Torque during motoring is omitted                    
+                
+            if (self.Torque_Demand[i]==0) & (self.Speed_Demand[i]==0) & ((self.Torque_Engine[i]-0.02*Torque_Max)<self.Torque_Engine[i]) & (self.Torque_Engine[i]<(self.Torque_Engine[i]+0.02*Torque_Max)):
+                self.Speed_Drop.append(i)
+                self.Power_Drop.append(i)
+                
+            if (self.Speed_Engine[i]>self.Speed_Demand[i]) & (self.Speed_Engine[i]<self.Speed_Demand[i]*1.02):
+                self.Speed_Drop.append(i)
+                self.Power_Drop.append(i)
+                
+            if (self.Torque_Engine[i]>self.Torque_Demand[i]) & ((self.Torque_Engine[i]<(self.Torque_Engine[i]+0.02*Torque_Max)) | (self.Torque_Engine[i]<(self.Torque_Engine[i]-0.02*Torque_Max))):
+                self.Torque_Drop.append(i)
+                self.Power_Drop.append(i)
+            
+        for i in self.Index_Max:
+            ##### Check Maximum Throttle ##### -- Table 1 EPA 1065.514
+            if (self.Speed_Engine[i]<self.Speed_Demand[i]) & (self.Speed_Engine[i]>self.Speed_Demand[i]*0.98):
+                self.Speed_Drop.append(i)
+                self.Power_Drop.append(i)
+                
+            if (self.Torque_Engine[i]<self.Torque_Demand[i]) & (self.Torque_Engine[i]>(self.Torque_Engine[i]-0.02*Torque_Max)):
+                self.Torque_Drop.append(i)
+                self.Power_Drop.append(i)            
 
-        self.data = self.data.drop(indeces)
-        #'Torque': [self.mapDict['Commanded_Torque'], self.mapDict['Engine_Torque']],
-        #indeces = self.data
-        
+        ##### Omitting the Data #####
+        self.Speed_Engine = self.Speed_Engine.drop(self.Speed_Drop)
+        self.Speed_Demand = self.Speed_Demand.drop(self.Speed_Drop)
+        self.Torque_Engine = self.Torque_Engine.drop(self.Torque_Drop)
+        self.Torque_Demand = self.Torque_Demand.drop(self.Torque_Drop)
+        self.Power_Engine = self.Power_Engine.drop(self.Power_Drop)
+        self.Power_Demand = self.Power_Demand.drop(self.Power_Drop)            
+
+        ##### Reindexing the data #####
+        self.Torque_Engine.index = range(0,len(self.Torque_Engine))
+        self.Torque_Demand.index = range(0,len(self.Torque_Demand))
+        self.Speed_Engine.index = range(0,len(self.Speed_Engine))
+        self.Speed_Demand.index = range(0,len(self.Speed_Demand))
+        self.Power_Engine.index = range(0,len(self.Power_Engine))
+        self.Power_Demand.index = range(0,len(self.Power_Demand))
+
+        ##### Cleaning Variables #####
+        self.Throttle, self.Torque_Max, self.Index_Min = None, None, None
+        self.Torque_Drop, self.Speed_Drop, self.Power_Drop = None, None, None
+       
 
     def _regression(self):
         
@@ -303,17 +389,16 @@ class CycleValidator:
            self._regression_util(channel[0], channel[1][0], channel[1][1])
  
 
-
     def _regression_util(self, channel, X, Y):
 
-        ymean = self.data[Y].mean()
-        xmean = self.data[X].mean()
+        ymean = self.Y.mean()
+        xmean = self.X.mean()
 
         # -- Regression Slope -- EPA 1065.602-9 
         numerator, denominator = 0.0, 0.0
-        for x, y in zip(self.data[X], self.data[Y]):
+        for x, y in zip(self.X, self.Y):
             numerator = numerator + ((x - xmean) * (y - ymean))
-        for x, y in zip(self.data[X], self.data[Y]):
+        for x, y in zip(self.X, self.Y):
             denominator = denominator + ((y - ymean) ** 2)
                 
         slope = numerator / denominator 
@@ -323,16 +408,16 @@ class CycleValidator:
 
         # -- Regression Standard Error of Estimate -- EPA 1065.602-11 
         sumat = 0.0
-        for x, y in zip(self.data[X], self.data[Y]):
+        for x, y in zip(self.X, self.Y):
             sumat = sumat + ((x - intercept - (slope * y)) ** 2)
-        see = sumat / (self.data[X].size - 2)
+        see = sumat / (self.X.size - 2)
         standerror = math.sqrt(see)
 
         # -- Regression Coefficient of determination -- EPA 1065.602-12
         numerator, denominator = 0.0, 0.0
-        for x, y in zip(self.data[X], self.data[Y]):
+        for x, y in zip(self.X, self.Y):
             numerator = numerator + ((x - intercept - (slope * y)) ** 2)
-        for x, y in zip(self.data[X], self.data[Y]):
+        for x, y in zip(self.X, self.Y):
             denominator = denominator + ((x - ymean) ** 2)
                 
         r2 = 1 - (numerator / denominator)
@@ -343,19 +428,15 @@ class CycleValidator:
         self.reg_results[channel]['rsquared'] = r2
             
 
-            
 
 
 
 
 
 
-    
-    
 
 
 
 
-         
 
 

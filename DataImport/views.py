@@ -55,7 +55,7 @@ class FileUploadView(views.APIView):
 
             cache.set(request.session._get_session_key(), dataHandler)
             
-            jsonLog = json.dumps(jsoDict)
+            jsonLog = json.dumps(jsonDict)
             return Response(jsonLog, status=200)
             
         except Exception as e:

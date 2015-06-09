@@ -43,6 +43,8 @@ class DataHandler:
           
           self.attrs = ['fullLoad', 'postZeroSpan', 'preZeroSpan', 'testData']
 
+
+
           for attr in self.attrs:
                if not hasattr(self, attr):
                     break

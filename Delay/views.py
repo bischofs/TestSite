@@ -6,6 +6,8 @@ from rest_framework.response import Response
 from rest_framework.parsers import FileUploadParser, MultiPartParser, FormParser
 from rest_framework.renderers import JSONRenderer
 
+from Delay.models import DelayPrep
+
 # Create your views here.
 
 class DelayView(views.APIView):
@@ -19,11 +21,11 @@ class DelayView(views.APIView):
             return Response(status=400)
         else:
             dataHandler = cache.get(request.session._get_session_key())
+            delayPrep = DelayPrep(dataHandler.testData.data, dataHandler.testDataMapDict, True)
+            js = delayPrep.create_windows()
             #if(dataHandler.allFilesUploaded == False):
                 
-        import ipdb; ipdb.set_trace()                    
-                
-        return Response(status=200)
+        return Response(js,status=200)
 
 
 
