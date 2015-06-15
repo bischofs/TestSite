@@ -1,18 +1,18 @@
 <!-- <div ac-chart="chartType" ac-data="data" ac-config="config" id='chart' class='chart'></div> -->
 <div class="row">
     <div class="col-md-6 col-md-offset-1">
-        <button type="button" class="btn btn-warning">NOx</button>
-        <button type="button" class="btn btn-warning">CH4</button>
-        <button type="button" class="btn btn-warning">CO</button>
-        <button type="button" class="btn btn-warning">CO2</button>
-        <button type="button" class="btn btn-warning">O2</button>
-        <button type="button" class="btn btn-warning">NO</button>
-        <button type="button" class="btn btn-warning">MAF</button>
+        <button type="button" ng-click="nox()" class="btn btn-warning">NOx</button>
+        <button type="button" ng-click="ch4()" class="btn btn-warning">CH4</button>
+        <button type="button" ng-click="thc()" class="btn btn-warning">THC</button>
+        <button type="button" ng-click="co()" class="btn btn-warning">CO</button>
+        <button type="button" ng-click="co2()" class="btn btn-warning">CO2</button>
+        <button type="button" ng-click="o2()" class="btn btn-warning">O2</button>
+        <button type="button" ng-click="no()" class="btn btn-warning">NO</button>
+        <button type="button" ng-click="maf()" class="btn btn-warning">MAF</button>
     </div>
     <div class="col-md-4 col-md-offset-1">
-
-        <button class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span> 1 second</button>
-        <button class="btn btn-default">1 second <span class="glyphicon glyphicon-arrow-right"></span> </button>
+        <button  ng-click="back()"class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span> 1 second</button>
+        <button  ng-click="forward()" class="btn btn-default">1 second <span class="glyphicon glyphicon-arrow-right"></span> </button>
     </div>
 </div>
 <div>

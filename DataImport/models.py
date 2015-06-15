@@ -17,7 +17,7 @@ class DataHandler:
           self.masterDict = {} 
           self.ebenches = Ebench.objects.all()
           self.allFilesLoaded = False
-          self.CoHigh = False
+          self.CoHigh = True
 
      def import_test_data(self, numBenches, dataFile):
           self.testData = TestData(dataFile, numBenches) 
@@ -104,7 +104,7 @@ class Data:
 
 
           self.speciesData = pd.read_json("spec.json")
-          self.data = pd.read_csv(dataFile)
+          self.data = pd.read_csv(dataFile, encoding='windows-1258')
           self.metaData, self.data = self._load_metadata(self.data)
 
           self.data = self.data.dropna(how="all",axis=(1))
