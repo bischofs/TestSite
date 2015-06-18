@@ -57,6 +57,9 @@
                                     document.getElementById(List_label[i]).innerHTML = jsonObj.Regression[channel][List_regType[i]];
                             };
                     };
+                })
+                .fail(function(response) {
+                    toastr.error(response.message, 'Data is not available!');
                 });
         }
 

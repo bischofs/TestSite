@@ -1,0 +1,40 @@
+{
+    "Fuels": {
+       "ULS Diesel": {
+       		"Carbon mass fraction": "0.8657",
+       		"Tank":"000"
+       	},
+        "Prem E10": {
+        	"Carbon mass fraction": "0.8267",
+       		"Tank":"000"
+        },
+       "Mid-grade": {
+       		"Carbon mass fraction": "0.8209",
+       		"Tank":"000"
+       	},
+        "E100": {
+        	"Carbon mass fraction": "0.5034",
+       		"Tank":"000"
+        },
+       "Reg E10": {
+       		"Carbon mass fraction": "0.8131",
+       		"Tank":"000"
+       	},
+        "ULSD": {
+        	"Carbon mass fraction": "None",
+       		"Tank":"000"
+        },
+        "UTG 96": {
+        	"Carbon mass fraction": "0.8698",
+       		"Tank":"000"
+        },
+       "Euro V": {
+       		"Carbon mass fraction": "0.8506",
+       		"Tank":"000"
+       	},
+        "Premium E10": {
+        	"Carbon mass fraction": "0.833",
+       		"Tank":"000"
+        },        
+    }
+}

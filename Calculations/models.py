@@ -139,7 +139,7 @@ class Preparation:
 
   def _prepare_time_window(self,Species):
 
-    ## Species = ['CO2','CO','NOX','THC','CH4'] these are the Species in the array but with different names
+    ## Species = ['CO2','CO','NOX','THC','CH4'] these are the Species in the array but with the channel names
 
     TypeTime = ['Zero_start','Zero_end','Span_start','Span_end']
     SpecTime = [0,59,60,119] # Time window for Zero and Span Data
@@ -188,12 +188,12 @@ class Calculation:
   def __init__(self, Preparation, MapDict):
 
     if preparation.transient_bool == True:
-         self._transientCalculation(Preparation, MapDict)
+         self._transient_calculation(Preparation, MapDict)
     else:
-         self._steadyStateCalculation(Preparation, MapDict)
+         self._steady_state_calculation(Preparation, MapDict)
 
 
-  def _transientCalculation(self, Preparation):
+  def _transient_calculation(self, Preparation):
 
     Species = Preparation.Species
     ZeroSpan = Preparation.zeroSpan
@@ -201,23 +201,23 @@ class Calculation:
     self.DataCor = pd.DataFrame()
     
     ##### Drif-uncorrected Calc #####
-    [self.DataUn, self.ArraySumUn] = self._innerCalc(Preparation, self.DataUn, Species)
+    [self.DataUn, self.ArraySumUn] = self._inner_calc(Preparation, self.DataUn, Species)
 
     ##### Drift-corrected Calc #####
     Preparation.test = self._drift_correction(self.DataUn, ZeroSpan, Preparation.test, Species)
-    [self.DataCor, self.ArraySumCor] = self._innerCalc(Preparation, self.DataCor, Species)
+    [self.DataCor, self.ArraySumCor] = self._inner_calc(Preparation, self.DataCor, Species)
     self.DataCor = self._remove_negatives(self.DataCor)
 
     # Clear Variables
     Species, ZeroSpan = None
 
 
-  def _steadyStateCalculation(self, Preparation):
+  def _steady_state_calculation(self, Preparation):
 
     ## Calculate steady state Cycle
 
 
-  def _innerCalc(self, Preparation, Data, Species):
+  def _inner_calc(self, Preparation, Data, Species):
 
     ##### Load Data #####
     TestData = Preparation.test
