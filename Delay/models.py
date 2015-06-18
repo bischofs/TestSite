@@ -38,7 +38,7 @@ class DelayPrep:
                 high = largest.index[1] + 100                
                 
                 #torq = pd.Series(torqWindow, name="Torque") 
-                #import ipdb; ipdb.set_trace()
+
                 
                 self.delaySpecies = self.delaySpecies[low:high]
 

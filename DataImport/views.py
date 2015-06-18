@@ -32,10 +32,14 @@ class FileUploadView(views.APIView):
 
             cache = caches['default']
 
-            if(not cache.get(request.session._get_session_key())):
+            #import ipdb; ipdb.set_trace()
+
+            request.session.set_test_cookie()
+
+            if(not cache.get(request.session.session_key)):
                  dataHandler = DataHandler()
             else:
-                dataHandler = cache.get(request.session._get_session_key())
+                dataHandler = cache.get(request.session.session_key)
 
             if(request.data['ftype'] == 'full'):#file is full load curve
                 dataHandler.import_full_load(request.data['file'])
@@ -53,7 +57,7 @@ class FileUploadView(views.APIView):
                 regResults = "stuff"
                 jsonDict = {'regression':regResults, 'errors': dataHandler.log}
 
-            cache.set(request.session._get_session_key(), dataHandler)
+            cache.set(request.session.session_key, dataHandler)
             
             jsonLog = json.dumps(jsonDict)
             return Response(jsonLog, status=200)

@@ -12,15 +12,14 @@ from Delay.models import DelayPrep
 
 class DelayView(views.APIView):
 
-
     def get(self, request, format=None):
 
         cache = caches['default']
 
-        if(not cache.get(request.session._get_session_key())):
+        if(not cache.get(request.session.session_key)):
             return Response(status=400)
         else:
-            dataHandler = cache.get(request.session._get_session_key())
+            dataHandler = cache.get(request.session.session_key)
             delayPrep = DelayPrep(dataHandler.testData.data, dataHandler.testDataMapDict, True)
             js = delayPrep.create_windows()
             #if(dataHandler.allFilesUploaded == False):
