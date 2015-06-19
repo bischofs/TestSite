@@ -42,6 +42,7 @@ class CalculationView(views.APIView):
 
 
         def post(self, request, format=None):
+
                 try:
 
                     ##### Load dataHandler from Cache #####
@@ -53,9 +54,9 @@ class CalculationView(views.APIView):
                     jsonDict = {'Report':report,'errors': dataHandler.log}
                     ##### Save Session #####
                     cache.set(request.session._get_session_key(), dataHandler)            
-                    #jsonLog = json.dumps(jsonDict)
+                    jsonLog = json.dumps(jsonDict)
 
-                    return Response(status=200)
+                    return Response(jsonLog, status=200)
 
                 except Exception as e:
 

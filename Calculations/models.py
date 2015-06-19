@@ -490,6 +490,7 @@ class Calculation:
 class Report:
 
      def __init__(self, DataHandler):
+        
         import ipdb
         ipdb.set_trace()
 
@@ -505,14 +506,9 @@ class Report:
         final = pd.DataFrame()
         final['Species'] = ['CO2','CO','NOx','THC','NMHC']
         final['Units'] = ['g/ghphr','g/ghphr','g/ghphr','g/ghphr','g/ghphr']
-        for i in range(0,len(final['Species']))-1:
-            final['Cold Start Em.'][i] = ArraySumCorWon[i+1]/U_BPOW_Factor
-        #CO2 = sum_CO2_cor_won/U_BPOW_Factor
-        #CO = sum_CO_cor_won/U_BPOW_Factor
-        #NOx = sum_NOx_cor_won/U_BPOW_Factor
-        #THC = sum_THC_cor_won/U_BPOW_Factor
-        #NMHC = sum_NMHC_cor_won/U_BPOW_Factor
-        #final['Cold Start Em.'] = [CO2,CO,NOx,THC,NMHC]
+        final['Test'] = np.zeros(5)
+        for i in range(0,len(final['Species'])):
+            final['Test'][i] = ArraySumCorWon[final['Species'][i]]/U_BPOW_Factor
 
         # Preparation of Excel-File
         file = xlsxwriter.Workbook('Final.xlsx')
@@ -526,11 +522,13 @@ class Report:
         merge_format2 = file.add_format({'bold': 1,'border': 1,'align': 'center','valign': 'vcenter','fg_color': '#A9A9A9'})
 
         # Final Emissions
-        sheet.merge_range('A1:H1', 'Final Emissions', merge_format)
+        sheet.merge_range('A1:D1', 'Final Emissions', merge_format)
         sheet.write_row('A2',final.columns.values,dark_grey)
         sheet.write_column('A3',final.Species,bright_grey)
         sheet.write_column('B3',final.Units,bright_grey)
-        sheet.write_column('C3',np.round(final.get('Cold Start Em.'),3),border)
+        where_are_NaNs = np.isnan(final.Test)
+        final.Test[where_are_NaNs] = 0
+        sheet.write_column('C3',np.round(final.get('Test'),3),border)
 
         # Emissions Mass - corrected without negative values
         sheet.merge_range('J1:K1', 'Emissions Mass', merge_format2)
@@ -541,21 +539,17 @@ class Report:
         drift = pd.DataFrame()
         drift['Species'] = ['CO2','CO','NOx','THC','NMHC']
         drift['Units'] = ['g/ghphr','g/ghphr','g/ghphr','g/ghphr','g/ghphr']
-        for i in xrange(0,len(drift['Species'])-1):
-             drift['Cold Start Em.'][i] = ArraySumCor[i+1]/U_BPOW_Factor
-        #CO2 = sum_CO2_cor/U_BPOW_Factor
-        #CO = sum_CO_cor/U_BPOW_Factor
-        #NOx = sum_NOx_cor/U_BPOW_Factor
-        #THC = sum_THC_cor/U_BPOW_Factor
-        #NMHC = sum_NMHC_cor/U_BPOW_Factor
-        #drift['Cold Start Em.'] = [CO2,CO,NOx,THC,NMHC]
+        drift['Test'] = np.zeros(5)
+        for i in range(0,len(drift['Species'])):
+             drift['Test'][i] = ArraySumCor[final['Species'][i]]/U_BPOW_Factor
 
-
-        sheet.merge_range('A10:H10', 'Drift corrected Emissions', merge_format)
+        sheet.merge_range('A10:D10', 'Drift corrected Emissions', merge_format)
         sheet.write_row('A11',drift.columns.values,dark_grey)
         sheet.write_column('A12',drift.Species,bright_grey)
         sheet.write_column('B12',drift.Units,bright_grey)
-        sheet.write_column('C12',np.round(drift.get('Cold Start Em.'),3),border)
+        where_are_NaNs = np.isnan(drift.Test)
+        drift.Test[where_are_NaNs] = 0        
+        sheet.write_column('C12',np.round(drift.get('Test'),3),border)
 
         # Emissions Mass - corrected
         sheet.merge_range('J10:K10', 'Emissions Mass', merge_format2)
@@ -566,20 +560,17 @@ class Report:
         un = pd.DataFrame()
         un['Species'] = ['CO2','CO','NOx','THC','NMHC']
         un['Units'] = ['g/ghphr','g/ghphr','g/ghphr','g/ghphr','g/ghphr']
-        for i in xrange(0,len(un['Species'])-1):
-            un['Cold Start Em.'][i] = ArraySumUn[i+1]/U_BPOW_Factor
-        #CO2 = sum_CO2_un/U_BPOW_Factor
-        #CO = sum_CO_un/U_BPOW_Factor
-        #NOx = sum_NOx_un/U_BPOW_Factor
-        #THC = sum_THC_un/U_BPOW_Factor
-        #NMHC = sum_NMHC_un/U_BPOW_Factor
-        #un['Cold Start Em.'] = [CO2,CO,NOx,THC,NMHC]
+        un['Test'] = np.zeros(5)
+        for i in range(0,len(un['Species'])):
+            un['Test'][i] = ArraySumUn[final['Species'][i]]/U_BPOW_Factor
 
-        sheet.merge_range('A19:H19', 'Drift uncorrected emissions', merge_format)
+        sheet.merge_range('A19:D19', 'Drift uncorrected emissions', merge_format)
         sheet.write_row('A20',un.columns.values,dark_grey)
         sheet.write_column('A21',un.Species,bright_grey)
         sheet.write_column('B21',un.Units,bright_grey)
-        sheet.write_column('C21',np.round(un.get('Cold Start Em.'),3),border)
+        where_are_NaNs = np.isnan(un.Test)
+        un.Test[where_are_NaNs] = 0        
+        sheet.write_column('C21',np.round(un.get('Test'),3),border)
 
         # Emissions Mass - uncorrected
         sheet.merge_range('J19:K19', 'Emissions Mass', merge_format2)
@@ -587,4 +578,4 @@ class Report:
         sheet.write_column('J21',ArraySumUn,border)
 
         file.close()
-        print('1065 Calculation finished! Report is saved!')
+        

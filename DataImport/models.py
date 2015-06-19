@@ -63,7 +63,7 @@ class DataHandler:
 
           if(self.allFilesLoaded == True):
                self.files = [self.testData, self.preZeroSpan, self.postZeroSpan, self.fullLoad]
-               self._check_all_metadata()
+               #self._check_all_metadata()
                #self._check_time_stamps
                
                
