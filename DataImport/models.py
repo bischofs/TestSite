@@ -21,6 +21,16 @@ class DataHandler:
           self.CoHigh = True
 
 
+          ######## HARD CODE EBENCH #########
+          self.ebenchData = {}
+          self.ebenchData['RFPF'] = 0.0133
+          self.ebenchData['CH4_RF'] = 1.1
+          self.ebenchData['Tchiller'] = 7
+          self.ebenchData['Pchiller'] = 121.8418852
+          self.ebenchData['xTHC[THC_FID]init'] = 1
+          ###################################
+
+
      def import_test_data(self, numBenches, dataFile):
           self.testData = TestData(dataFile, numBenches) 
           self.testDataMapDict = self.testData.load_data(dataFile)
@@ -109,8 +119,9 @@ class Data:
           self._check_units()
           self.data = self.data.convert_objects(convert_numeric=True)       # Convert all data to numeric
           self.data = self.data.dropna()
+          self.data.index = range(0,len(self.data))
           self._check_channels()
-          
+
 
           return self.mapDict
 
@@ -135,16 +146,17 @@ class Data:
               
                    
 
-     def _check_channels(self):
+     def _check_channels(self):          
           
           for species in self.speciesData.Species.items():
 
-               if species[1]['files'].__contains__(self.fileType) and species[1]['header_data'] == False:
+                if species[1]['files'].__contains__(self.fileType) and species[1]['header_data'] == False:
                     if (species[1]['multiple_benches'] == True):
                          self._check_channels_util(species[0], species[1]['channel_names'], True, self.data, self.fileName)
                     else:
                          self._check_channels_util(species[0], species[1]['channel_names'], False, self.data, self.fileName)
-
+                elif species[1]['header_data'] == True:
+                    self._check_channels_util(species[0], species[1]['channel_names'], False, self.metaData, self.fileName) 
 
 
      def _check_units(self):

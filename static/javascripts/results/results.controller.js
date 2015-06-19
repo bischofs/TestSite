@@ -6,34 +6,33 @@
         .controller('ResultsController', ResultsController);
 
     ResultsController.$inject = ['$scope', '$http', 'toastr'];
-    /**
-     * @namespace UploadController
-     */
+
+
+
     function ResultsController($scope, $http, toastr) {
 
-        var read = function() {
-            $http.get('/api/v1/data/delay/')
-                .success(function(data) {
-                    var spec = JSON.parse(data)
-                    $scope.spec = spec
-                    $scope.options = {
-                        pointDot: false,
-                        showTooltips: false
-                    };
-                    $scope.series = ['Species', 'Torque'];
-                    createWindow();
+        $scope.Calculation = function() {
+            toastr.info('Calculations started!');
+            $http.get('/api/v1/data/calculations/')
+                .success(function(response) {
+                    toastr.success(response.message, 'Calculations finished!');
 
                 })
-                .error(function(data, status, headers, config) {
-                    throw new Error('Something went wrong with reading data');
+                .error(function(response) {
+                    toastr.error(response.message, 'Calculations failed!');                    
                 });
 
         };
 
-
-        read();
-
-
+        $scope.Report = function(){
+            $http.post('/api/v1/data/calculations/')
+                .success(function(response){
+                    toastr.success(response.message, 'Report finished!');
+                })
+                .error(function(response){
+                    toastr.error(response.message, 'Report failed!');
+                });
+        }
     }
 
 })();
