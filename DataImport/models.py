@@ -21,6 +21,8 @@ class DataHandler:
           self.CoHigh = True
 
 
+     #Have to change ordering of load data so that excpetion causes file to not be saved to datahandler
+
      def import_test_data(self, numBenches, dataFile):
           self.testData = TestData(dataFile, numBenches) 
           self.testDataMapDict = self.testData.load_data(dataFile)
@@ -144,6 +146,10 @@ class Data:
                          self._check_channels_util(species[0], species[1]['channel_names'], True, self.data, self.fileName)
                     else:
                          self._check_channels_util(species[0], species[1]['channel_names'], False, self.data, self.fileName)
+               elif species[1]['header_data'] == True:
+                    self._check_channels_util(species[0], species[1]['channel_names'], False, self.metaData, self.fileName)
+                    
+
 
 
 
