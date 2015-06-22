@@ -1,32 +1,44 @@
-<div class="row">
-    <div class="col-xs-6">
-        <div style="max-height: 300px;">
-            <ul class="list-group checked-list-box">
-                <li class="list-group-item">All Options</li>
-                <li class="list-group-item">Phasing Results</li>
-		<li class="list-group-item">Regression Results</li>
-	        <li class="list-group-item">Regression Omissions</li>
-	        <li class="list-group-item" data-checked="true">Corrected Results</li>
-                <li class="list-group-item">Uncorrected Results</li>
-                <li class="list-group-item">Step-by-Step Equation Results</li>
-            </ul>
+<div ng-controller="ResultsController" data-ng-init="Calculation()">
+    <div class="row">    
+        <div class="col-xs-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Options for Report</h3>
+                </div>
+                <div style="max-height: 300px;">
+                    <ul class="list-group checked-list-box">
+                        <li class="list-group-item">All Options</li>
+                        <li class="list-group-item">Phasing Results</li>
+        		        <li class="list-group-item">Regression Results</li>
+        	            <li class="list-group-item">Regression Omissions</li>
+        	            <li class="list-group-item" data-checked="true">Corrected Results</li>
+                        <li class="list-group-item">Uncorrected Results</li>
+                        <li class="list-group-item">Step-by-Step Equation Results</li>
+                    </ul>
+                </div>
+            </div>    
         </div>
-    </div>
-    <div class="col-xs-2">
-        <!-- <h5>Deterioration factor</h5> --> CO2
-        <input class="regoutput" ng-value="powerI | number"></input>
-        NOx
-        <input class="regoutput" ng-value="powerr | number"></input>
-        THC
-        <input class="regoutput" ng-value="powers | number"></input>
-        NMHC
-        <input class="regoutput" ng-value="powerse | number"></input>
-    </div>
-    <div class="col-xs-3">
-        <button type="button" class="btn btn-success btn-s" style="margin-left: 105px;
-  margin-top: 267px;">
-            <span class="glyphicon glyphicon-arrow-down"></span> Download Results
-        </button>
+        <div class="col-xs-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Calculation Results</h3>
+                </div>             
+            </div>
+            <!-- <h5>Deterioration factor</h5>  CO2
+            <input class="regoutput" ng-value="powerI | number"></input>
+            NOx
+            <input class="regoutput" ng-value="powerr | number"></input>
+            THC
+            <input class="regoutput" ng-value="powers | number"></input>
+            NMHC
+            <input class="regoutput" ng-value="powerse | number"></input> -->
+        </div>
+        
+        <div class="col-xs-2">
+            <button type="button" class="btn btn-success btn-s" ng-click="Report()">
+                <span class="glyphicon glyphicon-arrow-down"></span> Download Results
+            </button>
+        </div>
     </div>
 </div>
 <script type="text/javascript">
@@ -109,6 +121,7 @@ $(function() {
         $('#display-json').html(JSON.stringify(checkedItems, null, '\t'));
     });
 });
+
 </script>
 <style type="text/css">
 /* CSS REQUIRED */

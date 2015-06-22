@@ -4,6 +4,7 @@ from django.conf import settings
 from Project.views import ProjectViewSet
 from Authentication.views import AccountViewSet, LoginView, LogoutView
 from DataImport.views import FileUploadView, MetaDataView
+from Calculations.views import CalculationView
 from Delay.views import DelayView
 from rest_framework import routers
 
@@ -28,6 +29,7 @@ urlpatterns = patterns('',
         url(r'^api/v1/data/import/$', FileUploadView.as_view(), name='upload'),
         url(r'^api/v1/data/meta/$', MetaDataView.as_view(), name='meta'),
         url(r'^api/v1/data/delay/$',DelayView.as_view(), name='delay'),
+        url(r'^api/v1/data/calculations/$',CalculationView.as_view(), name='calc'),
         url(r'^', TemplateView.as_view(template_name='index.html')), #I THINK THIS ALWAYS HAS TO BE THE LAST ONE
 
 

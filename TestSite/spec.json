@@ -223,7 +223,7 @@
             "multiple_benches": false,
             "header_data": false,
 	    "files": [
-                "FullLoad"
+                "TestData"
             ],
 	    "channel_names": [
                 "P_AMB"
