@@ -8,10 +8,11 @@ import numpy as np
 import scipy as sc
 import scipy.optimize as opt
 import xlsxwriter
+import io
 
 class Calculator:
 
-  def __init__(self, DataHandler, MapDict, ReportParams):
+  def __init__(self, DataHandler, MapDict, ReportParams): 
      	
     self.preparation = Preparation(DataHandler, MapDict)   
     self.calculation = Calculation(self.preparation, MapDict)
@@ -42,7 +43,7 @@ class Preparation:
     ##### Prepare Pre/Post-Data #####
     self.Species = [MapDict['Carbon_Dioxide_Dry'],self.CO,MapDict['Nitrogen_X_Dry'],
                     MapDict['Total_Hydrocarbons_Wet'],MapDict['Methane_Wet']]                  
-    self.zeroSpan = self._zeroSpan(self.pre, self.post, self.Species, self.EbenchData)    
+    self.zeroSpan = self._zeroSpan(self.pre, self.post, self.Species, self.EbenchData)        
 
     ##### Prepare Test parameter
     if (self.TestType == 'Transient').bool:
@@ -120,10 +121,10 @@ class Preparation:
     TimeWindow = self._prepare_time_window(Species)
 
     ##### Chosen-Data From Ebench
-    ZeroSpan[Species[0]]['Chosen'] = 191000
-    ZeroSpan[Species[1]]['Chosen'] = 58700
+    ZeroSpan[Species[0]]['Chosen'] = 18
+    ZeroSpan[Species[1]]['Chosen'] = 12
     ZeroSpan[Species[2]]['Chosen'] = 4005
-    ZeroSpan[Species[3]]['Chosen'] = 9900
+    ZeroSpan[Species[3]]['Chosen'] = 30000
     ZeroSpan[Species[4]]['Chosen'] = 2510
 
     ##### Pre Zero/Span #####
@@ -171,14 +172,14 @@ class Preparation:
       
       for i in range(0,len(ColumnZero)):
 
-          if ColumnZero[i]< ZeroSpan[spec]['Chosen']*0.001: # Accetable Range of noise 0.1%
+          if ColumnZero[i]> ZeroSpan[spec]['Chosen']*0.01: # Accetable Range of noise 0.1%
               ColumnZero = ColumnZero.drop(i)
 
           if (ColumnSpan[i]< ZeroSpan[spec]['Chosen']*0.98) | (ColumnSpan[i] > ZeroSpan[spec]['Chosen']*1.02): # Acceptable Range of noise +-2%
               ColumnSpan = ColumnSpan.drop(i)
 
-      ZeroSpan[spec][name['Zero']] = ColumnZero.mean()
-      ZeroSpan[spec][name['Span']] = ColumnSpan.mean()
+      ZeroSpan[spec][name['Zero']] = abs(ColumnZero.mean())
+      ZeroSpan[spec][name['Span']] = abs(ColumnSpan.mean())
 
     # Clear Variables
     ColumnZero, ColumnSpan, spec, Species, TimeWindow, Data, name, i = None, None, None, None, None, None, None, None
@@ -208,8 +209,9 @@ class Calculation:
     [self.DataUn, self.ArraySumUn] = self._inner_calc(Preparation, self.DataUn, Species)
 
     ##### Drift-corrected Calc #####
-    Preparation.test = self._drift_correction(self.DataUn, ZeroSpan, Preparation.test, Species)
-    [self.DataCor, self.ArraySumCor] = self._inner_calc(Preparation, self.DataCor, Species)
+    PreparationDrift = Preparation
+    PreparationDrift.test = self._drift_correction(self.DataUn, ZeroSpan, Preparation.test, Species)
+    [self.DataCor, self.ArraySumCor] = self._inner_calc(PreparationDrift, self.DataCor, Species)
     self.ArraySumCorWon = self._remove_negatives(self.DataCor)
 
     # Clear Variables
@@ -489,90 +491,108 @@ class Calculation:
 
 class Report:
 
-     def __init__(self, DataHandler):
+    def __init__(self, DataHandler, MapDict, Calculator, output):
+        self.output = output
 
-        # Prepare Variables
-        Calculator = DataHandler.resultsLog['Calculation']
+        ###### Load Variables #####
         Test = DataHandler.testData.data
+        Uncorrected = Calculator.calculation.DataUn
+        Corrected = Calculator.calculation.DataCor
         ArraySumCorWon = Calculator.calculation.ArraySumCorWon
         ArraySumCor = Calculator.calculation.ArraySumCor
         ArraySumUn = Calculator.calculation.ArraySumUn
-        U_BPOW_Factor = Test.U_BPOW.sum(skipna=True)/(3600*0.746)
+        Species = ['CO2','CO','NOx','THC','NMHC']
+        U_BPOW_Factor = Test[MapDict['Engine_Power']].sum(skipna=True)/(3600*0.746)
 
-        ##### Final Report ######
-        final = pd.DataFrame()
-        final['Species'] = ['CO2','CO','NOx','THC','NMHC']
-        final['Units'] = ['g/ghphr','g/ghphr','g/ghphr','g/ghphr','g/ghphr']
-        final['Test'] = np.zeros(5)
-        for i in range(0,len(final['Species'])):
-            final['Test'][i] = ArraySumCorWon[final['Species'][i]]/U_BPOW_Factor
+        ##### Calculate Species in g/ghpr #####
+        DriftUncorrected = self._calculate_species(ArraySumUn, U_BPOW_Factor, Species)
+        DriftCorrected = self._calculate_species(ArraySumCor, U_BPOW_Factor, Species)
+        Final = self._calculate_species(ArraySumCorWon, U_BPOW_Factor, Species)
 
-        # Preparation of Excel-File
-        self.file = xlsxwriter.Workbook('Final.xlsx')
+        ###### Preparation of Excel-File #####
+        self.file = xlsxwriter.Workbook(self.output, {'in_memory':True})
         sheet = self.file.add_worksheet('Emissions_Calculations')
+        sheet2 = self.file.add_worksheet('Raw Data')
+        sheet3 = self.file.add_worksheet('Drift-uncorrected Data')
+        sheet4 = self.file.add_worksheet('Drift-corrected Data')
+
+        ##### Write Emissions in Report ######
+        import ipdb
+        ipdb.set_trace()
+        sheet = self._write_emissions(sheet, DriftUncorrected, ArraySumUn, 'uncorrected', Species)
+        sheet = self._write_emissions(sheet, DriftCorrected, ArraySumCor, 'corrected', Species)
+        sheet = self._write_emissions(sheet, Final, ArraySumCorWon, 'final', Species)
+
+        ##### Write calculated and raw data #####
+        sheet2 = self._write_dataframe(sheet2, Test)
+        sheet3 = self._write_dataframe(sheet3, Uncorrected)
+        sheet4 = self._write_dataframe(sheet4, Corrected)
+
+        self.file.close()
+
+
+    def _calculate_species(self, ArraySum, U_BPOW_Factor, Species):
+            
+        DataFrame = pd.DataFrame()
+        DataFrame['Species'] = Species
+        DataFrame['Units'] = ['g/ghphr','g/ghphr','g/ghphr','g/ghphr','g/ghphr']
+        DataFrame['Test'] = np.zeros(5)
+        for i in range(0,len(DataFrame['Species'])):
+            DataFrame['Test'][i] = ArraySum[DataFrame['Species'][i]]/U_BPOW_Factor
+
+        return DataFrame
+
+
+    def _write_emissions(self, sheet, Data, Array, Type, Species):
+
+        ##### Choose Emissions state #####
+        if Type == 'uncorrected':
+
+            text = 'Drif-uncorrected'
+            index = 19
+
+        elif Type == 'corrected':
+
+            text = 'Drift-corrected'
+            index = 10
+
+        elif Type == 'final':
+
+            text = 'Final'
+            index = 1
+
+        ##### Prepare Formats #####
         bold = self.file.add_format({'bold': True})
-        red = self.file.add_format({'font_color': 'red','border':1,'bold':1,'fg_color':'#FFA62F'})
         dark_grey = self.file.add_format({'fg_color':'#696969','bold':1,'border': 1})
         bright_grey = self.file.add_format({'fg_color':'#A9A9A9', 'bold':1,'border': 1})
         border = self.file.add_format({'border':1})
         merge_format = self.file.add_format({'bold': 1,'border': 1,'align': 'center','valign': 'vcenter','fg_color': '#C71585','font_color':'white'})
         merge_format2 = self.file.add_format({'bold': 1,'border': 1,'align': 'center','valign': 'vcenter','fg_color': '#A9A9A9'})
 
-        # Final Emissions
-        sheet.merge_range('A1:D1', 'Final Emissions', merge_format)
-        sheet.write_row('A2',final.columns.values,dark_grey)
-        sheet.write_column('A3',final.Species,bright_grey)
-        sheet.write_column('B3',final.Units,bright_grey)
-        where_are_NaNs = np.isnan(final.Test)
-        final.Test[where_are_NaNs] = 0
-        sheet.write_column('C3',np.round(final.get('Test'),3),border)
+        ##### Write Data to File #####
+        sheet.merge_range('A'+str(index) + ':C'+str(index), text +' Emissions', merge_format)
+        sheet.write_row('A'+str(index+1),Data.columns.values,dark_grey)
+        sheet.write_column('A'+str(index+2),Data.Species,bright_grey)
+        sheet.write_column('B'+str(index+2),Data.Units,bright_grey)
+        where_are_NaNs = np.isnan(Data.Test)
+        Data.Test[where_are_NaNs] = 0
+        sheet.write_column('C'+str(index+2),np.round(Data.get('Test'),3),border)
 
-        # Emissions Mass - corrected without negative values
-        sheet.merge_range('J1:K1', 'Emissions Mass', merge_format2)
-        sheet.write('J2','Cold Start',bright_grey)
-        sheet.write_column('J3',ArraySumCorWon,border)      
-                
-        # Drift corrected emissions
-        drift = pd.DataFrame()
-        drift['Species'] = ['CO2','CO','NOx','THC','NMHC']
-        drift['Units'] = ['g/ghphr','g/ghphr','g/ghphr','g/ghphr','g/ghphr']
-        drift['Test'] = np.zeros(5)
-        for i in range(0,len(drift['Species'])):
-             drift['Test'][i] = ArraySumCor[final['Species'][i]]/U_BPOW_Factor
+        ##### Emissions Total Mass #####
+        sheet.write('D'+str(index), 'Emissions Mass', merge_format2)
+        sheet.write('D'+str(index+1),'Calc. Data',bright_grey)
 
-        sheet.merge_range('A10:D10', 'Drift corrected Emissions', merge_format)
-        sheet.write_row('A11',drift.columns.values,dark_grey)
-        sheet.write_column('A12',drift.Species,bright_grey)
-        sheet.write_column('B12',drift.Units,bright_grey)
-        where_are_NaNs = np.isnan(drift.Test)
-        drift.Test[where_are_NaNs] = 0        
-        sheet.write_column('C12',np.round(drift.get('Test'),3),border)
+        for i in range(0,len(Species)):
+            sheet.write('D'+str(index+2+i), np.round(Array[Species[i]],3), border)
 
-        # Emissions Mass - corrected
-        sheet.merge_range('J10:K10', 'Emissions Mass', merge_format2)
-        sheet.write('J11','Cold Start',bright_grey)
-        sheet.write_column('J12',ArraySumCor,border)
+        return sheet
 
-        # Uncorrected emissions
-        un = pd.DataFrame()
-        un['Species'] = ['CO2','CO','NOx','THC','NMHC']
-        un['Units'] = ['g/ghphr','g/ghphr','g/ghphr','g/ghphr','g/ghphr']
-        un['Test'] = np.zeros(5)
-        for i in range(0,len(un['Species'])):
-            un['Test'][i] = ArraySumUn[final['Species'][i]]/U_BPOW_Factor
 
-        sheet.merge_range('A19:D19', 'Drift uncorrected emissions', merge_format)
-        sheet.write_row('A20',un.columns.values,dark_grey)
-        sheet.write_column('A21',un.Species,bright_grey)
-        sheet.write_column('B21',un.Units,bright_grey)
-        where_are_NaNs = np.isnan(un.Test)
-        un.Test[where_are_NaNs] = 0        
-        sheet.write_column('C21',np.round(un.get('Test'),3),border)
+    def _write_dataframe(self, Sheet, Data):
 
-        # Emissions Mass - uncorrected
-        sheet.merge_range('J19:K19', 'Emissions Mass', merge_format2)
-        sheet.write('J20','Cold Start',bright_grey)
-        sheet.write_column('J21',ArraySumUn,border)
+        for i in range(0,len(Data.columns)):
+            Sheet.write(0,i,Data.columns[i])
+            Sheet.write_column(1,i,Data[Data.columns[i]])
 
-        self.file.close()
-        
+        return Sheet
+

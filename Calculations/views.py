@@ -1,4 +1,5 @@
 import json
+import io
 import xlsxwriter
 from django.core.servers.basehttp import FileWrapper
 
@@ -48,22 +49,16 @@ class CalculationView(views.APIView):
 
                 try:
 
-                    import ipdb
-                    ipdb.set_trace()
-
-                    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-                    response['Content-Disposition'] = 'attachment; filename=Final.xlsx'
-
                     ##### Load dataHandler from Cache #####
                     cache = caches['default']
                     dataHandler = cache.get(request.session._get_session_key())
                     ##### Initialize Calculation #####
                     #fileReport = xlsxwriter.Workbook(response)
-                    report = Report(dataHandler)
-
+                    Output = io.BytesIO()
+                    report = Report(dataHandler, dataHandler.testDataMapDict, dataHandler.resultsLog['Calculation'], Output)
 
                     #wrapper = FileWrapper(fileReport)
-                    response = HttpResponse(report.file)
+                    #response = HttpResponse(report.file)
                     #response['Content-Length'] = os.path.getsize(filename)
                     #return response
   
@@ -71,6 +66,9 @@ class CalculationView(views.APIView):
                     ##### Save Session #####
                     cache.set(request.session._get_session_key(), dataHandler)            
                     #jsonLog = json.dumps(jsonDict)
+                    report.output.seek(0)
+                    response = HttpResponse(report.output.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                    response['Content-Disposition'] = 'attachment; filename="Final.xlsx"'
 
                     return response
 
