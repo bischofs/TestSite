@@ -154,12 +154,12 @@ class Data:
           
           for species in self.speciesData.Species.items():
 
-                if species[1]['files'].__contains__(self.fileType) and species[1]['header_data'] == False:
+               if species[1]['files'].__contains__(self.fileType) and species[1]['header_data'] == False:
                     if (species[1]['multiple_benches'] == True):
                          self._check_channels_util(species[0], species[1]['channel_names'], True, self.data, self.fileName)
                     else:
                          self._check_channels_util(species[0], species[1]['channel_names'], False, self.data, self.fileName)
-
+                         
                elif species[1]['header_data'] == True:
                     self._check_channels_util(species[0], species[1]['channel_names'], False, self.metaData, self.fileName)
     
