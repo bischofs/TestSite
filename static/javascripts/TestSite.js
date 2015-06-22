@@ -8,6 +8,7 @@
 	'TestSite.delay',
 	'TestSite.authentication',
 	'TestSite.import',
+	'TestSite.results',
 	'TestSite.layout',
 	'TestSite.config',
 	'ngAnimate',

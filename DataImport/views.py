@@ -33,8 +33,6 @@ class FileUploadView(views.APIView):
 
             cache = caches['default']
 
-            #import ipdb; ipdb.set_trace()
-
             request.session.set_test_cookie()
 
             if(not cache.get(request.session.session_key)):
@@ -68,10 +66,10 @@ class FileUploadView(views.APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
 
         try:
-
+            
             if request.QUERY_PARAMS['bool'] == 'With Filter':
                 Filter_bool = True
             else:
@@ -91,11 +89,10 @@ class FileUploadView(views.APIView):
 
         except Exception as e:
         
-            return Response({
-
-                'status': 'Bad request',
-                'message': str(e)
-            }, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({
+                    'status': 'Bad request',
+                    'message': str(e)
+                    }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MetaDataView(views.APIView):

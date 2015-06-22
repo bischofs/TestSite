@@ -40,8 +40,8 @@
             })
             .state('1065.Results', {
                 url: "/results",
-                templateUrl: "/static/javascripts/results/results.html"
-                // controller: "ImportController"
+                templateUrl: "/static/javascripts/results/results.html",
+                controller: "ResultsController"
             });
     }
 
