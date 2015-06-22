@@ -13,7 +13,7 @@
 
         $scope.Calculation = function() {
             toastr.info('Calculations started!');
-            $http.get('/api/v1/data/calculations/')
+            $http.post('/api/v1/data/calculations/')
                 .success(function(response) {
                     toastr.success(response.message, 'Calculations finished!');
 
@@ -25,7 +25,7 @@
         };
 
         $scope.Report = function(){
-            $http.post('/api/v1/data/calculations/')
+            $http.get('/api/v1/data/calculations/')
                 .success(function(response){
                     toastr.success(response.message, 'Report finished!');
                 })

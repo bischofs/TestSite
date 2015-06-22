@@ -490,9 +490,6 @@ class Calculation:
 class Report:
 
      def __init__(self, DataHandler):
-        
-        import ipdb
-        ipdb.set_trace()
 
         # Prepare Variables
         Calculator = DataHandler.resultsLog['Calculation']
@@ -511,15 +508,15 @@ class Report:
             final['Test'][i] = ArraySumCorWon[final['Species'][i]]/U_BPOW_Factor
 
         # Preparation of Excel-File
-        file = xlsxwriter.Workbook('Final.xlsx')
-        sheet = file.add_worksheet('Emissions_Calculations')
-        bold = file.add_format({'bold': True})
-        red = file.add_format({'font_color': 'red','border':1,'bold':1,'fg_color':'#FFA62F'})
-        dark_grey = file.add_format({'fg_color':'#696969','bold':1,'border': 1})
-        bright_grey = file.add_format({'fg_color':'#A9A9A9', 'bold':1,'border': 1})
-        border = file.add_format({'border':1})
-        merge_format = file.add_format({'bold': 1,'border': 1,'align': 'center','valign': 'vcenter','fg_color': '#C71585','font_color':'white'})
-        merge_format2 = file.add_format({'bold': 1,'border': 1,'align': 'center','valign': 'vcenter','fg_color': '#A9A9A9'})
+        self.file = xlsxwriter.Workbook('Final.xlsx')
+        sheet = self.file.add_worksheet('Emissions_Calculations')
+        bold = self.file.add_format({'bold': True})
+        red = self.file.add_format({'font_color': 'red','border':1,'bold':1,'fg_color':'#FFA62F'})
+        dark_grey = self.file.add_format({'fg_color':'#696969','bold':1,'border': 1})
+        bright_grey = self.file.add_format({'fg_color':'#A9A9A9', 'bold':1,'border': 1})
+        border = self.file.add_format({'border':1})
+        merge_format = self.file.add_format({'bold': 1,'border': 1,'align': 'center','valign': 'vcenter','fg_color': '#C71585','font_color':'white'})
+        merge_format2 = self.file.add_format({'bold': 1,'border': 1,'align': 'center','valign': 'vcenter','fg_color': '#A9A9A9'})
 
         # Final Emissions
         sheet.merge_range('A1:D1', 'Final Emissions', merge_format)
@@ -577,5 +574,5 @@ class Report:
         sheet.write('J20','Cold Start',bright_grey)
         sheet.write_column('J21',ArraySumUn,border)
 
-        file.close()
+        self.file.close()
         
