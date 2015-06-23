@@ -9,55 +9,93 @@
                     <ul class="list-group checked-list-box">
                         <li class="list-group-item">All Options</li>
                         <li class="list-group-item">Phasing Results</li>
-        		        <li class="list-group-item">Regression Results</li>
-        	            <li class="list-group-item">Regression Omissions</li>
-        	            <li class="list-group-item" data-checked="true">Corrected Results</li>
+                        <li class="list-group-item">Regression Results</li>
+                        <li class="list-group-item">Regression Omissions</li>
+                        <li class="list-group-item" data-checked="true">Corrected Results</li>
                         <li class="list-group-item">Uncorrected Results</li>
                         <li class="list-group-item">Step-by-Step Equation Results</li>
                     </ul>
                 </div>
             </div>    
         </div>
-        <div class="col-xs-4">
+        <div class="col-xs-6">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Calculation Results</h3>
+                </div>
+                <div class="panel-body">
+                    <table id="ResultTable" class="table" style="margin-bottom: 0px; visibility: hidden;">
+                            <thead>
+                                    <tr>
+                                            <th>Species</th>
+                                            <th>Data</th>
+                                            <th>Units</th>
+                                            <th>Total Mass</th>
+                                    </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>CO2</td>
+                                    <td>740</td>
+                                    <td>g/ghpr</td>
+                                    <td>15000 mg</td>
+                                </tr>
+                                <tr>
+                                    <td>CO</td>
+                                    <td>6</td>
+                                    <td>g/ghpr</td>
+                                    <td>124 mg</td>
+                                </tr>
+                                <tr>
+                                    <td>NOx</td>
+                                    <td>0.32</td>
+                                    <td>g/ghpr</td>
+                                    <td>6.45 mg</td>
+                                </tr>
+                                <tr>
+                                    <td>THC</td>
+                                    <td>0.5</td>
+                                    <td>g/ghpr</td>
+                                    <td>10.1 mg</td>
+                                </tr>
+                                <tr>
+                                    <td>NMHC</td>
+                                    <td>0.41</td>
+                                    <td>g/ghpr</td>
+                                    <td>8.3 mg</td>
+                                </tr>
+                          </tbody>
+                    </table>
                 </div>             
             </div>
-            <!-- <h5>Deterioration factor</h5>  CO2
-            <input class="regoutput" ng-value="powerI | number"></input>
-            NOx
-            <input class="regoutput" ng-value="powerr | number"></input>
-            THC
-            <input class="regoutput" ng-value="powers | number"></input>
-            NMHC
-            <input class="regoutput" ng-value="powerse | number"></input> -->
-        </div>
-        
-        <div class="col-xs-2">
-            <button type="button" class="btn btn-success btn-s" ng-click="Report()">
+            <button type="button" class="btn btn-success btn-s"  ng-click="Report()" onclick="run()">
                 <span class="glyphicon glyphicon-arrow-down"></span> Download Results
-            </button>
+            </button>           
         </div>
     </div>
 </div>
 <script type="text/javascript">
-$(function() {
-    $('.list-group.checked-list-box .list-group-item').each(function() {
+
+function run() {
+    document.getElementById("ResultTable").style.visibility = "visible";
+}
+
+    $(function() {
+        $('.list-group.checked-list-box .list-group-item').each(function() {
 
         // Settings
         var $widget = $(this),
-            $checkbox = $('<input type="checkbox" class="hidden" />'),
-            color = ($widget.data('color') ? $widget.data('color') : "primary"),
-            style = ($widget.data('style') == "button" ? "btn-" : "list-group-item-"),
-            settings = {
-                on: {
-                    icon: 'glyphicon glyphicon-check'
-                },
-                off: {
-                    icon: 'glyphicon glyphicon-unchecked'
-                }
-            };
+        $checkbox = $('<input type="checkbox" class="hidden" />'),
+        color = ($widget.data('color') ? $widget.data('color') : "primary"),
+        style = ($widget.data('style') == "button" ? "btn-" : "list-group-item-"),
+        settings = {
+            on: {
+                icon: 'glyphicon glyphicon-check'
+            },
+            off: {
+                icon: 'glyphicon glyphicon-unchecked'
+            }
+        };
 
         $widget.css('cursor', 'pointer')
         $widget.append($checkbox);
@@ -82,8 +120,8 @@ $(function() {
 
             // Set the button's icon
             $widget.find('.state-icon')
-                .removeClass()
-                .addClass('state-icon ' + settings[$widget.data('state')].icon);
+            .removeClass()
+            .addClass('state-icon ' + settings[$widget.data('state')].icon);
 
             // Update the button's color
             if (isChecked) {
@@ -110,33 +148,33 @@ $(function() {
         init();
     });
 
-    $('#get-checked-data').on('click', function(event) {
-        event.preventDefault();
-        var checkedItems = {},
-            counter = 0;
-        $("#check-list-box li.active").each(function(idx, li) {
-            checkedItems[counter] = $(li).text();
-            counter++;
-        });
-        $('#display-json').html(JSON.stringify(checkedItems, null, '\t'));
+$('#get-checked-data').on('click', function(event) {
+    event.preventDefault();
+    var checkedItems = {},
+    counter = 0;
+    $("#check-list-box li.active").each(function(idx, li) {
+        checkedItems[counter] = $(li).text();
+        counter++;
     });
+    $('#display-json').html(JSON.stringify(checkedItems, null, '\t'));
+});
 });
 
 </script>
 <style type="text/css">
-/* CSS REQUIRED */
+    /* CSS REQUIRED */
 
-.state-icon {
-    left: -5px;
-}
+    .state-icon {
+        left: -5px;
+    }
 
-.list-group-item-primary {
-    color: rgb(255, 255, 255);
-    background-color: rgb(66, 139, 202);
-}
-/* DEMO ONLY - REMOVES UNWANTED MARGIN */
+    .list-group-item-primary {
+        color: rgb(255, 255, 255);
+        background-color: rgb(66, 139, 202);
+    }
+    /* DEMO ONLY - REMOVES UNWANTED MARGIN */
 
-.well .list-group {
-    margin-bottom: 0px;
-}
+    .well .list-group {
+        margin-bottom: 0px;
+    }
 </style>

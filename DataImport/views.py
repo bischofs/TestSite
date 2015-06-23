@@ -70,7 +70,7 @@ class FileUploadView(views.APIView):
 
         try:
             
-            if request.QUERY_PARAMS['bool'] == 'With Filter':
+            if request.QUERY_PARAMS['bool'] == 'Omitting Torque, Speed, Power':
                 Filter_bool = True
             else:
                 Filter_bool = False
@@ -89,10 +89,10 @@ class FileUploadView(views.APIView):
 
         except Exception as e:
         
-                    return Response({
-                    'status': 'Bad request',
-                    'message': str(e)
-                    }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+            'status': 'Bad request',
+            'message': str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MetaDataView(views.APIView):

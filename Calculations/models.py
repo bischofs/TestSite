@@ -492,9 +492,9 @@ class Calculation:
 class Report:
 
     def __init__(self, DataHandler, MapDict, Calculator, output):
-        self.output = output
 
         ###### Load Variables #####
+        self.output = output        
         Test = DataHandler.testData.data
         Uncorrected = Calculator.calculation.DataUn
         Corrected = Calculator.calculation.DataCor
@@ -517,8 +517,6 @@ class Report:
         sheet4 = self.file.add_worksheet('Drift-corrected Data')
 
         ##### Write Emissions in Report ######
-        import ipdb
-        ipdb.set_trace()
         sheet = self._write_emissions(sheet, DriftUncorrected, ArraySumUn, 'uncorrected', Species)
         sheet = self._write_emissions(sheet, DriftCorrected, ArraySumCor, 'corrected', Species)
         sheet = self._write_emissions(sheet, Final, ArraySumCorWon, 'final', Species)
@@ -574,16 +572,16 @@ class Report:
         sheet.write_row('A'+str(index+1),Data.columns.values,dark_grey)
         sheet.write_column('A'+str(index+2),Data.Species,bright_grey)
         sheet.write_column('B'+str(index+2),Data.Units,bright_grey)
-        where_are_NaNs = np.isnan(Data.Test)
-        Data.Test[where_are_NaNs] = 0
+        #where_are_NaNs = np.isnan(Data.Test)
+        #Data.Test[where_are_NaNs] = 0
         sheet.write_column('C'+str(index+2),np.round(Data.get('Test'),3),border)
 
         ##### Emissions Total Mass #####
-        sheet.write('D'+str(index), 'Emissions Mass', merge_format2)
-        sheet.write('D'+str(index+1),'Calc. Data',bright_grey)
+        sheet.write('E'+str(index), 'Emissions Mass', merge_format2)
+        sheet.write('E'+str(index+1),'Total',bright_grey)
 
         for i in range(0,len(Species)):
-            sheet.write('D'+str(index+2+i), np.round(Array[Species[i]],3), border)
+            sheet.write('E'+str(index+2+i), np.round(Array[Species[i]],3), border)
 
         return sheet
 
