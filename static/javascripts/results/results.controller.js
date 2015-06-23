@@ -24,7 +24,7 @@
         };
 
         $scope.Report = function(){
-            document.getElementById("ResultTable").style.display = "True";
+
             $http.get('/api/v1/data/calculations/')
                 .success(function(response){
                     toastr.success(response.message, 'Report finished!');
