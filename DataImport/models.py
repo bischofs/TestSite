@@ -12,17 +12,14 @@ class DataHandler:
 
      def __init__(self):
          # need required channels for each file
-          self.resultsLog = {'Regression': {},'Regression_bool': {}, 'Data Alignment': {}, 'Calculation': {}} 
+          self.resultsLog = {'Regression': {},'Regression_bool': {}, 'Data Alignment': {}, 'Calculation': {}, 'Report':{}} 
           self.log = {}
-          self.masterDict = {} 
+          self.masterDict = {}
+          self.masterMetaData = {}
+          self.masterFileName = {}
           self.ebenches = Ebench.objects.all()
           self.allFilesLoaded = False
-
           self.CoHigh = True
-
-
-
-     #Have to change ordering of load data so that excpetion causes file to not be saved to datahandler
 
           ######## HARD CODE EBENCH #########
           self.ebenchData = {}
@@ -33,72 +30,35 @@ class DataHandler:
           self.ebenchData['xTHC[THC_FID]init'] = 1
           ###################################
 
+     def import_full_load(self, dataFile):
+          self.fullLoad = FullLoad(dataFile)
+          [self.fullLoadMapDict, self.masterMetaData, self.masterFileName] = self.fullLoad.load_data(dataFile, self.masterMetaData, self.masterFileName)
 
+     def import_pre_zero_span(self, dataFile):
+          self.preZeroSpan = ZeroSpan(dataFile)
+          [self.zeroSpanMapDict, self.masterMetaData, self.masterFileName] = self.preZeroSpan.load_data(dataFile, self.masterMetaData, self.masterFileName)     
 
      def import_test_data(self, numBenches, dataFile):
           self.testData = TestData(dataFile, numBenches) 
-          self.testDataMapDict = self.testData.load_data(dataFile)
-          self._all_files_loaded()          
-         
-     def import_pre_zero_span(self, dataFile):
-          self.preZeroSpan = ZeroSpan(dataFile)
-          self.zeroSpanMapDict = self.preZeroSpan.load_data(dataFile)
-          self._all_files_loaded()
-          
+          [self.masterDict, self.masterMetaData, self.masterFileName] = self.testData.load_data(dataFile, self.masterMetaData, self.masterFileName)     
+                   
      def import_post_zero_span(self, dataFile):
           self.postZeroSpan = ZeroSpan(dataFile)
-          self.zeroSpanMapDict = self.postZeroSpan.load_data(dataFile)
-          self._all_files_loaded()
-          
-     def import_full_load(self, dataFile):
-          self.fullLoad = FullLoad(dataFile)
-          self.fullLoadMapDict = self.fullLoad.load_data(dataFile)
-          self._all_files_loaded()
+          [self.zeroSpanMapDict, self.masterMetaData, self.masterFileName] = self.postZeroSpan.load_data(dataFile, self.masterMetaData, self.masterFileName)      
 
      def _all_files_loaded(self):
           
           self.attrs = ['fullLoad', 'postZeroSpan', 'preZeroSpan', 'testData']
 
           for attr in self.attrs:
-               if not hasattr(self, attr):
+                if not hasattr(self, attr):
                     break
-          else:
-               self.allFilesLoaded = True
+                else:
+                  self.allFilesLoaded = True
 
           if(self.allFilesLoaded == True):
                self.files = [self.testData, self.preZeroSpan, self.postZeroSpan, self.fullLoad]
-               #self._check_all_metadata()
-               #self._check_time_stamps
-               
-               
-     def _check_all_metadata(self):
-          for x, y in itertools.combinations(self.files, 2):
-               if not x.metaData.equals(y.metaData):
-                    raise Exception("metadata in file %s does not match file %s" % (x.fileName, y.fileName))
-                              
 
-
-     #def _check_all_time_stamps:
-
-     
-
-     # def _corr_frequencies(self):
-          
-
-     # def _corr_time_stamps(self):
-
-
-     # def _corr_fuel_data(self):
-
-
-
-#load all files check each import if all files are uploaded
-
-
-
-#Files must arrive in a certain order to check things
-#Full load -> regression
-#zero and spans can be in any order 
 
 class Data:
 
@@ -112,12 +72,12 @@ class Data:
           self.fileType = self.__class__.__name__
 
 
-     def load_data(self, dataFile):
-
+     def load_data(self, dataFile, masterMetaData, masterFileName):
 
           self.speciesData = pd.read_json("spec.json")
           self.data = pd.read_csv(dataFile, encoding='windows-1258')
           self.metaData, self.data = self._load_metadata(self.data)
+          [masterMetaData, masterFileName] = self._check_metadata(self.metaData, self.fileName, masterMetaData, masterFileName)
 
           self.data = self.data.dropna(how="all",axis=(1))
           self._check_units()
@@ -127,7 +87,25 @@ class Data:
           self._check_channels()
 
 
-          return self.mapDict
+          return self.mapDict, masterMetaData, masterFileName
+
+
+     def _check_metadata(self, MetaData, FileName, masterMetaData, masterFileName):
+
+      SkipList = ['N_TR','no_run','Comment1','Comment2','Proj#', 'N_TQ']   
+
+      if len(masterMetaData) == 0:
+
+        masterMetaData = MetaData
+        masterFileName = FileName
+        
+      else:
+
+        for x, y, z in zip(masterMetaData.values[0],MetaData.values[0],MetaData):
+          if (not x == y) and (z not in SkipList):
+            raise Exception("%s in file %s is not the same as in file %s" % (z, FileName, masterFileName)) 
+
+      return masterMetaData, masterFileName    
 
 
      def _check_channels_util(self, species, channelNames, multipleBenches, data, fileName):
@@ -175,8 +153,6 @@ class Data:
                          raise Exception("%s units are not in %s" % (self.mapDict[species], unit))
 
 
-
-
      def _load_metadata(self, data):
 
           metaData = data[:1]
@@ -216,95 +192,6 @@ class TestData(Data):
           super().__init__(dataFile)
           self.numBenches = numBenches
 
-
-
-     # def load_data(self,filename):
-
-     #    self.filename = filename
-
-     #    self.speciesData = pd.read_json("spec.json")
-     #    self.data = pd.read_csv(filename)                                 # Read Data into DataFrame
-     #    self.metaData = self._load_metadata(self.data, filename)          # Read Meta data
-     #    self._check_channels()                                            # Check Units based on dictionary
-     #    self._check_units()
-     #    self.data = self.data.convert_objects(convert_numeric=True)       # Convert all data to numeric
-     #    self.data = self.data.dropna()                                    # Drop NaN values from data
-     #    self._check_ranges()
-     #    self._convert_bar_to_kpa()
-       
-     #    return self.data, self.mapDict, self.logDict
-
-
-     # def _convert_bar_to_kpa(self): #FIX DIS
-        
-     #    self.data.P_AMB = self.data.P_AMB * 100
-     #    self.data.P_INLET = self.data.P_INLET * 100
-
-
-     # def _check_units(self):
-
-     #    for species in self.mapDict:
-
-     #        unit = self.speciesData.Species[species]['unit']
-     #        booleanCond = self.data[self.mapDict[species]].str.contains(unit)
-     #        if not (booleanCond.any()):
-     #            self.logDict['error'] = "%s units are not in %s" % (self.mapDict[species], unit)
-     #            raise Exception("%s units are not in %s" % (self.mapDict[species], unit))
-
-
-     # def _check_ranges(self):
-        
-     #    for species in self.mapDict:
-
-     #        maxValue = self.speciesData.Species[species]['maximum_value']
-     #        minValue = self.speciesData.Species[species]['minimum_value']
-
-     #        booleanCond = self.data[self.mapDict[species]] > float(maxValue)
-     #        if(booleanCond.any()):
-     #            self.logDict['error'] = "%s is above required maximum of %s %s" % (self.mapDict[species], str(maxValue), self.speciesData.Species[species]['unit'])
-     #            raise Exception ("%s is above required maximum of %s %s" % (self.mapDict[species], str(maxValue), self.speciesData.Species[species]['unit']))
-     #        booleanCond = self.data[self.mapDict[species]] < float(minValue)
-     #        if(booleanCond.any()):
-     #            self.logDict['error'] = "%s is below required minimum of %s %s" % (self.mapDict[species], str(minValue), self.speciesData.Species[species]['unit'])
-     #            raise Exception ("%s is below required minimum of %s %s" % (self.mapDict[species], str(minValue), self.speciesData.Species[species]['unit']))
-
-
-     # def _check_channels(self):
-
-     #    def _check_channels_util(species, channelNames, multipleBenches, data, filename):
-            
-     #        for name in channelNames:
-     #            if (multipleBenches == True ) and (self.bench == '2'):
-     #                if (name in data.columns) and ((name + "2") in data.columns):
-     #                    self.mapDict[species] = name
-     #                    break
-     #            else:
-     #                if (name in data.columns):
-     #                    self.mapDict[species] = name
-     #                    break
-     #        else:
-     #           if (multipleBenches == True): 
-     #               channelNames.append(channelNames[0] + "2")   
-     #               raise Exception("Cannot find %s channel names %s in file %s" % (species.replace("_"," "), channelNames, filename))    
-     #           else:
-     #               raise Exception("Cannot find %s channel %s in file %s" % (species.replace("_"," "), channelNames, filename))    
-                   
-
-     #    for species in self.speciesData.Species.items():
-     #        if (species[1]['multiple_benches'] == True):
-     #            _check_channels_util(species[0], species[1]['channel_names'], True, self.data, self.filename)
-     #        else:
-     #            _check_channels_util(species[0], species[1]['channel_names'], False, self.data, self.filename)
- 
-
-     # def _load_metadata(self, data, filename):
-
-     #    metaData = data[:2]
-     #    if 'proj' in metaData.columns:
-     #        self.logDict['info'] = "Meta-Data read from import file %s" % filename
-     #        return metaData
-     #    else:
-     #        self.logDict['warning'] = "Meta-Data missing in import file %s" % filename
 
 
 class CycleValidator:

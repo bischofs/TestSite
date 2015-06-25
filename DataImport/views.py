@@ -38,7 +38,7 @@ class FileUploadView(views.APIView):
             if(not cache.get(request.session.session_key)):
                  dataHandler = DataHandler()
             else:
-                dataHandler = cache.get(request.session.session_key)
+                dataHandler = cache.get(request.session.session_key)               
 
             if(request.data['ftype'] == 'full'):#file is full load curve
                 dataHandler.import_full_load(request.data['file'])
@@ -73,7 +73,7 @@ class FileUploadView(views.APIView):
             OmitChoice = int(request.QUERY_PARAMS['choice'])
             cache = caches['default']
             dataHandler = cache.get(request.session.session_key)
-            cycleValidator = CycleValidator(dataHandler.testData, dataHandler.testDataMapDict,
+            cycleValidator = CycleValidator(dataHandler.testData, dataHandler.masterDict,
                                             dataHandler.fullLoad, dataHandler.fullLoad.metaData['n_CurbIdle'], OmitChoice)
             dataHandler.resultsLog['Regression'] = cycleValidator.reg_results
             dataHandler.resultsLog['Regression_bool'] = cycleValidator.reg_results_bool      

@@ -11,9 +11,44 @@
 
     function ResultsController($scope, $http, toastr) {
 
+                // Write Names of Species
+        $scope.CO2_Name = 'Undefined'
+        $scope.CO_Name = 'Undefined'                  
+        $scope.NOX_Name = 'Undefined'
+        $scope.THC_Name = 'Undefined'
+        $scope.NMHC_Name = 'Undefined' 
+
+        // Write Values of Species
+        $scope.CO2_Result = 'Undefined'
+        $scope.CO_Result = 'Undefined'                  
+        $scope.NOX_Result = 'Undefined'
+        $scope.THC_Result = 'Undefined'
+        $scope.NMHC_Result = 'Undefined'         
+
+        // Write Units of Species
+        $scope.CO2_Unit = 'Undefined'
+        $scope.CO_Unit = 'Undefined'                  
+        $scope.NOX_Unit = 'Undefined'
+        $scope.THC_Unit = 'Undefined'
+        $scope.NMHC_Unit = 'Undefined'            
+
+        // Write Total of Species
+        $scope.CO2_Total = 'Undefined'
+        $scope.CO_Total = 'Undefined'                  
+        $scope.NOX_Total = 'Undefined'
+        $scope.THC_Total = 'Undefined'
+        $scope.NMHC_Total = 'Undefined'    
+
         $scope.Calculation = function() {
+
+            $scope.delay = 0;
+            $scope.minDuration = 0;
+            $scope.message = 'Calculation Running...';
+            $scope.backdrop = true;
+            $scope.promise = null;
+
             toastr.info('Calculations started!');
-            $scope.myPromise = $http.post('/api/v1/data/calculations/')
+            $scope.promise = $http.post('/api/v1/data/calculations/')
                 .success(function(response) {
                     toastr.success('Calculations finished!');
                     var jsonLog = JSON.parse(response)
@@ -51,7 +86,7 @@
                     $scope.THC_Total = Math.round(Total[3]*100)/100
                     $scope.NMHC_Total = Math.round(Total[4]*100)/100                                                             
 
-                    document.getElementById("ResultTable").style.visibility = "visible";
+                    //document.getElementById("ResultTable").style.visibility = "visible";
 
                 })
                 .error(function(response) {

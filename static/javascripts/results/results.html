@@ -7,26 +7,24 @@
                 </div>
                 <div style="max-height: 300px;">
                     <ul class="list-group checked-list-box">
-                        <li class="list-group-item">All Options</li>
-                        <li class="list-group-item">Phasing Results</li>
-			<li class="list-group-item">Drift Criteria</li>
-			<li class="list-group-item">Regression Results</li>
-                        <li class="list-group-item">Regression Omissions</li>
-                        <li class="list-group-item" data-checked="true">Corrected Results</li>
-                        <li class="list-group-item">Uncorrected Results</li>
-                        <li class="list-group-item">Step-by-Step Equation Results</li>
-                    
-		    </ul>
+                        <li value=0 class="list-group-item">All Options</li>
+                        <li value=1 class="list-group-item">Phasing Results</li>
+                        <li value=2 class="list-group-item">Regression Results</li>
+                        <li value=3 class="list-group-item">Regression Omissions</li>
+                        <li value=4 class="list-group-item" data-checked="true">Corrected Results</li>
+                        <li value=5 class="list-group-item">Uncorrected Results</li>
+                        <li value=6 class="list-group-item">Step-by-Step Equation Results</li>
+                    </ul>
                 </div>
             </div>    
         </div>
         <div class="col-xs-6">
             <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Calculation Results</h3>
-                </div>
-                <div class="panel-body" style="visibility: hidden;" id="ResultTable">
-                    <div cg-busy="{promise:myPromise,message:'Loading',backdrop:false,delay:300,minDuration:2000}">
+                <div cg-busy="{promise:promise,message:message,backdrop:backdrop,delay:delay,minDuration:minDuration}">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Calculation Results</h3>
+                    </div>
+                    <div class="panel-body" id="ResultTable">                    
                         <table class="table" style="margin-bottom: 0px;">
                                 <thead>
                                     <tr>
@@ -68,9 +66,9 @@
                                         <td>{{NMHC_Total}}</td>
                                     </tr>
                               </tbody>
-                        </table>
-                    </div>
-                </div>             
+                        </table>                    
+                    </div>             
+                </div>
             </div>
             <button type="button" class="btn btn-success btn-s"  ng-click="Report()">
                 <span class="glyphicon glyphicon-arrow-down"></span> Download Results

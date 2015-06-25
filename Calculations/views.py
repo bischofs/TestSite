@@ -31,7 +31,7 @@ class CalculationView(views.APIView):
                     if not dataHandler.resultsLog['Calculation']:   
                                            
                         ##### Initialize Calculation #####
-                        calculator = Calculator(dataHandler, dataHandler.testDataMapDict, request.QUERY_PARAMS)
+                        calculator = Calculator(dataHandler, dataHandler.masterDict, request.QUERY_PARAMS)
 
                         ##### Save Results #####
                         dataHandler.resultsLog['Calculation'] = calculator      
@@ -62,7 +62,7 @@ class CalculationView(views.APIView):
 
                     ##### Initialize Report #####
                     Output = io.BytesIO()
-                    report = Report(dataHandler, dataHandler.testDataMapDict, dataHandler.resultsLog['Calculation'], Output)
+                    report = Report(dataHandler, dataHandler.masterDict, dataHandler.resultsLog['Calculation'], Output)
   
                     ##### Save Session #####
                     cache.set(request.session._get_session_key(), dataHandler)            
