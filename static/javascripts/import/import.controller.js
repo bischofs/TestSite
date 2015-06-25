@@ -31,7 +31,7 @@
         $scope.Regression = function() {
 
             // Fill in Regression Data
-            $.get("api/v1/data/import/",{bool:document.getElementById("sel1").value}) 
+            $.get("api/v1/data/import/",{choice:document.getElementById("sel1").value}) 
                 .done(function(response){
                     var jsonObj = JSON.parse(response);
                     var List_channel = ['Power','Speed','Torque'];
@@ -54,11 +54,11 @@
                                             result = "label label-danger";                            
                                     }
                                     document.getElementById(List_label[i]).className = result; 
-                                    document.getElementById(List_label[i]).innerHTML = jsonObj.Regression[channel][List_regType[i]];
+                                    document.getElementById(List_label[i]).innerHTML = jsonObj.Regression[channel][List_regType[i]].toFixed(2);
                             };
                     };
                 })
-                .fail(function(response) {
+                .error(function(response) {
                     toastr.error(response.message, 'Data is not available!');
                 });
         }

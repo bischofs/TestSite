@@ -310,7 +310,7 @@ class TestData(Data):
 class CycleValidator:
     
 
-    def __init__(self, Testdata, Mapdict, Fullload, Warmidle, Filter_bool):
+    def __init__(self, Testdata, Mapdict, Fullload, Warmidle, FilterChoice):
 
         self.data = Testdata.data
         self.data_full = Fullload.data
@@ -322,7 +322,7 @@ class CycleValidator:
         self.Throttle = self.data[self.mapDict['Commanded_Throttle']]
         self.Torque_Demand = self.data[self.mapDict['Commanded_Torque']]
         self.Torque_Engine = self.data[self.mapDict['Engine_Torque']] 
-        self.Speed_Demand = self.data[self.mapDict['Commanded_Throttle']]
+        self.Speed_Demand = self.data[self.mapDict['Commanded_Speed']]
         self.Speed_Engine = self.data[self.mapDict['Engine_Speed']]
         self.Power_Demand = (self.data[self.mapDict['Commanded_Torque']] * self.data[self.mapDict['Commanded_Speed']] / 9.5488) / 1000
         self.Power_Engine = self.data[self.mapDict['Engine_Power']]
@@ -348,41 +348,41 @@ class CycleValidator:
         self.dataDict = {'Torque': ['Torque_Demand', 'Torque_Engine'],
                          'Power': ['Power_Demand', 'Power_Engine'], 
                          'Speed': ['Speed_Demand', 'Speed_Engine']}
-        if Filter_bool:
-          self._pre_regression_filter()        
+
+        if (FilterChoice != 0):
+          self._pre_regression_filter(FilterChoice)        
         self._regression()
         self._regression_validation()
         
-    def _pre_regression_filter(self):
+    def _pre_regression_filter(self, FilterChoice):
 
         for i in self.Index_Min:
             ##### Check Minimum Throttle ##### -- Table 1 EPA 1065.514
-            if self.Torque_Demand[i]<0:
+            if (self.Torque_Demand[i])<0 and (FilterChoice == 1):
                 self.Torque_Drop.append(i)
-                self.Power_Drop.append(i)
-                self.Torque_Below_Zero = True # Used to show the User that negative Torque during motoring is omitted                    
+                self.Power_Drop.append(i)                  
                 
-            if (self.Torque_Demand[i]==0) & (self.Speed_Demand[i]==0) & ((self.Torque_Engine[i]-0.02*self.Torque_Max)<self.Torque_Engine[i]) & (self.Torque_Engine[i]<(self.Torque_Engine[i]+0.02*self.Torque_Max)):
+            if (self.Torque_Demand[i]==0) and (self.Speed_Demand[i]==0) and ((self.Torque_Engine[i]-0.02*self.Torque_Max)<self.Torque_Engine[i]) and (self.Torque_Engine[i]<(self.Torque_Engine[i]+0.02*self.Torque_Max)) and (FilterChoice == 2):
                 self.Speed_Drop.append(i)
                 self.Power_Drop.append(i)
                 
-            if (self.Speed_Engine[i]>self.Speed_Demand[i]) & (self.Speed_Engine[i]<self.Speed_Demand[i]*1.02):
-                self.Speed_Drop.append(i)
+            if (self.Torque_Engine[i]>self.Torque_Demand[i]) and ((self.Torque_Engine[i]<(self.Torque_Engine[i]+0.02*self.Torque_Max)) | (self.Torque_Engine[i]<(self.Torque_Engine[i]-0.02*self.Torque_Max))) and (FilterChoice == 3):
+                self.Torque_Drop.append(i)
                 self.Power_Drop.append(i)
                 
-            if (self.Torque_Engine[i]>self.Torque_Demand[i]) & ((self.Torque_Engine[i]<(self.Torque_Engine[i]+0.02*self.Torque_Max)) | (self.Torque_Engine[i]<(self.Torque_Engine[i]-0.02*self.Torque_Max))):
-                self.Torque_Drop.append(i)
+            if (self.Speed_Engine[i]>self.Speed_Demand[i]) and (self.Speed_Engine[i]<self.Speed_Demand[i]*1.02) and (FilterChoice == 4):
+                self.Speed_Drop.append(i)
                 self.Power_Drop.append(i)
             
-        for i in self.Index_Max:
-            ##### Check Maximum Throttle ##### -- Table 1 EPA 1065.514
-            if (self.Speed_Engine[i]<self.Speed_Demand[i]) & (self.Speed_Engine[i]>self.Speed_Demand[i]*0.98):
-                self.Speed_Drop.append(i)
-                self.Power_Drop.append(i)
-                
-            if (self.Torque_Engine[i]<self.Torque_Demand[i]) & (self.Torque_Engine[i]>(self.Torque_Engine[i]-0.02*self.Torque_Max)):
-                self.Torque_Drop.append(i)
-                self.Power_Drop.append(i)            
+        for j in self.Index_Max:
+            ##### Check Maximum Throttle ##### -- Table 1 EPA 1065.514                
+            if (self.Torque_Engine[j]<self.Torque_Demand[j]) and (self.Torque_Engine[j]>(self.Torque_Engine[j]-0.02*self.Torque_Max)) and (FilterChoice == 5):
+                self.Torque_Drop.append(j)
+                self.Power_Drop.append(j)
+
+            if (self.Speed_Engine[j]<self.Speed_Demand[j]) and (self.Speed_Engine[j]>self.Speed_Demand[j]*0.98) and (FilterChoice == 6):
+                self.Speed_Drop.append(j)
+                self.Power_Drop.append(j)                    
 
         ##### Omitting the Data #####
         self.Speed_Engine = self.Speed_Engine.drop(self.Speed_Drop)
@@ -412,7 +412,8 @@ class CycleValidator:
                             'Speed': { 'slope': " ", 'intercept': " ", 'standard_error': " ", 'rsquared': " " }}
         
         for channel in self.dataDict.items():
-           self._regression_util(channel[0], channel[1][0], channel[1][1])
+
+          self._regression_util(channel[0], channel[1][1], channel[1][0])
  
 
     def _regression_util(self, channel, X, Y):
@@ -420,7 +421,7 @@ class CycleValidator:
         ymean = vars(self)[Y].mean()
         xmean = vars(self)[X].mean()
 
-        # -- Regression Slope -- EPA 1065.602-9 
+        # -- Regression Slope -- EPA 1065.602-9   
         numerator, denominator = 0.0, 0.0
         for x, y in zip(vars(self)[X], vars(self)[Y]):
             numerator = numerator + ((x - xmean) * (y - ymean))
@@ -467,7 +468,7 @@ class CycleValidator:
             if parameter == 'Speed':
 
                 # Slope
-                if (self.reg_results[parameter]['slope'] <= 1.03) & (self.reg_results[parameter]['slope'] >= 0.95):
+                if (self.reg_results[parameter]['slope'] <= 1.03) and (self.reg_results[parameter]['slope'] >= 0.95):
                     self.reg_results_bool[parameter]['slope'] = True
 
                 # Intercept
@@ -486,7 +487,7 @@ class CycleValidator:
             if parameter == 'Torque':
 
                 # Slope
-                if (self.reg_results[parameter]['slope'] <= 1.03) & (self.reg_results[parameter]['slope'] >= 0.83):
+                if (self.reg_results[parameter]['slope'] <= 1.03) and (self.reg_results[parameter]['slope'] >= 0.83):
                     self.reg_results_bool[parameter]['slope'] = True
                 # Intercept
                 if (self.reg_results[parameter]['intercept'] <= 0.02*self.Torque_Max):
@@ -504,7 +505,7 @@ class CycleValidator:
             if parameter == 'Power':
 
                 # Slope
-                if (self.reg_results[parameter]['slope'] <= 1.03) & (self.reg_results[parameter]['slope'] >= 0.83):
+                if (self.reg_results[parameter]['slope'] <= 1.03) and (self.reg_results[parameter]['slope'] >= 0.83):
                     self.reg_results_bool[parameter]['slope'] = True
 
                 # Intercept

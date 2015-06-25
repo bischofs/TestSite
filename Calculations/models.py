@@ -43,15 +43,13 @@ class Preparation:
     ##### Prepare Pre/Post-Data #####
     self.Species = [MapDict['Carbon_Dioxide_Dry'],self.CO,MapDict['Nitrogen_X_Dry'],
                     MapDict['Total_Hydrocarbons_Wet'],MapDict['Methane_Wet']]                  
-    self.zeroSpan = self._zeroSpan(self.pre, self.post, self.Species, self.EbenchData)        
+    self.ZeroSpan = self._zeroSpan(self.pre, self.post, self.Species, self.EbenchData)        
 
     ##### Prepare Test parameter
     if (self.TestType == 'Transient').bool:
          self.TransientBool = True
     else:
          self.TransientBool = False
-
-    # Clear Variables
 
 
   def _fuel_data(self, HeaderData, MapDict):
@@ -172,7 +170,7 @@ class Preparation:
       
       for i in range(0,len(ColumnZero)):
 
-          if ColumnZero[i]> ZeroSpan[spec]['Chosen']*0.01: # Accetable Range of noise 0.1%
+          if ColumnZero[i]> ZeroSpan[spec]['Chosen']*0.01: # Accetable Range of noise 1%
               ColumnZero = ColumnZero.drop(i)
 
           if (ColumnSpan[i]< ZeroSpan[spec]['Chosen']*0.98) | (ColumnSpan[i] > ZeroSpan[spec]['Chosen']*1.02): # Acceptable Range of noise +-2%
@@ -190,302 +188,312 @@ class Preparation:
 
 class Calculation:
 
-  def __init__(self, Preparation, MapDict):
+    def __init__(self, Preparation, MapDict):
 
-    if Preparation.TransientBool == True:
-         self._transient_calculation(Preparation, MapDict)
-    else:
-         self._steady_state_calculation(Preparation, MapDict)
-
-
-  def _transient_calculation(self, Preparation, MapDict):    
-
-    Species = Preparation.Species
-    ZeroSpan = Preparation.zeroSpan
-    self.DataUn = pd.DataFrame()
-    self.DataCor = pd.DataFrame()
-    
-    ##### Drif-uncorrected Calc #####
-    [self.DataUn, self.ArraySumUn] = self._inner_calc(Preparation, self.DataUn, Species)
-
-    ##### Drift-corrected Calc #####
-    PreparationDrift = Preparation
-    PreparationDrift.test = self._drift_correction(self.DataUn, ZeroSpan, Preparation.test, Species)
-    [self.DataCor, self.ArraySumCor] = self._inner_calc(PreparationDrift, self.DataCor, Species)
-    self.ArraySumCorWon = self._remove_negatives(self.DataCor)
-
-    # Clear Variables
-    Species, ZeroSpan = None, None
-
-
-  def _steady_state_calculation(self, Preparation):
-
-    ## Calculate steady state Cycle
-    pass
-
-
-  def _inner_calc(self, Preparation, Data, Species):
-
-    ##### Load Data #####
-    TestData = Preparation.test
-    Ebench = Preparation.EbenchData
-    Fuel = Preparation.FuelData 
-
-    ##### Steps of calculation #####
-    Data = self._unit_conversion(Data, TestData, Species)
-    Data = self._prepare_iteration(Data, TestData, Ebench)
-    Data = self._iteration(Data, Fuel, Ebench)
-    [Data, ArraySum] = self._rest_calculation(Data, Fuel)
-
-    # Clear Variables
-    Preparation, Species, TestData, Ebench, Fuel = None, None, None, None, None
-
-    return Data, ArraySum
-
-
-  def _unit_conversion(self, Data, TestData, Species):
-
-    # Species
-    Data["E_CO2D2"] = TestData[Species[0]]*10000 # % --> ppm
-    Data[Species[1]] = TestData[Species[1]]*10000 # % --> ppm
-    Data["E_NOXD2"] = TestData.E_NOXD2 # in ppm
-    Data["E_THCW2"] = TestData.E_THCW2 # in ppm        
-
-    Data["xCH4wet"] = TestData[Species[4]]/1000000 # ppm --> mol/mol
-    Data["xCO2meas"] = Data.E_CO2D2/1000000 # ppm --> mol/mol
-    Data["xCOmeas"] = Data.get(Species[1])/1000000 # ppm --> mol/mol
-    Data["xNOxmeas"] = Data.E_NOXD2/1000000 # ppm --> mol/mol
-    Data["xTHCmeas"] = Data.E_THCW2/1000000 # ppm --> mol/mol
-
-    # Flows
-    Data["mfuel"] = TestData.M_FRFUEL*1000/3600 # kg/h --> g/s
-    Data["Molar Flow Wet"] = TestData.C_FRAIRWS*1000/3600 # kg/h --> g/s
-    Data["Intake Air flow"] = Data.get("Molar Flow Wet")/28.96 # g/sec --> mol/sec
-
-    # Rest
-    Data["BARO Press"] = TestData.P_INLET*10000 # bar --> Pa
-    Data["T_INLET"] = TestData.T_INLET + 273.15 # °C --> K
-
-    # Clear Variables
-    TestData, Species = None, None
-
-    return Data
-
-
-  def _prepare_iteration(self, Data, TestData, Ebench):    
-
-    # Intake
-    Data["pH2O @ inlet"] = 10**(10.79574*(1-(273.16/(Data.T_INLET)))-5.028*np.log10((Data.T_INLET)/273.16)+0.000150475*(1-10**(-8.2969*(((Data.T_INLET)/273.16)-1)))+0.00042873*(10**(4.76955*(1-(273.16/(Data.T_INLET))))-1)-0.2138602)
-    Data["xH2O"] = TestData.M_RELHUM*Data.get("pH2O @ inlet")/(Data.get("BARO Press"))
-    Data["xH2Oint"] = Data.xH2O
-    Data["Mmix"] = 28.96559*(1-Data.xH2O)+18.01528*Data.xH2O
-    Data["nint (Intake Air Flow)"] = Data.get("Molar Flow Wet")/Data.Mmix
-    Data["xH2Ointdry"] = Data.xH2Oint/(1-Data.xH2Oint)
-    Data["xCO2int"] = Ebench.xCO2intdry/(1+Data.xH2Ointdry)
-    Data["xO2int"] = ((0.20982-Ebench.xCO2intdry)/(1+Data.xH2Ointdry))
-
-    # Dilution
-    Data["xH2Odil"] = Data.xH2O 
-    Data["xH2Odildry"] = Data.xH2Odil/(1-Data.xH2Odil)
-    Data["xCO2dil"] = Ebench.xCO2dildry/(1+Data.xH2Odildry)
-
-    # Rest
-    Data["xTHC[THC_FID]cor"] = Data.E_THCW2-Ebench.xTHC_THC_FID_init
-    Data["xNO2meas"] = Data.xNOxmeas*0 # NO2 not measured
-    Data["xNOmeas"] = Data.xNOxmeas*1
-    Data["xTHCwet"] = Data.xTHCmeas
-    Data["xNMHCwet"] = (Data.xTHCwet-Data.xCH4wet*Ebench.CH4_RF)/(1-Ebench.RFPF*Ebench.CH4_RF)        
-
-    # Clear Variables
-    TestData, Ebench = None, None
-
-    return Data
-
-
-  def _iteration(self, Data, Fuel, Ebench):   
-
-    def function_iteration(variables):
-
-        ###### Channels in Formulas #####
-
-        #A = xdil/exh -- G
-        #B = xH2Oexh -- H
-        #C = xCcombdry -- I
-        #D = xH2Oexhdry -- J
-        #E = xdil/exhdry -- K
-        #F = xint/exhdry -- L
-        #G = xraw/exhdry -- M
-        #H = xH2OCOmeas -- AC
-        #I = xH2OTHCmeas -- AD
-        #J = xH2ONOxmeas -- AE
-        #K = xH2ONO2meas -- AF
-        #L = xH2OCO2meas -- AH
-        #M = xCOdry -- AI
-        #N = xTHCdry -- AJ
-        #O = xNOxdry -- AK
-        #P = xNO2dry -- AL
-        #Q = xCO2dry -- AN
-        #R = xH2dry -- AO 
-        
-        # Unknown Variables
-        (A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R) = variables
-            
-        # Known Variables
-        S = Data.xCO2dil[i]
-        T = Data.xCO2int[i]
-        U = Fuel.alpha
-        V = Data.xH2Odil[i]
-        W = Data.xH2Oint[i]
-        X = Data.xO2int[i]
-        Y = Fuel.beta
-        Z = Fuel.gamma
-        AA = Fuel.delta
-        AB = Data.xCOmeas[i]
-        AC = Data.xTHCmeas[i]
-        AD = Data.xNOxmeas[i]
-        AE = Data.xNO2meas[i]
-        AF = Fuel.xH2Ogas
-        AG = Data.xCO2meas[i]
-        
-        # Equations to solve
-        eq1 = 1-(G/(1+D))-A
-        eq2 = D/(1+D)-B
-        eq3 = Q+(M)+(N)-(S*E)-(T*F)-C
-        eq4 = ((U/2)*(C-N))+V*E+W*F-R-D 
-        eq5 = A/(1-B)-E
-        eq6 = (1/(2*X))*(((U/2)-Y+2+(2*Z))*(C-N)-(M-O-(2*P)+R))-F
-        eq7 = 0.5*(((U/2)+Y+AA)*(C-N)+((2*N)+M-P+R))+F-G
-        eq8 = AB/(1-H)-M ## Reference: CFR 1065.659
-        eq10 = AC/(1-I)-N ## Reference: CFR 1065.659
-        eq11 = B-I
-        eq12 = AD/(1-J)-O ## Reference: CFR 1065.659
-        eq14 = AE/(1-K)-P ## Reference: CFR 1065.659
-        eq16 = (M*(D-V*E))/(AF*(Q-S*E))-R ## Reference: CFR 1065.659
-        eq17 = AG/(1-L)-Q ## Reference: CFR 1065.659
-        
-        if Mode==0:
-            eq9 = Ebench.Factorchiller-H    
-            eq13 = Ebench.Factorchiller-J
-            eq15 = Ebench.Factorchiller-K
-            eq18 = Ebench.Factorchiller-L
+        if Preparation.TransientBool == True:
+             self._transient_calculation(Preparation, MapDict)
+             [self.DriftUncorrected, self.DriftCorrected, self.Final] = self._result()             
         else:
-            eq9 = B-H    
-            eq13 = B-J
-            eq15 = B-K
-            eq18 = B-L
-        
-        return [eq1,eq2,eq3,eq4,eq5,eq6,eq7,eq8,eq9,eq10,eq11,eq12,eq13,eq14,eq15,eq16,eq17,eq18]
+             self._steady_state_calculation(Preparation, MapDict)
 
-    i = 0
-    Mode = 0
-    ResultList = np.zeros((len(Data),18))     
 
-    while i < len(Data)-1:
-        i +=1  
-        g = 0.5 # First guess for iteration start
+    def _transient_calculation(self, Preparation, MapDict):
 
-        Solution = opt.fsolve(function_iteration,(g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g))
-        
-        if Solution[2]<Ebench.Factorchiller:
-            Mode = 1 # Different Calculation with mode 1 or 0
+        Species = Preparation.Species
+        ZeroSpan = Preparation.ZeroSpan
+        DataUn = pd.DataFrame()
+        DataCor = pd.DataFrame()
+
+        ##### Drif-uncorrected Calc #####
+        [DataUn, self.ArraySumUn] = self._inner_calc(Preparation, DataUn, Species)
+
+        ##### Drift-corrected Calc #####
+        PreparationDrift = Preparation
+        PreparationDrift.test = self._drift_correction(DataUn, ZeroSpan, Preparation.test, Species)
+        [DataCor, self.ArraySumCor] = self._inner_calc(PreparationDrift, DataCor, Species)  
+        [self.ArraySumCorWon, self.U_BPOW_Factor] = self._remove_negatives(DataCor, Preparation.test, MapDict)
+
+        #self.ArraySum = [ArraySumUn, ArraySumCor, ArraySumCorWon]
+        self.Data = [Preparation.test, DataUn, DataCor]
+
+        # Clear Variables
+        Species, ZeroSpan, DataUn, DataCor = None, None, None, None
+
+
+    def _steady_state_calculation(self, Preparation):
+
+        ## Calculate steady state Cycle
+        pass
+
+
+    def _inner_calc(self, Preparation, Data, Species):
+
+        ##### Load Data #####
+        TestData = Preparation.test
+        Ebench = Preparation.EbenchData
+        Fuel = Preparation.FuelData 
+
+        ##### Steps of calculation #####
+        Data = self._unit_conversion(Data, TestData, Species)
+        Data = self._prepare_iteration(Data, TestData, Ebench)
+        Data = self._iteration(Data, Fuel, Ebench)
+        [Data, ArraySum] = self._rest_calculation(Data, Fuel)
+
+        # Clear Variables
+        Preparation, Species, TestData, Ebench, Fuel = None, None, None, None, None
+
+        return Data, ArraySum
+
+
+    def _unit_conversion(self, Data, TestData, Species):
+
+        # Species
+        Data["E_CO2D2"] = TestData[Species[0]]*10000 # % --> ppm
+        Data[Species[1]] = TestData[Species[1]]*10000 # % --> ppm
+        Data["E_NOXD2"] = TestData.E_NOXD2 # in ppm
+        Data["E_THCW2"] = TestData.E_THCW2 # in ppm        
+
+        Data["xCH4wet"] = TestData[Species[4]]/1000000 # ppm --> mol/mol
+        Data["xCO2meas"] = Data.E_CO2D2/1000000 # ppm --> mol/mol
+        Data["xCOmeas"] = Data.get(Species[1])/1000000 # ppm --> mol/mol
+        Data["xNOxmeas"] = Data.E_NOXD2/1000000 # ppm --> mol/mol
+        Data["xTHCmeas"] = Data.E_THCW2/1000000 # ppm --> mol/mol
+
+        # Flows
+        Data["mfuel"] = TestData.M_FRFUEL*1000/3600 # kg/h --> g/s
+        Data["Molar Flow Wet"] = TestData.C_FRAIRWS*1000/3600 # kg/h --> g/s
+        Data["Intake Air flow"] = Data.get("Molar Flow Wet")/28.96 # g/sec --> mol/sec
+
+        # Rest
+        Data["BARO Press"] = TestData.P_INLET*10000 # bar --> Pa
+        Data["T_INLET"] = TestData.T_INLET + 273.15 # °C --> K
+
+        # Clear Variables
+        TestData, Species = None, None
+
+        return Data
+
+
+    def _prepare_iteration(self, Data, TestData, Ebench):    
+
+        # Intake
+        Data["pH2O @ inlet"] = 10**(10.79574*(1-(273.16/(Data.T_INLET)))-5.028*np.log10((Data.T_INLET)/273.16)+0.000150475*(1-10**(-8.2969*(((Data.T_INLET)/273.16)-1)))+0.00042873*(10**(4.76955*(1-(273.16/(Data.T_INLET))))-1)-0.2138602)
+        Data["xH2O"] = TestData.M_RELHUM*Data.get("pH2O @ inlet")/(Data.get("BARO Press"))
+        Data["xH2Oint"] = Data.xH2O
+        Data["Mmix"] = 28.96559*(1-Data.xH2O)+18.01528*Data.xH2O
+        Data["nint (Intake Air Flow)"] = Data.get("Molar Flow Wet")/Data.Mmix
+        Data["xH2Ointdry"] = Data.xH2Oint/(1-Data.xH2Oint)
+        Data["xCO2int"] = Ebench.xCO2intdry/(1+Data.xH2Ointdry)
+        Data["xO2int"] = ((0.20982-Ebench.xCO2intdry)/(1+Data.xH2Ointdry))
+
+        # Dilution
+        Data["xH2Odil"] = Data.xH2O 
+        Data["xH2Odildry"] = Data.xH2Odil/(1-Data.xH2Odil)
+        Data["xCO2dil"] = Ebench.xCO2dildry/(1+Data.xH2Odildry)
+
+        # Rest
+        Data["xTHC[THC_FID]cor"] = Data.E_THCW2-Ebench.xTHC_THC_FID_init
+        Data["xNO2meas"] = Data.xNOxmeas*0 # NO2 not measured
+        Data["xNOmeas"] = Data.xNOxmeas*1
+        Data["xTHCwet"] = Data.xTHCmeas
+        Data["xNMHCwet"] = (Data.xTHCwet-Data.xCH4wet*Ebench.CH4_RF)/(1-Ebench.RFPF*Ebench.CH4_RF)        
+
+        # Clear Variables
+        TestData, Ebench = None, None
+
+        return Data
+
+
+    def _iteration(self, Data, Fuel, Ebench):   
+
+        def function_iteration(variables):
+
+            ###### Channels in Formulas #####
+
+            #A = xdil/exh -- G
+            #B = xH2Oexh -- H
+            #C = xCcombdry -- I
+            #D = xH2Oexhdry -- J
+            #E = xdil/exhdry -- K
+            #F = xint/exhdry -- L
+            #G = xraw/exhdry -- M
+            #H = xH2OCOmeas -- AC
+            #I = xH2OTHCmeas -- AD
+            #J = xH2ONOxmeas -- AE
+            #K = xH2ONO2meas -- AF
+            #L = xH2OCO2meas -- AH
+            #M = xCOdry -- AI
+            #N = xTHCdry -- AJ
+            #O = xNOxdry -- AK
+            #P = xNO2dry -- AL
+            #Q = xCO2dry -- AN
+            #R = xH2dry -- AO 
+            
+            # Unknown Variables
+            (A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R) = variables
+                
+            # Known Variables
+            S = Data.xCO2dil[i]
+            T = Data.xCO2int[i]
+            U = Fuel.alpha
+            V = Data.xH2Odil[i]
+            W = Data.xH2Oint[i]
+            X = Data.xO2int[i]
+            Y = Fuel.beta
+            Z = Fuel.gamma
+            AA = Fuel.delta
+            AB = Data.xCOmeas[i]
+            AC = Data.xTHCmeas[i]
+            AD = Data.xNOxmeas[i]
+            AE = Data.xNO2meas[i]
+            AF = Fuel.xH2Ogas
+            AG = Data.xCO2meas[i]
+            
+            # Equations to solve
+            eq1 = 1-(G/(1+D))-A
+            eq2 = D/(1+D)-B
+            eq3 = Q+(M)+(N)-(S*E)-(T*F)-C
+            eq4 = ((U/2)*(C-N))+V*E+W*F-R-D 
+            eq5 = A/(1-B)-E
+            eq6 = (1/(2*X))*(((U/2)-Y+2+(2*Z))*(C-N)-(M-O-(2*P)+R))-F
+            eq7 = 0.5*(((U/2)+Y+AA)*(C-N)+((2*N)+M-P+R))+F-G
+            eq8 = AB/(1-H)-M ## Reference: CFR 1065.659
+            eq10 = AC/(1-I)-N ## Reference: CFR 1065.659
+            eq11 = B-I
+            eq12 = AD/(1-J)-O ## Reference: CFR 1065.659
+            eq14 = AE/(1-K)-P ## Reference: CFR 1065.659
+            eq16 = (M*(D-V*E))/(AF*(Q-S*E))-R ## Reference: CFR 1065.659
+            eq17 = AG/(1-L)-Q ## Reference: CFR 1065.659
+            
+            if Mode==0:
+                eq9 = Ebench.Factorchiller-H    
+                eq13 = Ebench.Factorchiller-J
+                eq15 = Ebench.Factorchiller-K
+                eq18 = Ebench.Factorchiller-L
+            else:
+                eq9 = B-H    
+                eq13 = B-J
+                eq15 = B-K
+                eq18 = B-L
+            
+            return [eq1,eq2,eq3,eq4,eq5,eq6,eq7,eq8,eq9,eq10,eq11,eq12,eq13,eq14,eq15,eq16,eq17,eq18]
+
+        i = 0
+        Mode = 0
+        ResultList = np.zeros((len(Data),18))     
+
+        while i < len(Data)-1:
+            i +=1  
+            g = 0.5 # First guess for iteration start
+
             Solution = opt.fsolve(function_iteration,(g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g))
-            Mode = 0
-        ResultList[:][i] = Solution
+            
+            if Solution[2]<Ebench.Factorchiller:
+                Mode = 1 # Different Calculation with mode 1 or 0
+                Solution = opt.fsolve(function_iteration,(g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g))
+                Mode = 0
+            ResultList[:][i] = Solution
 
-    Iteration = pd.DataFrame(ResultList,columns =['xdil/exh','xH2Oexh','xCcombdry','xH2Oexhdry','xdil/exhdry','xint/exhdry',
-                                                  'xraw/exhdry','xH2OCOmeas','xH2OTHCmeas','xH2ONOxmeas','xH2ONO2meas','xH2OCO2meas',
-                                                  'xCOdry','xTHCdry','xNOxdry','xNO2dry','xCO2dry','xH2dry'])
-    Data = pd.concat([Data,Iteration],axis=1)
+        Iteration = pd.DataFrame(ResultList,columns =['xdil/exh','xH2Oexh','xCcombdry','xH2Oexhdry','xdil/exhdry','xint/exhdry',
+                                                      'xraw/exhdry','xH2OCOmeas','xH2OTHCmeas','xH2ONOxmeas','xH2ONO2meas','xH2OCO2meas',
+                                                      'xCOdry','xTHCdry','xNOxdry','xNO2dry','xCO2dry','xH2dry'])
+        Data = pd.concat([Data,Iteration],axis=1)
 
-      # Clear Variables
-    Mode = None
-    ResultList = None
-    g = None
-    Solution = None
-    Iteration = None
+        # Clear Variables
+        Iteration, Mode, ResultList, g, Solution = None, None, None, None, None
 
-    return Data
-
-
-  def _rest_calculation(self, Data, Fuel):   
-
-    # Dry Emissions
-    Data["xH2ONOmeas"] = Data.xH2ONO2meas
-    Data["xNOdry"] = Data.xNOmeas/(1-Data.xH2ONOmeas) ## Reference: CFR 1065.659
-    Data["xCO2dry"] = Data.xCO2meas/(1-Data.xH2OCO2meas) ## Reference: CFR 1065.659
-    Data["xH2dry"] = (Data.xCOdry*(Data.xH2Oexhdry-Data.xH2Odil*Data.get("xdil/exhdry")))/(Fuel.xH2Ogas*(Data.xCO2dry-Data.xCO2dil*Data.get("xdil/exhdry")))
-    
-    # Wet Emissions
-    Data["xCOwet"] = Data.xCOmeas*((1-Data.xH2Oexh)/(1-Data.xH2OCOmeas))
-    Data['xNOxwet'] = Data.xNOxmeas*((1-Data.xH2Oexh)/(1-Data.xH2ONOxmeas))
-    Data["xNO2wet"] = Data.xNO2meas*((1-Data.xH2Oexh)/(1-Data.xH2ONO2meas))
-    Data["xNOwet"] = Data.xNOmeas*((1-Data.xH2Oexh)/(1-Data.xH2ONOmeas))
-    Data["xCO2wet"] = Data.xCO2meas*((1-Data.xH2Oexh)/(1-Data.xH2OCO2meas))
-    Data["xNOxcorrwet"] = Data.xNOxwet*(18.84 *Data.xH2O + 0.68094) ## Reference: CFR 1065.670 !!!!!@!@!@@!??? Change the value to take from json
-
-    # Masses of emissions
-    Data["nexh"] = Data.get("nint (Intake Air Flow)")/(1+((Data.get("xint/exhdry")-Data.get("xraw/exhdry"))/(1+Data.xH2Oexhdry)))
-    Data["Mass_THC"] = Data.xTHCwet*Data.nexh*Fuel.M_HC
-    Data["Mass_CO"] = Data.xCOwet*Data.nexh*Fuel.M_CO
-    Data["Mass_NOx"] = Data.xNOxcorrwet*Data.nexh*Fuel.M_NOX
-    Data["Mass_CO2"] = Data.xCO2wet*Data.nexh*Fuel.M_CO2
-    Data["Mass_NMHC"] = Data.xNMHCwet*Data.nexh*Fuel.M_NMHC
-
-    # Emissions in total
-    Sum_CO2 = Data.Mass_CO2.sum()
-    Sum_CO = Data.Mass_CO.sum()        
-    Sum_NOx = Data.Mass_NOx.sum()
-    Sum_THC = Data.Mass_THC.sum()        
-    Sum_NMHC = Data.Mass_NMHC.sum()
-    ArraySum = {'CO2':Sum_CO2,'CO':Sum_CO,'NOx':Sum_NOx,'THC':Sum_THC,'NMHC':Sum_NMHC}
-
-    # Clear Variables
-    Fuel, Sum_THC, Sum_CO, Sum_NOx, Sum_CO2, Sum_NMHC = None, None, None, None, None, None
-
-    return Data, ArraySum
+        return Data
 
 
-  def _drift_correction(self, DataUn, ZeroSpan, TestData, Species):
+    def _rest_calculation(self, Data, Fuel):   
 
-    ## Correct Raw-Emissions ##
-    TestData['E_CO2D2'] = ZeroSpan.E_CO2D2['Chosen']*((2*DataUn.E_CO2D2)-(ZeroSpan.E_CO2D2['PreZero']+ZeroSpan.E_CO2D2['PostZero']))/((ZeroSpan.E_CO2D2['PreSpan']+ZeroSpan.E_CO2D2['PostSpan'])-(ZeroSpan.E_CO2D2['PreZero']+ZeroSpan.E_CO2D2['PostZero']))/10000 # in % because of later calculation
-    TestData[Species[1]] = ZeroSpan[Species[1]]['Chosen']*((2*DataUn.get(Species[1]))-(ZeroSpan[Species[1]]['PreZero']+ZeroSpan[Species[1]]['PostZero']))/((ZeroSpan[Species[1]]['PreSpan']+ZeroSpan[Species[1]]['PostSpan'])-(ZeroSpan[Species[1]]['PreZero']+ZeroSpan[Species[1]]['PostZero']))/10000 # in % because of later calculation
-    TestData['E_NOXD2'] = ZeroSpan.E_NOXD2['Chosen']*((2*TestData.E_NOXD2)-(ZeroSpan.E_NOXD2['PreZero']+ZeroSpan.E_NOXD2['PostZero']))/((ZeroSpan.E_NOXD2['PreSpan']+ZeroSpan.E_NOXD2['PostSpan'])-(ZeroSpan.E_NOXD2['PreZero']+ZeroSpan.E_NOXD2['PostZero']))
-    TestData['E_THCW2'] = ZeroSpan.E_THCW2['Chosen']*((2*DataUn.get('xTHC[THC_FID]cor'))-(ZeroSpan.E_THCW2['PreZero']+ZeroSpan.E_THCW2['PostZero']))/((ZeroSpan.E_THCW2['PreSpan']+ZeroSpan.E_THCW2['PostSpan'])-(ZeroSpan.E_THCW2['PreZero']+ZeroSpan.E_THCW2['PostZero']))
-    TestData['E_CH4W2'] = ZeroSpan.E_CH4W2['Chosen']*((2*TestData.E_CH4W2)-(ZeroSpan.E_CH4W2['PreZero']+ZeroSpan.E_CH4W2['PostZero']))/((ZeroSpan.E_CH4W2['PreSpan']+ZeroSpan.E_CH4W2['PostSpan'])-(ZeroSpan.E_CH4W2['PreZero']+ZeroSpan.E_CH4W2['PostZero']))
+        # Dry Emissions
+        Data["xH2ONOmeas"] = Data.xH2ONO2meas
+        Data["xNOdry"] = Data.xNOmeas/(1-Data.xH2ONOmeas) ## Reference: CFR 1065.659
+        Data["xCO2dry"] = Data.xCO2meas/(1-Data.xH2OCO2meas) ## Reference: CFR 1065.659
+        Data["xH2dry"] = (Data.xCOdry*(Data.xH2Oexhdry-Data.xH2Odil*Data.get("xdil/exhdry")))/(Fuel.xH2Ogas*(Data.xCO2dry-Data.xCO2dil*Data.get("xdil/exhdry")))
 
-    # Clear Variables
-    DataUn, ZeroSpan = None, None
+        # Wet Emissions
+        Data["xCOwet"] = Data.xCOmeas*((1-Data.xH2Oexh)/(1-Data.xH2OCOmeas))
+        Data['xNOxwet'] = Data.xNOxmeas*((1-Data.xH2Oexh)/(1-Data.xH2ONOxmeas))
+        Data["xNO2wet"] = Data.xNO2meas*((1-Data.xH2Oexh)/(1-Data.xH2ONO2meas))
+        Data["xNOwet"] = Data.xNOmeas*((1-Data.xH2Oexh)/(1-Data.xH2ONOmeas))
+        Data["xCO2wet"] = Data.xCO2meas*((1-Data.xH2Oexh)/(1-Data.xH2OCO2meas))
+        Data["xNOxcorrwet"] = Data.xNOxwet*(18.84 *Data.xH2O + 0.68094) ## Reference: CFR 1065.670 !!!!!@!@!@@!??? Change the value to take from json
 
-    return TestData
+        # Masses of emissions
+        Data["nexh"] = Data.get("nint (Intake Air Flow)")/(1+((Data.get("xint/exhdry")-Data.get("xraw/exhdry"))/(1+Data.xH2Oexhdry)))
+        Data["Mass_THC"] = Data.xTHCwet*Data.nexh*Fuel.M_HC
+        Data["Mass_CO"] = Data.xCOwet*Data.nexh*Fuel.M_CO
+        Data["Mass_NOx"] = Data.xNOxcorrwet*Data.nexh*Fuel.M_NOX
+        Data["Mass_CO2"] = Data.xCO2wet*Data.nexh*Fuel.M_CO2
+        Data["Mass_NMHC"] = Data.xNMHCwet*Data.nexh*Fuel.M_NMHC
 
-  def _remove_negatives(self, DataCor):
+        # Emissions in total
+        ArraySum = {'CO2':Data.Mass_CO2.sum(),'CO':Data.Mass_CO.sum(),'NOx':Data.Mass_NOx.sum(),'THC':Data.Mass_THC.sum(),'NMHC':Data.Mass_NMHC.sum()}
 
-    # Emissions in total (Negative Values removed)
-    for i in range(1,len(DataCor)):
-        if DataCor.Mass_THC[i]<0:
-            DataCor.Mass_THC[i] = 0
-        if DataCor.Mass_CO.ix[i]<0:
-            DataCor.Mass_CO.ix[i] = 0
-        if DataCor.Mass_NOx.ix[i]<0:
-            DataCor.Mass_NOx.ix[i] = 0
-        if DataCor.Mass_CO2.ix[i]<0:        
-            DataCor.Mass_CO2.ix[i] = 0
-        if DataCor.Mass_NMHC.ix[i]<0:
-            DataCor.Mass_NMHC.ix[i] = 0
+        # Clear Variables
+        Fuel = None, None, None, None, None, None
 
-    Sum_CO_cor_won = DataCor.Mass_CO.sum()
-    Sum_CO2_cor_won = DataCor.Mass_CO2.sum()
-    Sum_NOx_cor_won = DataCor.Mass_NOx.sum() 
-    Sum_THC_cor_won = DataCor.Mass_THC.sum()               
-    Sum_NMHC_cor_won = DataCor.Mass_NMHC.sum()
+        return Data, ArraySum
 
-    ArraySumCorWon = {'CO2':Sum_CO2_cor_won,'CO':Sum_CO_cor_won,'NOx':Sum_NOx_cor_won,'THC':Sum_THC_cor_won,'NMHC':Sum_NMHC_cor_won}
 
-    # Clear Variables
-    i = None
+    def _drift_correction(self, DataUn, ZeroSpan, TestData, Species):
 
-    return ArraySumCorWon
+        ## Correct Raw-Emissions ##
+        TestData['E_CO2D2'] = ZeroSpan.E_CO2D2['Chosen']*((2*DataUn.E_CO2D2)-(ZeroSpan.E_CO2D2['PreZero']+ZeroSpan.E_CO2D2['PostZero']))/((ZeroSpan.E_CO2D2['PreSpan']+ZeroSpan.E_CO2D2['PostSpan'])-(ZeroSpan.E_CO2D2['PreZero']+ZeroSpan.E_CO2D2['PostZero']))/10000 # in % because of later calculation
+        TestData[Species[1]] = ZeroSpan[Species[1]]['Chosen']*((2*DataUn.get(Species[1]))-(ZeroSpan[Species[1]]['PreZero']+ZeroSpan[Species[1]]['PostZero']))/((ZeroSpan[Species[1]]['PreSpan']+ZeroSpan[Species[1]]['PostSpan'])-(ZeroSpan[Species[1]]['PreZero']+ZeroSpan[Species[1]]['PostZero']))/10000 # in % because of later calculation
+        TestData['E_NOXD2'] = ZeroSpan.E_NOXD2['Chosen']*((2*TestData.E_NOXD2)-(ZeroSpan.E_NOXD2['PreZero']+ZeroSpan.E_NOXD2['PostZero']))/((ZeroSpan.E_NOXD2['PreSpan']+ZeroSpan.E_NOXD2['PostSpan'])-(ZeroSpan.E_NOXD2['PreZero']+ZeroSpan.E_NOXD2['PostZero']))
+        TestData['E_THCW2'] = ZeroSpan.E_THCW2['Chosen']*((2*DataUn.get('xTHC[THC_FID]cor'))-(ZeroSpan.E_THCW2['PreZero']+ZeroSpan.E_THCW2['PostZero']))/((ZeroSpan.E_THCW2['PreSpan']+ZeroSpan.E_THCW2['PostSpan'])-(ZeroSpan.E_THCW2['PreZero']+ZeroSpan.E_THCW2['PostZero']))
+        TestData['E_CH4W2'] = ZeroSpan.E_CH4W2['Chosen']*((2*TestData.E_CH4W2)-(ZeroSpan.E_CH4W2['PreZero']+ZeroSpan.E_CH4W2['PostZero']))/((ZeroSpan.E_CH4W2['PreSpan']+ZeroSpan.E_CH4W2['PostSpan'])-(ZeroSpan.E_CH4W2['PreZero']+ZeroSpan.E_CH4W2['PostZero']))
+
+        # Clear Variables
+        DataUn, ZeroSpan, Species = None, None, None
+
+        return TestData
+
+    def _remove_negatives(self, Data, DataRaw, MapDict):
+
+        # Emissions and Engine Power in total (Negative Values removed)
+        Data.Mass_CO2[np.where(Data.Mass_CO2<0)[0]] = 0          
+        Data.Mass_CO[np.where(Data.Mass_CO<0)[0]] = 0
+        Data.Mass_NOx[np.where(Data.Mass_NOx<0)[0]] = 0      
+        Data.Mass_THC[np.where(Data.Mass_THC<0)[0]] = 0
+        Data.Mass_NMHC[np.where(Data.Mass_NMHC<0)[0]] = 0
+        U_BPOW_Factor = DataRaw[MapDict['Engine_Power']].drop(np.where(DataRaw[MapDict['Engine_Power']]<0)[0]).sum(skipna=True)/(3600*0.746)
+
+        ArraySumCorWon = {'CO2':Data.Mass_CO2.sum(),'CO':Data.Mass_CO.sum(),'NOx':Data.Mass_NOx.sum(),
+                         'THC':Data.Mass_THC.sum(),'NMHC':Data.Mass_NMHC.sum()}
+
+        # Clear Variables
+        MapDict, DataRaw, i = None, None, None
+
+        return ArraySumCorWon, U_BPOW_Factor
+
+
+    def _result(self):
+
+        ##### Load Data #####
+        Species = ['CO2','CO','NOx','THC','NMHC'] 
+
+        ##### Create DataFrames #####
+        DF = pd.DataFrame()
+        DF['Species'] = Species
+        DF['Units'] = ['g/ghphr','g/ghphr','g/ghphr','g/ghphr','g/ghphr']
+        DF['Test'] = np.zeros([5,1])
+        DF['Total'] =  np.zeros([5,1])
+        self.DriftUncorrected, self.DriftCorrected, self.Final = DF.copy(), DF.copy(), DF.copy()
+        DF = None
+
+        for i in range(0,len(Species)):
+            self.DriftUncorrected['Test'][i] = self.ArraySumUn[Species[i]]/self.U_BPOW_Factor
+            self.DriftUncorrected['Total'][i] = self.ArraySumUn[Species[i]]
+            self.DriftCorrected['Test'][i] = self.ArraySumCor[Species[i]]/self.U_BPOW_Factor
+            self.DriftCorrected['Total'][i] = self.ArraySumCor[Species[i]]
+            self.Final['Test'][i] = self.ArraySumCorWon[Species[i]]/self.U_BPOW_Factor
+            self.Final['Total'][i] = self.ArraySumCorWon[Species[i]]
+
+        return self.DriftUncorrected, self.DriftCorrected, self.Final
 
 
 
@@ -494,70 +502,69 @@ class Report:
     def __init__(self, DataHandler, MapDict, Calculator, output):
 
         ###### Load Variables #####
-        self.output = output        
-        Test = DataHandler.testData.data
-        Uncorrected = Calculator.calculation.DataUn
-        Corrected = Calculator.calculation.DataCor
-        ArraySumCorWon = Calculator.calculation.ArraySumCorWon
-        ArraySumCor = Calculator.calculation.ArraySumCor
-        ArraySumUn = Calculator.calculation.ArraySumUn
-        Species = ['CO2','CO','NOx','THC','NMHC']
-        U_BPOW_Factor = Test[MapDict['Engine_Power']].sum(skipna=True)/(3600*0.746)
+        self.output = output
+        Test, Uncorrected, Corrected = Calculator.calculation.Data
+        ArraySumUn, ArraySumCor, ArraySumCorWon = Calculator.calculation.ArraySum
+        self.DriftUncorrected, self.DriftCorrected, self.Final = Calculator.calculation.DriftUncorrected, Calculator.calculation.DriftCorrected, Calculator.calculation.Final
+        #U_BPOW_Factor = Calculator.calculation.U_BPOW_Factor
+        Species = ['CO2','CO','NOx','THC','NMHC']        
 
         ##### Calculate Species in g/ghpr #####
-        DriftUncorrected = self._calculate_species(ArraySumUn, U_BPOW_Factor, Species)
-        DriftCorrected = self._calculate_species(ArraySumCor, U_BPOW_Factor, Species)
-        Final = self._calculate_species(ArraySumCorWon, U_BPOW_Factor, Species)
+        #[self.DriftUncorrected, self.DriftCorrected, self.Final] = self._calculate_species(ArraySumUn, ArraySumCor, ArraySumCorWon, U_BPOW_Factor, Species)
 
         ###### Preparation of Excel-File #####
-        self.file = xlsxwriter.Workbook(self.output, {'in_memory':True})
-        sheet = self.file.add_worksheet('Emissions_Calculations')
-        sheet2 = self.file.add_worksheet('Raw Data')
-        sheet3 = self.file.add_worksheet('Drift-uncorrected Data')
-        sheet4 = self.file.add_worksheet('Drift-corrected Data')
+        self.file = self._preparation_excel_file(self.output)
 
         ##### Write Emissions in Report ######
-        sheet = self._write_emissions(sheet, DriftUncorrected, ArraySumUn, 'uncorrected', Species)
-        sheet = self._write_emissions(sheet, DriftCorrected, ArraySumCor, 'corrected', Species)
-        sheet = self._write_emissions(sheet, Final, ArraySumCorWon, 'final', Species)
+        self.sheet = self._write_emissions(self.sheet, self.DriftUncorrected, self.DriftCorrected, self.Final, ArraySumUn, ArraySumCor, ArraySumCorWon, Species)
 
-        ##### Write calculated and raw data #####
-        sheet2 = self._write_dataframe(sheet2, Test)
-        sheet3 = self._write_dataframe(sheet3, Uncorrected)
-        sheet4 = self._write_dataframe(sheet4, Corrected)
+        ##### Write Data according to choosen options #####
+        #self.sheet2 = self._write_dataframe(self.sheet2, Test)
+        #self.sheet3 = self._write_dataframe(self.sheet3, Uncorrected)
+        #self.sheet4 = self._write_dataframe(self.sheet4, Corrected)
 
         self.file.close()
 
 
-    def _calculate_species(self, ArraySum, U_BPOW_Factor, Species):
+    def _preparation_excel_file(self, output):
+
+        file = xlsxwriter.Workbook(output, {'in_memory':True})
+        self.sheet = file.add_worksheet('Emissions_Calculations')
+        self.sheet2 = file.add_worksheet('Raw Data')
+        self.sheet3 = file.add_worksheet('Drift-uncorrected Data')
+        self.sheet4 = file.add_worksheet('Drift-corrected Data')
+
+        return file
+
+
+    def _calculate_species(self, ArraySumUn, ArraySumCor, ArraySumCorWon, U_BPOW_Factor, Species):
             
-        DataFrame = pd.DataFrame()
-        DataFrame['Species'] = Species
-        DataFrame['Units'] = ['g/ghphr','g/ghphr','g/ghphr','g/ghphr','g/ghphr']
-        DataFrame['Test'] = np.zeros(5)
-        for i in range(0,len(DataFrame['Species'])):
-            DataFrame['Test'][i] = ArraySum[DataFrame['Species'][i]]/U_BPOW_Factor
+        ##### Create DataFrames #####
+        DF = pd.DataFrame()
+        DF['Species'] = Species
+        DF['Units'] = ['g/ghphr','g/ghphr','g/ghphr','g/ghphr','g/ghphr']
+        DF['Test'] = np.zeros([5,1])
+        DF['Total'] =  np.zeros([5,1])
+        DriftUncorrected, DriftCorrected, Final = DF.copy(), DF.copy(), DF.copy()
+        DF = None
 
-        return DataFrame
+        for i in range(0,len(Species)):
+            DriftUncorrected['Test'][i] = ArraySumUn[Species[i]]/U_BPOW_Factor
+            DriftUncorrected['Total'][i] = ArraySumUn[Species[i]]
+            DriftCorrected['Test'][i] = ArraySumCor[Species[i]]/U_BPOW_Factor
+            DriftCorrected['Total'][i] = ArraySumCor[Species[i]]
+            Final['Test'][i] = ArraySumCorWon[Species[i]]/U_BPOW_Factor
+            Final['Total'][i] = ArraySumCorWon[Species[i]]
+
+        return DriftUncorrected, DriftCorrected, Final
 
 
-    def _write_emissions(self, sheet, Data, Array, Type, Species):
+    def _write_emissions(self, sheet, DriftUncorrected, DriftCorrected, Final, ArraySumUn, ArraySumCor, ArraySumCorWon, Species):
 
-        ##### Choose Emissions state #####
-        if Type == 'uncorrected':
-
-            text = 'Drif-uncorrected'
-            index = 19
-
-        elif Type == 'corrected':
-
-            text = 'Drift-corrected'
-            index = 10
-
-        elif Type == 'final':
-
-            text = 'Final'
-            index = 1
+        Type = ['Drift-uncorrected', 'Drift-corrected', 'Final']
+        TypeNum = [19, 10 , 1]
+        DataList = [DriftUncorrected, DriftCorrected, Final]
+        ArrayList = [ArraySumUn, ArraySumCor, ArraySumCorWon]
 
         ##### Prepare Formats #####
         bold = self.file.add_format({'bold': True})
@@ -567,21 +574,21 @@ class Report:
         merge_format = self.file.add_format({'bold': 1,'border': 1,'align': 'center','valign': 'vcenter','fg_color': '#C71585','font_color':'white'})
         merge_format2 = self.file.add_format({'bold': 1,'border': 1,'align': 'center','valign': 'vcenter','fg_color': '#A9A9A9'})
 
-        ##### Write Data to File #####
-        sheet.merge_range('A'+str(index) + ':C'+str(index), text +' Emissions', merge_format)
-        sheet.write_row('A'+str(index+1),Data.columns.values,dark_grey)
-        sheet.write_column('A'+str(index+2),Data.Species,bright_grey)
-        sheet.write_column('B'+str(index+2),Data.Units,bright_grey)
-        #where_are_NaNs = np.isnan(Data.Test)
-        #Data.Test[where_are_NaNs] = 0
-        sheet.write_column('C'+str(index+2),np.round(Data.get('Test'),3),border)
+        for [text, index, Data, Array] in zip(Type, TypeNum, DataList, ArrayList):
+            
+            ##### Write Data to File #####
+            sheet.merge_range('A'+str(index) + ':C'+str(index), text +' Emissions', merge_format)
+            sheet.write_row('A'+str(index+1),Data.columns.values[0:3],dark_grey)
+            sheet.write_column('A'+str(index+2),Data.Species,bright_grey)
+            sheet.write_column('B'+str(index+2),Data.Units,bright_grey)
+            where_are_NaNs = np.isnan(Data.Test)
+            Data.Test[where_are_NaNs] = 99999
+            sheet.write_column('C'+str(index+2),np.round(Data.get('Test'),3),border)
 
-        ##### Emissions Total Mass #####
-        sheet.write('E'+str(index), 'Emissions Mass', merge_format2)
-        sheet.write('E'+str(index+1),'Total',bright_grey)
-
-        for i in range(0,len(Species)):
-            sheet.write('E'+str(index+2+i), np.round(Array[Species[i]],3), border)
+            ##### Emissions Total Mass #####
+            sheet.write('E'+str(index), 'Emissions Mass', merge_format2)
+            sheet.write('E'+str(index+1),'Total',bright_grey)
+            sheet.write_column('E'+str(index+2), np.round(Data.get('Total'),3), border)
 
         return sheet
 

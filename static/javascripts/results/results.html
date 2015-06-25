@@ -7,13 +7,13 @@
                 </div>
                 <div style="max-height: 300px;">
                     <ul class="list-group checked-list-box">
-                        <li class="list-group-item">All Options</li>
-                        <li class="list-group-item">Phasing Results</li>
-                        <li class="list-group-item">Regression Results</li>
-                        <li class="list-group-item">Regression Omissions</li>
-                        <li class="list-group-item" data-checked="true">Corrected Results</li>
-                        <li class="list-group-item">Uncorrected Results</li>
-                        <li class="list-group-item">Step-by-Step Equation Results</li>
+                        <li value=0 class="list-group-item">All Options</li>
+                        <li value=1 class="list-group-item">Phasing Results</li>
+                        <li value=2 class="list-group-item">Regression Results</li>
+                        <li value=3 class="list-group-item">Regression Omissions</li>
+                        <li value=4 class="list-group-item" data-checked="true">Corrected Results</li>
+                        <li value=5 class="list-group-item">Uncorrected Results</li>
+                        <li value=6 class="list-group-item">Step-by-Step Equation Results</li>
                     </ul>
                 </div>
             </div>    
@@ -23,62 +23,60 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">Calculation Results</h3>
                 </div>
-                <div class="panel-body">
-                    <table id="ResultTable" class="table" style="margin-bottom: 0px; visibility: hidden;">
-                            <thead>
+                <div class="panel-body" style="visibility: hidden;" id="ResultTable">
+                    <div cg-busy="{promise:myPromise,message:'Loading',backdrop:false,delay:300,minDuration:2000}">
+                        <table class="table" style="margin-bottom: 0px;">
+                                <thead>
                                     <tr>
-                                            <th>Species</th>
-                                            <th>Data</th>
-                                            <th>Units</th>
-                                            <th>Total Mass</th>
+                                        <th>Species</th>
+                                        <th>Data</th>
+                                        <th>Units</th>
+                                        <th>Total Mass</th>
                                     </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>CO2</td>
-                                    <td>740</td>
-                                    <td>g/ghpr</td>
-                                    <td>15000 mg</td>
-                                </tr>
-                                <tr>
-                                    <td>CO</td>
-                                    <td>6</td>
-                                    <td>g/ghpr</td>
-                                    <td>124 mg</td>
-                                </tr>
-                                <tr>
-                                    <td>NOx</td>
-                                    <td>0.32</td>
-                                    <td>g/ghpr</td>
-                                    <td>6.45 mg</td>
-                                </tr>
-                                <tr>
-                                    <td>THC</td>
-                                    <td>0.5</td>
-                                    <td>g/ghpr</td>
-                                    <td>10.1 mg</td>
-                                </tr>
-                                <tr>
-                                    <td>NMHC</td>
-                                    <td>0.41</td>
-                                    <td>g/ghpr</td>
-                                    <td>8.3 mg</td>
-                                </tr>
-                          </tbody>
-                    </table>
+                                </thead>
+                                <tbody>                                
+                                    <tr>
+                                        <td>{{CO2_Name}}</td>
+                                        <td>{{CO2_Result}}</td>
+                                        <td>{{CO2_Unit}}</td>
+                                        <td>{{CO2_Total}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{CO_Name}}</td>
+                                        <td>{{CO_Result}}</td>
+                                        <td>{{CO_Unit}}</td>
+                                        <td>{{CO_Total}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{NOX_Name}}</td>
+                                        <td>{{NOX_Result}}</td>
+                                        <td>{{NOX_Unit}}</td>
+                                        <td>{{NOX_Total}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{THC_Name}}</td>
+                                        <td>{{THC_Result}}</td>
+                                        <td>{{THC_Unit}}</td>
+                                        <td>{{THC_Total}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{NMHC_Name}}</td>
+                                        <td>{{NMHC_Result}}</td>
+                                        <td>{{NMHC_Unit}}</td>
+                                        <td>{{NMHC_Total}}</td>
+                                    </tr>
+                              </tbody>
+                        </table>
+                    </div>
                 </div>             
             </div>
-            <button type="button" class="btn btn-success btn-s"  ng-click="Report()" onclick="run()">
+            <button type="button" class="btn btn-success btn-s"  ng-click="Report()">
                 <span class="glyphicon glyphicon-arrow-down"></span> Download Results
             </button>           
         </div>
     </div>
 </div>
 <script type="text/javascript">
-
-function run() {
-    document.getElementById("ResultTable").style.visibility = "visible";
-}
 
     $(function() {
         $('.list-group.checked-list-box .list-group-item').each(function() {

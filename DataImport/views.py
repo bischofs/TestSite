@@ -70,14 +70,11 @@ class FileUploadView(views.APIView):
 
         try:
             
-            if request.QUERY_PARAMS['bool'] == 'Omitting Torque, Speed, Power':
-                Filter_bool = True
-            else:
-                Filter_bool = False
+            OmitChoice = int(request.QUERY_PARAMS['choice'])
             cache = caches['default']
             dataHandler = cache.get(request.session.session_key)
             cycleValidator = CycleValidator(dataHandler.testData, dataHandler.testDataMapDict,
-                                            dataHandler.fullLoad, dataHandler.fullLoad.metaData['n_CurbIdle'], Filter_bool)
+                                            dataHandler.fullLoad, dataHandler.fullLoad.metaData['n_CurbIdle'], OmitChoice)
             dataHandler.resultsLog['Regression'] = cycleValidator.reg_results
             dataHandler.resultsLog['Regression_bool'] = cycleValidator.reg_results_bool      
             jsonDict = {'Regression':cycleValidator.reg_results,

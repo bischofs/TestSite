@@ -1,6 +1,7 @@
 import json
 import io
 import xlsxwriter
+import os
 from django.core.servers.basehttp import FileWrapper
 
 from django.core.cache import caches
@@ -25,17 +26,23 @@ class CalculationView(views.APIView):
 
                     ##### Load dataHandler from Cache #####
                     cache = caches['default']
-                    dataHandler = cache.get(request.session._get_session_key())
-                    ##### Initialize Calculation #####
-                    calculator = Calculator(dataHandler, dataHandler.testDataMapDict, request.QUERY_PARAMS)
-                    ##### Save Results #####
-                    dataHandler.resultsLog['Calculation'] = calculator
-                    #jsonDict = {'Calculation':calculator,'errors': dataHandler.log}
-                    ##### Save Session #####
-                    cache.set(request.session._get_session_key(), dataHandler)            
-                    #jsonLog = json.dumps(jsonDict)
+                    dataHandler = cache.get(request.session._get_session_key())  
 
-                    return Response(status=200)
+                    if not dataHandler.resultsLog['Calculation']:   
+                                           
+                        ##### Initialize Calculation #####
+                        calculator = Calculator(dataHandler, dataHandler.testDataMapDict, request.QUERY_PARAMS)
+
+                        ##### Save Results #####
+                        dataHandler.resultsLog['Calculation'] = calculator      
+
+                    jsonDict = {'Report':dataHandler.resultsLog['Calculation'].calculation.Final.to_json(),'errors': dataHandler.log}
+                    jsonLog = json.dumps(jsonDict)
+
+                    ##### Save Session #####
+                    cache.set(request.session._get_session_key(), dataHandler)                        
+
+                    return Response(jsonLog, status=200)
 
                 except Exception as e:
 
@@ -52,25 +59,26 @@ class CalculationView(views.APIView):
                     ##### Load dataHandler from Cache #####
                     cache = caches['default']
                     dataHandler = cache.get(request.session._get_session_key())
-                    ##### Initialize Calculation #####
-                    #fileReport = xlsxwriter.Workbook(response)
+
+                    ##### Initialize Report #####
                     Output = io.BytesIO()
                     report = Report(dataHandler, dataHandler.testDataMapDict, dataHandler.resultsLog['Calculation'], Output)
-
-                    #wrapper = FileWrapper(fileReport)
-                    #response = HttpResponse(report.file)
-                    #response['Content-Length'] = os.path.getsize(filename)
-                    #return response
   
-                    #jsonDict = {'Report':report,'errors': dataHandler.log}
                     ##### Save Session #####
                     cache.set(request.session._get_session_key(), dataHandler)            
-                    #jsonLog = json.dumps(jsonDict)
-                    report.output.seek(0)
-                    response = HttpResponse(report.output.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-                    response['Content-Disposition'] = 'attachment; filename="Final.xlsx"'
 
-                    return response
+                    report.output.seek(0)
+                    Response = HttpResponse(report.output.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')                    
+                    Response['Pragma'] = 'public'
+                    Response['Expires'] = 0
+                    Response['Cache-Control'] = 'must-revalidate, post-check=0, pre-check=0'
+                    Response['Cache-Control'] = 'private:false'
+                    Response['Content-Disposition'] = 'attachment; filename="Final.xlsx"'
+                    #Response['Content-Transfer-Encoding'] = 'binary'
+                    Response['Conten-length'] = report.output.tell()
+                    #Response['Connection'] = 'close'
+
+                    return Response
 
                 except Exception as e:
 
