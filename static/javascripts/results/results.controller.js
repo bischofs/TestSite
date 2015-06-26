@@ -80,11 +80,11 @@
                     $scope.NMHC_Unit = Units[4]            
 
                     // Write Total of Species
-                    $scope.CO2_Total = Math.round(Total[0]*100)/100
-                    $scope.CO_Total = Math.round(Total[1]*100)/100                   
-                    $scope.NOX_Total = Math.round(Total[2]*100)/100
-                    $scope.THC_Total = Math.round(Total[3]*100)/100
-                    $scope.NMHC_Total = Math.round(Total[4]*100)/100                                                             
+                    $scope.CO2_Total = (Math.round(Total[0]*100)/100).toString() + ' mg'
+                    $scope.CO_Total = (Math.round(Total[1]*100)/100).toString() + ' mg'                 
+                    $scope.NOX_Total = (Math.round(Total[2]*100)/100).toString() + ' mg'
+                    $scope.THC_Total = (Math.round(Total[3]*100)/100).toString() + ' mg'
+                    $scope.NMHC_Total = (Math.round(Total[4]*100)/100).toString() + ' mg'                                                             
 
                     //document.getElementById("ResultTable").style.visibility = "visible";
 

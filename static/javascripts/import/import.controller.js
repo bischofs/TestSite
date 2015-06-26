@@ -71,23 +71,25 @@
         }
 
         function onBeforeUploadItem(item) {
-            if ($scope.filetype == "pre") {
-                $scope.uploader.formData.push({
-                    ftype: "pre"
-                });
-            } else if ($scope.filetype == "post") {
-                $scope.uploader.formData.push({
-                    ftype: "post"
-                });
-            } else if ($scope.filetype == "full") {
+
+            if ($scope.filetype == "full") {
                 $scope.uploader.formData.push({
                     ftype: "full"
+                });
+            } 
+            else if ($scope.filetype == "pre") {
+                $scope.uploader.formData.push({
+                    ftype: "pre"
                 });
             } else if ($scope.filetype == "test") {
                 $scope.uploader.formData.push({
                     ftype: "test"
                 });
-            }
+            } else if ($scope.filetype == "post") {
+                $scope.uploader.formData.push({
+                    ftype: "post"
+                });
+            } 
             item.formData = $scope.uploader.formData
         }
 

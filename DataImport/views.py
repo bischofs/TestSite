@@ -43,15 +43,19 @@ class FileUploadView(views.APIView):
             if(request.data['ftype'] == 'full'):#file is full load curve
                 dataHandler.import_full_load(request.data['file'])
                 jsonDict = {'errors': dataHandler.log}
+
             elif(request.data['ftype'] == 'pre'):#file is pre span check
                 dataHandler.import_pre_zero_span(request.data['file'])
                 jsonDict = {'errors': dataHandler.log}
+
+            elif(request.data['ftype'] == 'test'):#file is test data
+                request.data['bench'] = 0 ###### HARD CODED BENCH NUMBER ######
+                dataHandler.import_test_data(request.data['bench'], request.data['file'])  
+                jsonDict = {'errors': dataHandler.log}     
+
             elif(request.data['ftype'] == 'post'):#file is post span check 
                 dataHandler.import_post_zero_span(request.data['file'])
-                jsonDict = {'errors': dataHandler.log}
-            elif(request.data['ftype'] == 'test'):#file is test data
-                dataHandler.import_test_data(request.data['bench'], request.data['file'])  
-                jsonDict = {'errors': dataHandler.log}          
+                jsonDict = {'errors': dataHandler.log}       
 
             cache.set(request.session.session_key, dataHandler)
             

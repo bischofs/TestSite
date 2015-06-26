@@ -12,7 +12,7 @@ import io
 
 class Calculator:
 
-  def __init__(self, DataHandler, MapDict, ReportParams): 
+  def __init__(self, DataHandler, MapDict, ReportParams):
      	
     self.preparation = Preparation(DataHandler, MapDict)   
     self.calculation = Calculation(self.preparation, MapDict)
@@ -33,12 +33,14 @@ class Preparation:
     ##### CoHigh or COL #####
     if DataHandler.CoHigh:
          self.CO = MapDict['Carbon_Monoxide_High_Dry']
+         COString = 'COH'
     else:
          self.CO = MapDict['Carbon_Monoxide_Low_Dry']
+         COString = 'COL'
 
     ##### Prepare Fuel and E-bench data #####
     self.FuelData = self._fuel_data(DataHandler.testData.metaData, MapDict)
-    self.EbenchData = self._ebench_data(DataHandler.ebenchData, DataHandler.testData.data,MapDict)               
+    self.EbenchData = self._ebench_data(DataHandler.ebenchData, DataHandler.testData.data,MapDict, COString)               
 
     ##### Prepare Pre/Post-Data #####
     self.Species = [MapDict['Carbon_Dioxide_Dry'],self.CO,MapDict['Nitrogen_X_Dry'],
@@ -91,10 +93,12 @@ class Preparation:
     return FuelData
 
 
-  def _ebench_data(self, ebenchData,TestData,MapDict):    
+  def _ebench_data(self, ebenchData,TestData,MapDict,COString):    
 
-    EbenchData = pd.DataFrame(data=np.zeros([9,1]),index=['RFPF','CH4_RF','Tchiller','Pchiller','Pamb','Factorchiller',
-                                                        'xTHC_THC_FID_init','xCO2intdry','xCO2dildry'])
+    EbenchData = pd.DataFrame(data=np.zeros([14,1]),index=['RFPF','CH4_RF','Tchiller','Pchiller','Pamb','Factorchiller',
+                                                         'xTHC_THC_FID_init','xCO2intdry','xCO2dildry','Bottle_Concentration_CO2',
+                                                         'Bottle_Concentration_CO','Bottle_Concentration_NOX','Bottle_Concentration_THC',
+                                                         'Bottle_Concentration_NMHC'])
     ##### Write Ebench-Data #####
     EbenchData.RFPF = ebenchData['RFPF']
     EbenchData.CH4_RF = ebenchData['CH4_RF']
@@ -105,6 +109,13 @@ class Preparation:
     EbenchData.xCO2dildry = 0.000375 ## CFR 1065.655
     EbenchData.xTHC_THC_FID_init = ebenchData['xTHC[THC_FID]init']
     EbenchData.Factorchiller = (10**(10.79574*(1-(273.16/EbenchData.Tchiller))-5.028*np.log10(EbenchData.Tchiller/273.16)+0.000150475*(1-10**(-8.2969*((EbenchData.Tchiller/273.16)-1)))+0.00042873*(10**(4.76955*(1-(273.16/EbenchData.Tchiller)))-1)-0.2138602))/(EbenchData.Pchiller)
+
+    ##### Bottle Concentrations from Ebench #####
+    EbenchData.Bottle_Concentration_CO2 = ebenchData['Bottle_Concentration_CO2']
+    EbenchData.Bottle_Concentration_CO = ebenchData['Bottle_Concentration_' + COString]
+    EbenchData.Bottle_Concentration_NOX = ebenchData['Bottle_Concentration_NOX']
+    EbenchData.Bottle_Concentration_THC = ebenchData['Bottle_Concentration_THC']
+    EbenchData.Bottle_Concentration_NMHC =  ebenchData['Bottle_Concentration_NMHC']
 
     # Clear Variables
     ebenchData, TestData = None, None
@@ -119,11 +130,11 @@ class Preparation:
     TimeWindow = self._prepare_time_window(Species)
 
     ##### Chosen-Data From Ebench
-    ZeroSpan[Species[0]]['Chosen'] = 18
-    ZeroSpan[Species[1]]['Chosen'] = 12
-    ZeroSpan[Species[2]]['Chosen'] = 4005
-    ZeroSpan[Species[3]]['Chosen'] = 30000
-    ZeroSpan[Species[4]]['Chosen'] = 2510
+    ZeroSpan[Species[0]]['Chosen'] = Ebench.Bottle_Concentration_CO2
+    ZeroSpan[Species[1]]['Chosen'] = Ebench.Bottle_Concentration_CO
+    ZeroSpan[Species[2]]['Chosen'] = Ebench.Bottle_Concentration_NOX
+    ZeroSpan[Species[3]]['Chosen'] = Ebench.Bottle_Concentration_THC
+    ZeroSpan[Species[4]]['Chosen'] = Ebench.Bottle_Concentration_NMHC
 
     ##### Pre Zero/Span #####
     Name = {'Zero':'PreZero','Span':'PreSpan'}
@@ -503,16 +514,12 @@ class Report:
 
         ###### Load Variables #####
         self.output = output
-        Test, Uncorrected, Corrected = Calculator.calculation.Data
-        ArraySumUn, ArraySumCor, ArraySumCorWon = Calculator.calculation.ArraySum
-        self.DriftUncorrected, self.DriftCorrected, self.Final = Calculator.calculation.DriftUncorrected, Calculator.calculation.DriftCorrected, Calculator.calculation.Final
-        #U_BPOW_Factor = Calculator.calculation.U_BPOW_Factor
-        Species = ['CO2','CO','NOx','THC','NMHC']        
+        #Test, Uncorrected, Corrected = Calculator.Data
+        ArraySumUn, ArraySumCor, ArraySumCorWon = Calculator.ArraySumUn, Calculator.ArraySumCor, Calculator.ArraySumCorWon
+        self.DriftUncorrected, self.DriftCorrected, self.Final = Calculator.DriftUncorrected, Calculator.DriftCorrected, Calculator.Final
+        Species = ['CO2','CO','NOx','THC','NMHC']  
 
-        ##### Calculate Species in g/ghpr #####
-        #[self.DriftUncorrected, self.DriftCorrected, self.Final] = self._calculate_species(ArraySumUn, ArraySumCor, ArraySumCorWon, U_BPOW_Factor, Species)
-
-        ###### Preparation of Excel-File #####
+        ###### Preparation of Excel-File #####        
         self.file = self._preparation_excel_file(self.output)
 
         ##### Write Emissions in Report ######
@@ -530,34 +537,11 @@ class Report:
 
         file = xlsxwriter.Workbook(output, {'in_memory':True})
         self.sheet = file.add_worksheet('Emissions_Calculations')
-        self.sheet2 = file.add_worksheet('Raw Data')
-        self.sheet3 = file.add_worksheet('Drift-uncorrected Data')
-        self.sheet4 = file.add_worksheet('Drift-corrected Data')
+        #self.sheet2 = file.add_worksheet('Raw Data')
+        #self.sheet3 = file.add_worksheet('Drift-uncorrected Data')
+        #self.sheet4 = file.add_worksheet('Drift-corrected Data')
 
         return file
-
-
-    def _calculate_species(self, ArraySumUn, ArraySumCor, ArraySumCorWon, U_BPOW_Factor, Species):
-            
-        ##### Create DataFrames #####
-        DF = pd.DataFrame()
-        DF['Species'] = Species
-        DF['Units'] = ['g/ghphr','g/ghphr','g/ghphr','g/ghphr','g/ghphr']
-        DF['Test'] = np.zeros([5,1])
-        DF['Total'] =  np.zeros([5,1])
-        DriftUncorrected, DriftCorrected, Final = DF.copy(), DF.copy(), DF.copy()
-        DF = None
-
-        for i in range(0,len(Species)):
-            DriftUncorrected['Test'][i] = ArraySumUn[Species[i]]/U_BPOW_Factor
-            DriftUncorrected['Total'][i] = ArraySumUn[Species[i]]
-            DriftCorrected['Test'][i] = ArraySumCor[Species[i]]/U_BPOW_Factor
-            DriftCorrected['Total'][i] = ArraySumCor[Species[i]]
-            Final['Test'][i] = ArraySumCorWon[Species[i]]/U_BPOW_Factor
-            Final['Total'][i] = ArraySumCorWon[Species[i]]
-
-        return DriftUncorrected, DriftCorrected, Final
-
 
     def _write_emissions(self, sheet, DriftUncorrected, DriftCorrected, Final, ArraySumUn, ArraySumCor, ArraySumCorWon, Species):
 

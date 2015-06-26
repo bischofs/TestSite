@@ -7,170 +7,238 @@ import logging
 import math
 import itertools
 import numpy as np
+import datetime
+import time as time
 
 class DataHandler:
 
-     def __init__(self):
-         # need required channels for each file
-          self.resultsLog = {'Regression': {},'Regression_bool': {}, 'Data Alignment': {}, 'Calculation': {}, 'Report':{}} 
-          self.log = {}
-          self.masterDict = {}
-          self.masterMetaData = {}
-          self.masterFileName = {}
-          self.ebenches = Ebench.objects.all()
-          self.allFilesLoaded = False
-          self.CoHigh = True
+ def __init__(self):
+     # need required channels for each file
+      self.resultsLog = {'Regression': {},'Regression_bool': {}, 'Data Alignment': {}, 'Calculation': {}, 'Report':{}} 
+      self.log = {}
+      self.masterDict = {}
+      self.masterMetaData = {}
+      self.masterFileName = {}
+      self.ebenches = Ebench.objects.all()
+      self.allFilesLoaded = False
+      self.CoHigh = False
 
-          ######## HARD CODE EBENCH #########
-          self.ebenchData = {}
-          self.ebenchData['RFPF'] = 0.0133
-          self.ebenchData['CH4_RF'] = 1.1
-          self.ebenchData['Tchiller'] = 7
-          self.ebenchData['Pchiller'] = 121.8418852
-          self.ebenchData['xTHC[THC_FID]init'] = 1
-          ###################################
+ def import_full_load(self, dataFile):
+  self._clear_all_files_loaded()
+  self.fullLoad = FullLoad(dataFile)
+  [self.fullLoadMapDict, self.masterMetaData, self.masterFileName, _] = self.fullLoad.load_data(dataFile, self.masterMetaData, self.masterFileName)
+  self._check_files_loaded()
 
-     def import_full_load(self, dataFile):
-          self.fullLoad = FullLoad(dataFile)
-          [self.fullLoadMapDict, self.masterMetaData, self.masterFileName] = self.fullLoad.load_data(dataFile, self.masterMetaData, self.masterFileName)
+ def import_pre_zero_span(self, dataFile):
+  self._clear_all_files_loaded()
+  self.preZeroSpan = ZeroSpan(dataFile)
+  [self.zeroSpanMapDict, self.masterMetaData, self.masterFileName, _] = self.preZeroSpan.load_data(dataFile, self.masterMetaData, self.masterFileName)
+  self._check_files_loaded()     
 
-     def import_pre_zero_span(self, dataFile):
-          self.preZeroSpan = ZeroSpan(dataFile)
-          [self.zeroSpanMapDict, self.masterMetaData, self.masterFileName] = self.preZeroSpan.load_data(dataFile, self.masterMetaData, self.masterFileName)     
+ def import_test_data(self, numBenches, dataFile):
+  self._clear_all_files_loaded()
+  self.testData = TestData(dataFile, numBenches) 
+  [self.masterDict, self.masterMetaData, self.masterFileName, self.CoHigh] = self.testData.load_data(dataFile, self.masterMetaData, self.masterFileName)     
+  self.ebenchData = self._load_ebench(self.ebenches[0].history, self.testData.TimeStamp)
+  self._check_files_loaded()
+               
+ def import_post_zero_span(self, dataFile):
+  self._clear_all_files_loaded()
+  self.postZeroSpan = ZeroSpan(dataFile)
+  [self.zeroSpanMapDict, self.masterMetaData, self.masterFileName, _] = self.postZeroSpan.load_data(dataFile, self.masterMetaData, self.masterFileName)      
+  self._check_files_loaded()
 
-     def import_test_data(self, numBenches, dataFile):
-          self.testData = TestData(dataFile, numBenches) 
-          [self.masterDict, self.masterMetaData, self.masterFileName] = self.testData.load_data(dataFile, self.masterMetaData, self.masterFileName)     
-                   
-     def import_post_zero_span(self, dataFile):
-          self.postZeroSpan = ZeroSpan(dataFile)
-          [self.zeroSpanMapDict, self.masterMetaData, self.masterFileName] = self.postZeroSpan.load_data(dataFile, self.masterMetaData, self.masterFileName)      
+ def _clear_all_files_loaded(self):
+      
+  self.attrs = ['fullLoad', 'postZeroSpan', 'preZeroSpan', 'testData']
 
-     def _all_files_loaded(self):
-          
-          self.attrs = ['fullLoad', 'postZeroSpan', 'preZeroSpan', 'testData']
+  if(self.allFilesLoaded == True):
+       del self.testData, self.preZeroSpan, self.postZeroSpan, self.fullLoad
+       self.__init__()
 
-          for attr in self.attrs:
-                if not hasattr(self, attr):
-                    break
-                else:
-                  self.allFilesLoaded = True
+ def _check_files_loaded(self):                
 
-          if(self.allFilesLoaded == True):
-               self.files = [self.testData, self.preZeroSpan, self.postZeroSpan, self.fullLoad]
+  for attr in self.attrs:
+    if not hasattr(self, attr):
+      self.allFilesLoaded = False
+      break
+
+    else:
+      self.allFilesLoaded = True
+
+
+ def _load_ebench(self, Ebenches, TimeStamp):
+
+  ############### HARD CODED TIMESTAMP #######################
+  TimeStamp = time.time()
+  ############################################################
+
+  ebenchData = {}    
+  for EbenchSet in Ebenches.values():
+    if EbenchSet['history_date'].timestamp() < TimeStamp :
+
+      ebenchData['RFPF'] = EbenchSet['CH4_Penetration_Factor']
+      ebenchData['CH4_RF'] = EbenchSet['CH4_Response_Factor']
+      ebenchData['Tchiller'] = EbenchSet['Thermal_Chiller_Dewpoint']
+      ebenchData['Pchiller'] = EbenchSet['Thermal_Absolute_Pressure']
+      ebenchData['xTHC[THC_FID]init'] = EbenchSet['THC_Initial_Contamination']
+      ebenchData['Bottle_Concentration_CO2'] = EbenchSet['Bottle_Concentration_CO2']
+      ebenchData['Bottle_Concentration_COH'] = EbenchSet['Bottle_Concentration_COH']
+      ebenchData['Bottle_Concentration_COL'] = EbenchSet['Bottle_Concentration_COL']
+      ebenchData['Bottle_Concentration_NOX'] = EbenchSet['Bottle_Concentration_NOX']
+      ebenchData['Bottle_Concentration_THC'] = EbenchSet['Bottle_Concentration_THC']
+      ebenchData['Bottle_Concentration_NMHC'] =  EbenchSet['Bottle_Concentration_NMHC']
+      break
+
+  return ebenchData    
+
 
 
 class Data:
 
-     def __init__(self, dataFile):
-          
-          self.mapDict = {}
-          self.logDict = {}
+  def __init__(self, dataFile):
+      
+    self.mapDict = {}
+    self.logDict = {}
 
-          self.dataFile = dataFile
-          self.fileName = dataFile.name
-          self.fileType = self.__class__.__name__
-
-
-     def load_data(self, dataFile, masterMetaData, masterFileName):
-
-          self.speciesData = pd.read_json("spec.json")
-          self.data = pd.read_csv(dataFile, encoding='windows-1258')
-          self.metaData, self.data = self._load_metadata(self.data)
-          [masterMetaData, masterFileName] = self._check_metadata(self.metaData, self.fileName, masterMetaData, masterFileName)
-
-          self.data = self.data.dropna(how="all",axis=(1))
-          self._check_units()
-          self.data = self.data.convert_objects(convert_numeric=True)       # Convert all data to numeric
-          self.data = self.data.dropna()
-          self.data.index = range(0,len(self.data))
-          self._check_channels()
+    self.dataFile = dataFile
+    self.fileName = dataFile.name
+    self.fileType = self.__class__.__name__
 
 
-          return self.mapDict, masterMetaData, masterFileName
+  def load_data(self, dataFile, masterMetaData, masterFileName):
+
+    ##### Load Spec-File, Data, Metadata #####
+    self.speciesData = pd.read_json("spec.json")
+    self.data = pd.read_csv(dataFile, encoding='windows-1258')
+    self.metaData, self.data = self._load_metadata(self.data)
+    [masterMetaData, masterFileName] = self._check_metadata(self.metaData, self.fileName, masterMetaData, masterFileName)
+
+    ##### Perform Checks on Data #####
+    self.data = self.data.dropna(how="all",axis=(1))
+    self._check_units()
+    self.TimeStamp = time.mktime(datetime.datetime.strptime(self.data['Date'][3] + ' ' + self.data['Time'][3], "%m/%d/%Y %H:%M:%S.%f").timetuple())
+    self.data = (self.data.convert_objects(convert_numeric=True)).dropna() # Convert and drop NA
+    self.data.index = range(0,len(self.data))
+    self._check_channels()
+    CoHigh = self._check_ranges()
 
 
-     def _check_metadata(self, MetaData, FileName, masterMetaData, masterFileName):
+    return self.mapDict, masterMetaData, masterFileName, CoHigh
 
-      SkipList = ['N_TR','no_run','Comment1','Comment2','Proj#', 'N_TQ']   
 
-      if len(masterMetaData) == 0:
+  def _check_metadata(self, MetaData, FileName, masterMetaData, masterFileName):
 
-        masterMetaData = MetaData
-        masterFileName = FileName
+    SkipList = ['N_TR','no_run','Comment1','Comment2','Proj#', 'N_TQ']   
+
+    if len(masterMetaData) == 0:
+
+      masterMetaData = MetaData
+      masterFileName = FileName
+      
+    else:
+
+      ##### Check whether Channels are the same in the MetaData #####
+      for x, y, z in zip(masterMetaData.values[0],MetaData.values[0],MetaData):
+        if (not x == y) and (z not in SkipList):
+          raise Exception("%s in file %s is not the same as in file %s" % (z, FileName, masterFileName)) 
+
+    return masterMetaData, masterFileName    
+
+
+  def _check_channels_util(self, species, channelNames, multipleBenches, data, fileName):
         
-      else:
+      for name in channelNames:
+        if name in data.columns:
+          self.mapDict[species] = name
+          break
+        else:
+          raise Exception("Cannot find %s channel %s in file %s" % (species.replace("_"," "), channelNames, fileName))          
+               
 
-        for x, y, z in zip(masterMetaData.values[0],MetaData.values[0],MetaData):
-          if (not x == y) and (z not in SkipList):
-            raise Exception("%s in file %s is not the same as in file %s" % (z, FileName, masterFileName)) 
+  def _check_channels(self):          
+      
+    for species in self.speciesData.Species.items():
 
-      return masterMetaData, masterFileName    
-
-
-     def _check_channels_util(self, species, channelNames, multipleBenches, data, fileName):
-            
-          for name in channelNames:
-               if name in data.columns:
-                    self.mapDict[species] = name
-                    break
-               # if (multipleBenches == True ) and (self.numBenches == '2'):
-               #      if (name in data.columns) and ((name + "2") in data.columns):
-               #           self.mapDict[species] = name
-               #           break
-               # else:
-          else:
-               raise Exception("Cannot find %s channel %s in file %s" % (species.replace("_"," "), channelNames, fileName))
-               # if (multipleBenches == True):
-               #     channelNames.append(channelNames[0] + "2")
-               #     raise Exception("Cannot find %s channel names %s in file %s" % (species.replace("_"," "), channelNames, fileName))
-               # else:
-              
+      if species[1]['files'].__contains__(self.fileType) and species[1]['header_data'] == False:
+        if (species[1]['multiple_benches'] == True):
+           self._check_channels_util(species[0], species[1]['channel_names'], True, self.data, self.fileName)
+        else:
+           self._check_channels_util(species[0], species[1]['channel_names'], False, self.data, self.fileName)
                    
+      elif species[1]['header_data'] == True:
+        self._check_channels_util(species[0], species[1]['channel_names'], False, self.metaData, self.fileName)
 
-     def _check_channels(self):          
-          
-          for species in self.speciesData.Species.items():
 
-               if species[1]['files'].__contains__(self.fileType) and species[1]['header_data'] == False:
-                    if (species[1]['multiple_benches'] == True):
-                         self._check_channels_util(species[0], species[1]['channel_names'], True, self.data, self.fileName)
-                    else:
-                         self._check_channels_util(species[0], species[1]['channel_names'], False, self.data, self.fileName)
+  def _check_units(self):
+
+    for species in self.mapDict:
+      unit = self.speciesData.Species[species]['unit']
+      if self.speciesData.Species[species]['header_data'] == False: 
+        booleanCond = self.data[self.mapDict[species]].str.contains(unit)
+        if not (booleanCond.any()):
+          self.logDict['error'] = "%s units are not in %s" % (self.mapDict[species], unit)
+          raise Exception("%s units are not in %s" % (self.mapDict[species], unit))
+
+  def _check_ranges(self):
+
+    CoHigh = False
+        
+    for species in self.mapDict:       
+
+      ##### Read Max/Min-Vaues from json-file #####
+      maxValue = self.speciesData.Species[species]['maximum_value']
+      minValue = self.speciesData.Species[species]['minimum_value']
+
+      ##### Load Values from Data #####
+      if self.speciesData.Species[species]['header_data'] == False:
+        source = self.data
+        maxCompare = np.nanmax(source[self.mapDict[species]])[0]
+        minCompare = np.nanmin(source[self.mapDict[species]])[0]
+
+      ##### Load Values from Metadata #####
+      else:
+        source = self.metaData
+        maxCompare = float(source[self.mapDict[species]][0])
+        minCompare = float(source[self.mapDict[species]][0])
+
+      ##### Check whether maximum out of Range #####
+      if (maxCompare > float(maxValue)) == True:
+        self._output_out_of_range(species, maxValue, 'above required maximum')       
+
+      ##### Check whether minimum out of Range #####
+      if (minCompare < float(minValue)) == True:
+        if species == 'Carbon_Monoxide_Low_Dry':
+          CoHigh = True
+        else:
+          self._output_out_of_range(species, minValue, 'below required minimum')
+
+    return CoHigh
+
+
+  def _output_out_of_range(self, species, Value, ErrorString):   
+
+    self.logDict['error'] = "%s is %s of %s %s" % (self.mapDict[species], ErrorString, str(Value), self.speciesData.Species[species]['unit'])
+    raise Exception ("%s is %s of %s %s" % (self.mapDict[species], ErrorString, str(Value), self.speciesData.Species[species]['unit']))
+
+
+  def _load_metadata(self, data):
+
+      metaData = data[:1]
+      data.columns = data.loc[1].values
+      data = data[2:]
+
+      for channel in self.speciesData.Species.items():
+        if channel[1]['header_data'] == True:
+            for channelName in channel[1]['channel_names']:
+                if channelName in metaData.columns:
+                  self.logDict['info'] = "Meta-Data read from import file %s" % self.fileName
                          
-               elif species[1]['header_data'] == True:
-                    self._check_channels_util(species[0], species[1]['channel_names'], False, self.metaData, self.fileName)
-    
+                else:
+                  self.logDict['warning'] = "Meta-Data missing in import file %s" % self.fileName
+                  raise Exception("Cannot find %s channel in header data of file %s" % (channelName, self.fileName))
 
-     def _check_units(self):
-
-          for species in self.mapDict:
-               unit = self.speciesData.Species[species]['unit']
-               if self.speciesData.Species[species]['header_data'] == False: 
-                    booleanCond = self.data[self.mapDict[species]].str.contains(unit)
-                    if not (booleanCond.any()):
-                         self.logDict['error'] = "%s units are not in %s" % (self.mapDict[species], unit)
-                         raise Exception("%s units are not in %s" % (self.mapDict[species], unit))
-
-
-     def _load_metadata(self, data):
-
-          metaData = data[:1]
-          data.columns = data.loc[1].values
-          data = data[2:]
-
-          for channel in self.speciesData.Species.items():
-              if channel[1]['header_data'] == True:
-                    for channelName in channel[1]['channel_names']:
-                         if channelName in metaData.columns:
-                              self.logDict['info'] = "Meta-Data read from import file %s" % self.fileName
-                             
-                         else:
-                              self.logDict['warning'] = "Meta-Data missing in import file %s" % self.fileName
-                              raise Exception("Cannot find %s channel in header data of file %s" % (channelName, self.fileName))
-
-          return metaData, data
-
+      return metaData, data
 
 
 
