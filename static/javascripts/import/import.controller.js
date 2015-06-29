@@ -42,7 +42,7 @@
                 .done(function(response){
                     var jsonObj = JSON.parse(response);
                     var List_channel = ['Power','Speed','Torque'];
-                    var List_regType = ['intercept','rsquared','slope','standard_error'];
+                    var List_regType = ['Intercept','Rsquared','Slope','Standard Error'];
                     var result = "";
                     var List_reg = [['powerI','powerr','powers','powerse'],['speedI','speedr','speeds','speedse'],['torqueI','torquer','torques','torquese']]
                     

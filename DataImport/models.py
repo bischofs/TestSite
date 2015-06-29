@@ -173,11 +173,15 @@ class Data:
   def _check_units(self):
 
     for species in self.mapDict:
+
       unit = self.speciesData.Species[species]['unit']
+
       if self.speciesData.Species[species]['header_data'] == False: 
+
         booleanCond = self.data[self.mapDict[species]].str.contains(unit)
         if not (booleanCond.any()):
-          self.logDict['error'] = "%s units are not in %s" % (self.mapDict[species], unit)
+
+          self.logDict['error'] = "%s units are not in %s" % (self.mapDict[species], unit)          
           raise Exception("%s units are not in %s" % (self.mapDict[species], unit))
 
   def _check_ranges(self):
@@ -265,8 +269,10 @@ class TestData(Data):
 class CycleValidator:
     
 
-    def __init__(self, Testdata, Mapdict, Fullload, Warmidle, FilterChoice):
+    def __init__(self, Testdata, Mapdict, Fullload, Warmidle, filterChoice):
 
+        ##### Load Data #####
+        self.FilterChoice = filterChoice     
         self.data = Testdata.data
         self.data_full = Fullload.data
         self.data_full.index = range(0,len(self.data_full))
@@ -304,8 +310,8 @@ class CycleValidator:
                          'Power': ['Power_Demand', 'Power_Engine'], 
                          'Speed': ['Speed_Demand', 'Speed_Engine']}
 
-        if (FilterChoice != 0):
-          self._pre_regression_filter(FilterChoice)        
+        if (self.FilterChoice != 0):
+          self._pre_regression_filter(self.FilterChoice)        
         self._regression()
         self._regression_validation()
         
@@ -362,9 +368,9 @@ class CycleValidator:
 
     def _regression(self):
         
-        self.reg_results = {'Torque': { 'slope': " ", 'intercept': " ", 'standard_error': " ", 'rsquared': " " },
-                            'Power': { 'slope': " ", 'intercept': " ", 'standard_error': " ", 'rsquared': " " }, 
-                            'Speed': { 'slope': " ", 'intercept': " ", 'standard_error': " ", 'rsquared': " " }}
+        self.reg_results = {'Torque': { 'Slope': " ", 'Intercept': " ", 'Standard Error': " ", 'Rsquared': " " },
+                            'Power': { 'Slope': " ", 'Intercept': " ", 'Standard Error': " ", 'Rsquared': " " }, 
+                            'Speed': { 'Slope': " ", 'Intercept': " ", 'Standard Error': " ", 'Rsquared': " " }}
         
         for channel in self.dataDict.items():
 
@@ -383,38 +389,38 @@ class CycleValidator:
         for x, y in zip(vars(self)[X], vars(self)[Y]):
             denominator = denominator + ((y - ymean) ** 2)
                 
-        slope = numerator / denominator 
+        Slope = numerator / denominator 
 
         # -- Regression Intercept -- EPA 1065.602-10 
-        intercept = (xmean - (slope * ymean))
+        Intercept = (xmean - (Slope * ymean))
 
         # -- Regression Standard Error of Estimate -- EPA 1065.602-11 
         sumat = 0.0
         for x, y in zip(vars(self)[X], vars(self)[Y]):
-            sumat = sumat + ((x - intercept - (slope * y)) ** 2)
+            sumat = sumat + ((x - Intercept - (Slope * y)) ** 2)
         see = sumat / (vars(self)[X].size - 2)
         standerror = math.sqrt(see)
 
         # -- Regression Coefficient of determination -- EPA 1065.602-12
         numerator, denominator = 0.0, 0.0
         for x, y in zip(vars(self)[X], vars(self)[Y]):
-            numerator = numerator + ((x - intercept - (slope * y)) ** 2)
+            numerator = numerator + ((x - Intercept - (Slope * y)) ** 2)
         for x, y in zip(vars(self)[X], vars(self)[Y]):
             denominator = denominator + ((x - ymean) ** 2)
                 
         r2 = 1 - (numerator / denominator)
 
-        self.reg_results[channel]['slope'] = round(slope,2)
-        self.reg_results[channel]['intercept'] = round(intercept,2)
-        self.reg_results[channel]['standard_error'] = round(standerror,2)
-        self.reg_results[channel]['rsquared'] = round(r2,2)
+        self.reg_results[channel]['Slope'] = round(Slope,2)
+        self.reg_results[channel]['Intercept'] = round(Intercept,2)
+        self.reg_results[channel]['Standard Error'] = round(standerror,2)
+        self.reg_results[channel]['Rsquared'] = round(r2,2)
 
 
     def _regression_validation(self):
 
-        self.reg_results_bool = {'Torque': { 'slope': False, 'intercept': False, 'standard_error': False, 'rsquared': False }, 
-                                  'Power': { 'slope': False, 'intercept': False, 'standard_error': False, 'rsquared': False },
-                                  'Speed': { 'slope': False, 'intercept': False, 'standard_error': False, 'rsquared': False }}
+        self.reg_results_bool = {'Torque': { 'Slope': False, 'Intercept': False, 'Standard Error': False, 'Rsquared': False }, 
+                                  'Power': { 'Slope': False, 'Intercept': False, 'Standard Error': False, 'Rsquared': False },
+                                  'Speed': { 'Slope': False, 'Intercept': False, 'Standard Error': False, 'Rsquared': False }}
 
         # Cycle-validation criteria for operation over specified duty cycles -- EPA 1065.514 - Table 2
         for parameter in self.reg_results:
@@ -423,57 +429,57 @@ class CycleValidator:
             if parameter == 'Speed':
 
                 # Slope
-                if (self.reg_results[parameter]['slope'] <= 1.03) and (self.reg_results[parameter]['slope'] >= 0.95):
-                    self.reg_results_bool[parameter]['slope'] = True
+                if (self.reg_results[parameter]['Slope'] <= 1.03) and (self.reg_results[parameter]['Slope'] >= 0.95):
+                    self.reg_results_bool[parameter]['Slope'] = True
 
                 # Intercept
-                if (self.reg_results[parameter]['intercept'] <= 0.1*float(self.Warm_Idle)):
-                    self.reg_results_bool[parameter]['intercept'] = True
+                if (self.reg_results[parameter]['Intercept'] <= 0.1*float(self.Warm_Idle)):
+                    self.reg_results_bool[parameter]['Intercept'] = True
 
                 # Standard error
-                if self.reg_results[parameter]['standard_error'] <= 0.05*self.Speed_Max:
-                    self.reg_results_bool[parameter]['standard_error'] = True
+                if self.reg_results[parameter]['Standard Error'] <= 0.05*self.Speed_Max:
+                    self.reg_results_bool[parameter]['Standard Error'] = True
 
                 # Coefficient of determination
-                if self.reg_results[parameter]['rsquared'] >= 0.97:
-                    self.reg_results_bool[parameter]['rsquared'] = True
+                if self.reg_results[parameter]['Rsquared'] >= 0.97:
+                    self.reg_results_bool[parameter]['Rsquared'] = True
 
             ###### Statistical Criteria for Torque #####
             if parameter == 'Torque':
 
                 # Slope
-                if (self.reg_results[parameter]['slope'] <= 1.03) and (self.reg_results[parameter]['slope'] >= 0.83):
-                    self.reg_results_bool[parameter]['slope'] = True
+                if (self.reg_results[parameter]['Slope'] <= 1.03) and (self.reg_results[parameter]['Slope'] >= 0.83):
+                    self.reg_results_bool[parameter]['Slope'] = True
                 # Intercept
-                if (self.reg_results[parameter]['intercept'] <= 0.02*self.Torque_Max):
-                    self.reg_results_bool[parameter]['intercept'] = True
+                if (self.reg_results[parameter]['Intercept'] <= 0.02*self.Torque_Max):
+                    self.reg_results_bool[parameter]['Intercept'] = True
 
                 # Standard error
-                if self.reg_results[parameter]['standard_error'] <= 0.1*self.Torque_Max:
-                    self.reg_results_bool[parameter]['standard_error'] = True
+                if self.reg_results[parameter]['Standard Error'] <= 0.1*self.Torque_Max:
+                    self.reg_results_bool[parameter]['Standard Error'] = True
 
                 # Coefficient of determination
-                if self.reg_results[parameter]['rsquared'] >= 0.85:
-                    self.reg_results_bool[parameter]['rsquared'] = True
+                if self.reg_results[parameter]['Rsquared'] >= 0.85:
+                    self.reg_results_bool[parameter]['Rsquared'] = True
 
             ###### Statistical Criteria for Power #####
             if parameter == 'Power':
 
                 # Slope
-                if (self.reg_results[parameter]['slope'] <= 1.03) and (self.reg_results[parameter]['slope'] >= 0.83):
-                    self.reg_results_bool[parameter]['slope'] = True
+                if (self.reg_results[parameter]['Slope'] <= 1.03) and (self.reg_results[parameter]['Slope'] >= 0.83):
+                    self.reg_results_bool[parameter]['Slope'] = True
 
                 # Intercept
-                if (self.reg_results[parameter]['intercept'] <= 0.02*self.Power_Max):
-                    self.reg_results_bool[parameter]['intercept'] = True
+                if (self.reg_results[parameter]['Intercept'] <= 0.02*self.Power_Max):
+                    self.reg_results_bool[parameter]['Intercept'] = True
 
                 # Standard error
-                if self.reg_results[parameter]['standard_error'] <= 0.1*self.Power_Max:
-                    self.reg_results_bool[parameter]['standard_error'] = True
+                if self.reg_results[parameter]['Standard Error'] <= 0.1*self.Power_Max:
+                    self.reg_results_bool[parameter]['Standard Error'] = True
 
                 # Coefficient of determination
-                if self.reg_results[parameter]['rsquared'] >= 0.91:
-                    self.reg_results_bool[parameter]['rsquared'] = True
+                if self.reg_results[parameter]['Rsquared'] >= 0.91:
+                    self.reg_results_bool[parameter]['Rsquared'] = True
 
 
 

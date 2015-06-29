@@ -1,4 +1,5 @@
 <!-- <div ac-chart="chartType" ac-data="data" ac-config="config" id='chart' class='chart'></div> -->
+<div ng-controller="DelayController">
 <div class="row">
     <div class="col-md-6">
         <button type="button" ng-click="nox()" class="btn btn-primary">NOx</button>
@@ -15,13 +16,46 @@
         <input type="text" ng-model="currentDelay" class="input-sm" placeholder="0">
         <button type="button" ng-click="right()" class="btn btn-primary btn-arrow-right">1 second</button>
     </div>
+    <div>
+        <canvas id="line" class="chart chart-line" data="data" labels="labels" legend="true" series="series" click="onClick" options="options">
+        </canvas>
+    </div>
 </div>
-<div>
-    <canvas id="line" class="chart chart-line" data="data" labels="labels" legend="true" series="series" click="onClick" options="options">
-    </canvas>
-    <button type="button" class="btn btn-success btn-s" style="float:right;">
-        <span class="glyphicon glyphicon-arrow-up"></span> Submit Delays
-    </button>
+<div class="row">
+    <div class="col-md-8">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>NOx</th>
+                    <th>CH4</th>
+                    <th>THC</th>
+                    <th>CO</th>
+                    <th>CO2</th>
+                    <th>O2</th>
+                    <th>NO</th>
+                    <th>MAF</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>{{save['NOx']}}</th>
+                    <th>{{save['CH4']}}</th>
+                    <th>{{save['THC']}}</th>
+                    <th>{{save['CO']}}</th>
+                    <th>{{save['CO2']}}</th>
+                    <th>{{save['O2']}}</th>
+                    <th>{{save['NO']}}</th>
+                    <th>{{save['MFRAIR']}}</th>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-4">    
+        <button type="button" ng-click="Submit()" class="btn btn-success btn-s" style="float:right;">
+            <span class="glyphicon glyphicon-arrow-up"></span> Submit Delays
+        </button>
+    </div>
+</div>
 </div>
 <style>
 .input-sm {

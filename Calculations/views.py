@@ -34,13 +34,14 @@ class CalculationView(views.APIView):
                 calculator = Calculator(dataHandler, dataHandler.masterDict, request.QUERY_PARAMS)
 
                 ##### Save Results #####
-                dataHandler.resultsLog['Calculation'] = calculator      
+                dataHandler.resultsLog['Calculation'] = {'ZeroSpan' : calculator.preparation.ZeroSpan.to_json(), 'Fuel' : calculator.preparation.FuelData.to_json(),
+                                                        'Array' : calculator.calculation.ArraySum, 'Results' : calculator.calculation.result}
 
-            jsonDict = {'Report':dataHandler.resultsLog['Calculation'].calculation.Final.to_json(),'errors': dataHandler.log}
+            jsonDict = {'Report':dataHandler.resultsLog['Calculation'],'errors': dataHandler.log}
             jsonLog = json.dumps(jsonDict)
 
             ##### Save Session #####
-            cache.set(request.session._get_session_key(), dataHandler)                        
+            cache.set(request.session._get_session_key(), dataHandler)
 
             return Response(jsonLog, status=200)
 
@@ -62,20 +63,21 @@ class CalculationView(views.APIView):
 
             ##### Initialize Report #####
             Output = io.BytesIO()
-            report = Report(dataHandler, dataHandler.masterDict, dataHandler.resultsLog['Calculation'].calculation, Output)
+            report = Report(dataHandler, dataHandler.masterDict, dataHandler.resultsLog['Calculation'], dataHandler.resultsLog['Data Alignment'], Output)
 
             ##### Save Session #####
             cache.set(request.session._get_session_key(), dataHandler)
+
+            ##### Prepare the Response #####
             report.output.seek(0)
             Response = HttpResponse(report.output.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-            
             Response['Pragma'] = 'public'
             Response['Expires'] = 0
             Response['Cache-Control'] = 'must-revalidate, post-check=0, pre-check=0'
             Response['Cache-Control'] = 'private:false'
             Response['Content-Disposition'] = 'attachment; filename="Final.xlsx"'
             #Response['Content-Transfer-Encoding'] = 'binary'
-            Response['Conten-length'] = report.output.tell()
+            Response['Content-length'] = report.output.tell()
             #Response['Connection'] = 'close'
 
             return Response

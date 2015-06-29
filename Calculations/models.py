@@ -13,7 +13,7 @@ import io
 class Calculator:
 
   def __init__(self, DataHandler, MapDict, ReportParams):
-     	
+        
     self.preparation = Preparation(DataHandler, MapDict)   
     self.calculation = Calculation(self.preparation, MapDict)
     DataHandler, MapDict, ReportParams = None, None, None
@@ -187,8 +187,14 @@ class Preparation:
           if (ColumnSpan[i]< ZeroSpan[spec]['Chosen']*0.98) | (ColumnSpan[i] > ZeroSpan[spec]['Chosen']*1.02): # Acceptable Range of noise +-2%
               ColumnSpan = ColumnSpan.drop(i)
 
-      ZeroSpan[spec][name['Zero']] = abs(ColumnZero.mean())
-      ZeroSpan[spec][name['Span']] = abs(ColumnSpan.mean())
+      if (len(ColumnZero)) > 30 and (len(ColumnSpan) > 30): # At least 30 points to calculate the average of Zero and Span
+
+          ZeroSpan[spec][name['Zero']] = abs(ColumnZero.mean())
+          ZeroSpan[spec][name['Span']] = abs(ColumnSpan.mean())
+
+      else:
+
+        raise Exception('Not enough data points for average Zero/Span! Minimum : 30')
 
     # Clear Variables
     ColumnZero, ColumnSpan, spec, Species, TimeWindow, Data, name, i = None, None, None, None, None, None, None, None
@@ -203,7 +209,7 @@ class Calculation:
 
         if Preparation.TransientBool == True:
              self._transient_calculation(Preparation, MapDict)
-             [self.DriftUncorrected, self.DriftCorrected, self.Final] = self._result()             
+             self.result = self._result()             
         else:
              self._steady_state_calculation(Preparation, MapDict)
 
@@ -224,7 +230,7 @@ class Calculation:
         [DataCor, self.ArraySumCor] = self._inner_calc(PreparationDrift, DataCor, Species)  
         [self.ArraySumCorWon, self.U_BPOW_Factor] = self._remove_negatives(DataCor, Preparation.test, MapDict)
 
-        #self.ArraySum = [ArraySumUn, ArraySumCor, ArraySumCorWon]
+        self.ArraySum = [self.ArraySumUn, self.ArraySumCor, self.ArraySumCorWon]
         self.Data = [Preparation.test, DataUn, DataCor]
 
         # Clear Variables
@@ -504,19 +510,21 @@ class Calculation:
             self.Final['Test'][i] = self.ArraySumCorWon[Species[i]]/self.U_BPOW_Factor
             self.Final['Total'][i] = self.ArraySumCorWon[Species[i]]
 
-        return self.DriftUncorrected, self.DriftCorrected, self.Final
+        self.result = [self.DriftUncorrected.to_json(), self.DriftCorrected.to_json(), self.Final.to_json()]
+
+        return self.result
 
 
 
 class Report:
 
-    def __init__(self, DataHandler, MapDict, Calculator, output):
+    def __init__(self, DataHandler, MapDict, CalculatorLog, DelayArray, output):
 
         ###### Load Variables #####
         self.output = output
         #Test, Uncorrected, Corrected = Calculator.Data
-        ArraySumUn, ArraySumCor, ArraySumCorWon = Calculator.ArraySumUn, Calculator.ArraySumCor, Calculator.ArraySumCorWon
-        self.DriftUncorrected, self.DriftCorrected, self.Final = Calculator.DriftUncorrected, Calculator.DriftCorrected, Calculator.Final
+        ArraySumUn, ArraySumCor, ArraySumCorWon = CalculatorLog['Array']
+        self.DriftUncorrected, self.DriftCorrected, self.Final = CalculatorLog['Results']
         Species = ['CO2','CO','NOx','THC','NMHC']  
 
         ###### Preparation of Excel-File #####        
@@ -524,7 +532,7 @@ class Report:
 
         ##### Write Emissions in Report ######
         self.sheet = self._write_emissions(self.sheet, self.DriftUncorrected, self.DriftCorrected, self.Final, ArraySumUn, ArraySumCor, ArraySumCorWon, Species)
-
+        self.sheet = self._write_first_page(self.sheet, DataHandler.resultsLog, CalculatorLog['ZeroSpan'], DelayArray)
         ##### Write Data according to choosen options #####
         #self.sheet2 = self._write_dataframe(self.sheet2, Test)
         #self.sheet3 = self._write_dataframe(self.sheet3, Uncorrected)
@@ -548,34 +556,109 @@ class Report:
         Type = ['Drift-uncorrected', 'Drift-corrected', 'Final']
         TypeNum = [19, 10 , 1]
         DataList = [DriftUncorrected, DriftCorrected, Final]
-        ArrayList = [ArraySumUn, ArraySumCor, ArraySumCorWon]
+        ArrayList = [ArraySumUn, ArraySumCor, ArraySumCorWon]     
 
         ##### Prepare Formats #####
-        bold = self.file.add_format({'bold': True})
-        dark_grey = self.file.add_format({'fg_color':'#696969','bold':1,'border': 1})
-        bright_grey = self.file.add_format({'fg_color':'#A9A9A9', 'bold':1,'border': 1})
-        border = self.file.add_format({'border':1})
-        merge_format = self.file.add_format({'bold': 1,'border': 1,'align': 'center','valign': 'vcenter','fg_color': '#C71585','font_color':'white'})
-        merge_format2 = self.file.add_format({'bold': 1,'border': 1,'align': 'center','valign': 'vcenter','fg_color': '#A9A9A9'})
-
+        self.dark_grey = self.file.add_format({'fg_color':'#696969','bold':1,'border': 1})
+        self.bright_grey = self.file.add_format({'fg_color':'#A9A9A9', 'bold':1,'border': 1})
+        self.border = self.file.add_format({'border':1})
+        self.green = self.file.add_format({'fg_color':'#5EFB6E','border': 1})
+        self.red = self.file.add_format({'fg_color':'#F75D59','border': 1})        
+        self.merge = self.file.add_format({'bold': 1,'border': 1,'align': 'center','valign': 'vcenter','fg_color': '#C71585','font_color':'white'})
+        
         for [text, index, Data, Array] in zip(Type, TypeNum, DataList, ArrayList):
             
             ##### Write Data to File #####
-            sheet.merge_range('A'+str(index) + ':C'+str(index), text +' Emissions', merge_format)
-            sheet.write_row('A'+str(index+1),Data.columns.values[0:3],dark_grey)
-            sheet.write_column('A'+str(index+2),Data.Species,bright_grey)
-            sheet.write_column('B'+str(index+2),Data.Units,bright_grey)
+            Data = pd.read_json(Data)
+            sheet.merge_range('J'+str(index) + ':L'+str(index), text +' Emissions', self.merge)
+            sheet.write('J'+str(index+1),'Species',self.dark_grey)
+            sheet.write('K'+str(index+1),'Units',self.dark_grey)
+            sheet.write('L'+str(index+1),'Test',self.dark_grey)
+            sheet.write_column('J'+str(index+2),Data.Species,self.bright_grey)
+            sheet.write_column('K'+str(index+2),Data.Units,self.bright_grey)
             where_are_NaNs = np.isnan(Data.Test)
             Data.Test[where_are_NaNs] = 99999
-            sheet.write_column('C'+str(index+2),np.round(Data.get('Test'),3),border)
+            sheet.write_column('L'+str(index+2),np.round(Data.get('Test'),3),self.border)
 
             ##### Emissions Total Mass #####
-            sheet.write('E'+str(index), 'Emissions Mass', merge_format2)
-            sheet.write('E'+str(index+1),'Total',bright_grey)
-            sheet.write_column('E'+str(index+2), np.round(Data.get('Total'),3), border)
+            sheet.write('N'+str(index), 'Emissions Mass', self.bright_grey)
+            sheet.write('N'+str(index+1),'Total',self.bright_grey)
+            sheet.write_column('N'+str(index+2), np.round(Data.get('Total'),3), self.border)
 
         return sheet
 
+
+    def _write_first_page(self, sheet, ResultsLog, ZeroSpan, DelayArray):
+
+        Regression = ResultsLog['Regression'][0]
+        OmitChoice = ResultsLog['Regression'][1]
+        Regression_bool = ResultsLog['Regression_bool']
+        Delay = ResultsLog['Data Alignment']
+
+        TypeList = ['Power', 'Speed', 'Torque']
+        Letters = ['B','C','D']
+        ResultsList = ['Intercept', 'Rsquared', 'Slope', 'Standard Error']
+        sheet.write_row('B2',TypeList,self.dark_grey)
+        sheet.write('A2','Parameter',self.dark_grey)
+        sheet.merge_range('A7:B7','Omit Choice :',self.bright_grey)
+        if OmitChoice == 0:
+            text = 'W/o omit'
+        elif OmitChoice == 1:
+            text = 'Omit 1 (Power & Torque)'
+        elif OmitChoice == 2:
+            text = 'Omit 2 (Power & Speed)'
+        elif OmitChoice == 3:
+            text = 'Omit 3.1 (Power & Torque)'
+        elif OmitChoice == 4:
+            text = 'Omit 3.2 (Power & Speed)'
+        elif OmitChoice == 5:
+            text = 'OOmit 4.1 (Power & Torque)'  
+        elif OmitChoice == 6:
+            text = 'Omit 4.2 (Power & Speed)'
+        sheet.merge_range('C7:D7',text,self.border)                                            
+
+
+        sheet.merge_range('A1:D1','Regression', self.merge)
+        for Type, letter in zip(TypeList, Letters):
+            for result, index2 in zip(ResultsList, range(1,len(ResultsList)+1)):
+                if Regression_bool[Type][result] == True:
+                    sheet.write(letter+str(index2+2),Regression[Type][result],self.green)
+                    sheet.write('A'+str(index2+2),result,self.bright_grey)
+                else:
+                    sheet.write(letter+str(index2+2),Regression[Type][result],self.red)
+                    sheet.write('A'+str(index2+2),result,self.bright_grey)
+
+        import ipdb
+        ipdb.set_trace()
+        sheet.merge_range('A10:C10','Data Alignment', self.merge)
+        Species = ['CO2','CO','NOx','THC','NMHC']
+        sheet.write_row('A11:C11',['Species','Units','Delay'],self.dark_grey)
+        sheet.write_column('A12',Species,self.bright_grey)
+        sheet.write_column('B12',['seconds','seconds','seconds','seconds','seconds',],self.bright_grey)
+        #for spec, index in DelayArray
+        sheet.write('C12',5,self.border)
+        sheet.write('C13',4,self.border)
+        sheet.write('C14',8,self.border)
+        sheet.write('C15',7,self.border)
+        sheet.write('C16',3,self.border)
+
+
+        ZeroSpan = pd.read_json(ZeroSpan)
+        Species = ZeroSpan.columns.values
+        Letters = ['C','D','E','F','G']
+        TypeList = ['Chosen','PreZero','PostZero','PreSpan','PostSpan']
+        sheet.merge_range('A19:G19','Zero/Span - Table', self.merge)
+        sheet.write('A20','Species',self.dark_grey)
+        sheet.write('B20','Units',self.dark_grey)
+        sheet.write_row('C20:G20',TypeList,self.dark_grey)
+        for Type, letter in zip(TypeList, Letters):
+            for spec, index in zip(Species,range(1,len(Species)+1)):
+                if ZeroSpan[spec][Type] > 100:
+                    sheet.write('B'+str(index+20),'ppm',self.bright_grey)
+                else:
+                    sheet.write('B'+str(index+20),'%',self.bright_grey)
+                sheet.write(letter+str(index+20), np.round(ZeroSpan[spec][Type],2),self.border)
+                sheet.write('A'+str(index+20), spec,self.bright_grey)
 
     def _write_dataframe(self, Sheet, Data):
 

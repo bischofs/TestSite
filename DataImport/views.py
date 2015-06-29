@@ -74,18 +74,26 @@ class FileUploadView(views.APIView):
 
         try:
             
+            ##### Read in the choice to omit #####
             OmitChoice = int(request.QUERY_PARAMS['choice'])
+
             cache = caches['default']
             dataHandler = cache.get(request.session.session_key)
+
             cycleValidator = CycleValidator(dataHandler.testData, dataHandler.masterDict,
                                             dataHandler.fullLoad, dataHandler.fullLoad.metaData['n_CurbIdle'], OmitChoice)
-            dataHandler.resultsLog['Regression'] = cycleValidator.reg_results
+
+            ##### Saving Results in Log #####
+            dataHandler.resultsLog['Regression'] = [cycleValidator.reg_results,cycleValidator.FilterChoice]
             dataHandler.resultsLog['Regression_bool'] = cycleValidator.reg_results_bool      
+
+            ##### Saving Results in Json-File #####
             jsonDict = {'Regression':cycleValidator.reg_results,
                         'Regression_bool':cycleValidator.reg_results_bool,
                         'errors': dataHandler.log}
             cache.set(request.session.session_key, dataHandler)            
             jsonLog = json.dumps(jsonDict)
+
             return Response(jsonLog, status=200)
 
         except Exception as e:
