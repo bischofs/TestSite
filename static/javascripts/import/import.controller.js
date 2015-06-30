@@ -28,6 +28,13 @@
         $scope.uploader.onErrorItem = onErrorItem;
         $scope.uploader.onBeforeUploadItem = onBeforeUploadItem;
 
+        // Load default Values for Regression Panel
+        var List_reg = ['powerI','powerr','powers','powerse','speedI','speedr','speeds','speedse','torqueI','torquer','torques','torquese']            
+        for (var i = 0; i < List_reg.length; i++) {
+            $scope[List_reg[i]] = 'Unknown'
+            $scope['label_' + List_reg[i]] = 'label-default'
+        };
+
         $scope.Regression = function() {
 
             // Fill in Regression Data
@@ -35,52 +42,54 @@
                 .done(function(response){
                     var jsonObj = JSON.parse(response);
                     var List_channel = ['Power','Speed','Torque'];
-                    var List_regType = ['intercept','rsquared','slope','standard_error'];
+                    var List_regType = ['Intercept','Rsquared','Slope','Standard Error'];
                     var result = "";
+                    var List_reg = [['powerI','powerr','powers','powerse'],['speedI','speedr','speeds','speedse'],['torqueI','torquer','torques','torquese']]
+                    
+                    for (var i = 0; i < List_channel.length; i++) {
+                            var channel = List_channel[i];
+                            var List_label = List_reg[i];
 
-                    // List_reg has all Ids of panels of the Regression
-                    var List_reg = [['powerI','powerr','powers','powerse'],['speedI','speedr','speeds','speedse'],['torqueI','torquer','torques','torquese']]               
+                            for (var j = 0; j < List_regType.length; j++) {
 
-                    for (var j = 0; j < List_channel.length; j++) {
-                            var channel = List_channel[j];
-                            var List_label = List_reg[j];
-
-                            for (var i = 0; i < List_regType.length; i++) {
-
-                                    if (jsonObj.Regression_bool[channel][List_regType[i]]) {
-                                            result = "label label-success";
+                                    if (jsonObj.Regression_bool[channel][List_regType[j]]) {
+                                            result = "label-success";
                                     }             
                                     else {
-                                            result = "label label-danger";                            
+                                            result = "label-danger";                            
                                     }
-                                    document.getElementById(List_label[i]).className = result; 
-                                    document.getElementById(List_label[i]).innerHTML = jsonObj.Regression[channel][List_regType[i]].toFixed(2);
+                                    $scope['label_' + List_label[j]] = result;
+                                    $scope[List_label[j]] = jsonObj.Regression[channel][List_regType[j]].toFixed(2);
                             };
                     };
+                    $scope.$apply();
                 })
+
                 .error(function(response) {
-                    toastr.error(response.message, 'Data is not available!');
+                    toastr.error(response.message, 'Data is not available');
                 });
         }
 
         function onBeforeUploadItem(item) {
-            if ($scope.filetype == "pre") {
-                $scope.uploader.formData.push({
-                    ftype: "pre"
-                });
-            } else if ($scope.filetype == "post") {
-                $scope.uploader.formData.push({
-                    ftype: "post"
-                });
-            } else if ($scope.filetype == "full") {
+
+            if ($scope.filetype == "full") {
                 $scope.uploader.formData.push({
                     ftype: "full"
+                });
+            } 
+            else if ($scope.filetype == "pre") {
+                $scope.uploader.formData.push({
+                    ftype: "pre"
                 });
             } else if ($scope.filetype == "test") {
                 $scope.uploader.formData.push({
                     ftype: "test"
                 });
-            }
+            } else if ($scope.filetype == "post") {
+                $scope.uploader.formData.push({
+                    ftype: "post"
+                });
+            } 
             item.formData = $scope.uploader.formData
         }
 

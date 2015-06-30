@@ -7,70 +7,68 @@
                 </div>
                 <div style="max-height: 300px;">
                     <ul class="list-group checked-list-box">
-                        <li class="list-group-item">All Options</li>
-                        <li class="list-group-item">Phasing Results</li>
-			<li class="list-group-item">Drift Criteria</li>
-			<li class="list-group-item">Regression Results</li>
-                        <li class="list-group-item">Regression Omissions</li>
-                        <li class="list-group-item" data-checked="true">Corrected Results</li>
-                        <li class="list-group-item">Uncorrected Results</li>
-                        <li class="list-group-item">Step-by-Step Equation Results</li>
-                    
-		    </ul>
+                        <li value=0 class="list-group-item">All Options</li>
+                        <li value=1 class="list-group-item">Phasing Results</li>
+                        <li value=2 class="list-group-item">Regression Results</li>
+                        <li value=3 class="list-group-item">Regression Omissions</li>
+                        <li value=4 class="list-group-item" data-checked="true">Corrected Results</li>
+                        <li value=5 class="list-group-item">Uncorrected Results</li>
+                        <li value=6 class="list-group-item">Step-by-Step Equation Results</li>
+                    </ul>
                 </div>
             </div>    
         </div>
         <div class="col-xs-6">
             <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Calculation Results</h3>
-                </div>
-                <div class="panel-body" style="visibility: hidden;" id="ResultTable">
-                    <div cg-busy="{promise:myPromise,message:'Loading',backdrop:false,delay:300,minDuration:2000}">
-                        <table class="table" style="margin-bottom: 0px;">
-                                <thead>
-                                    <tr>
-                                        <th>Species</th>
-                                        <th>Data</th>
-                                        <th>Units</th>
-                                        <th>Total Mass</th>
-                                    </tr>
-                                </thead>
-                                <tbody>                                
-                                    <tr>
-                                        <td>{{CO2_Name}}</td>
-                                        <td>{{CO2_Result}}</td>
-                                        <td>{{CO2_Unit}}</td>
-                                        <td>{{CO2_Total}}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>{{CO_Name}}</td>
-                                        <td>{{CO_Result}}</td>
-                                        <td>{{CO_Unit}}</td>
-                                        <td>{{CO_Total}}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>{{NOX_Name}}</td>
-                                        <td>{{NOX_Result}}</td>
-                                        <td>{{NOX_Unit}}</td>
-                                        <td>{{NOX_Total}}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>{{THC_Name}}</td>
-                                        <td>{{THC_Result}}</td>
-                                        <td>{{THC_Unit}}</td>
-                                        <td>{{THC_Total}}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>{{NMHC_Name}}</td>
-                                        <td>{{NMHC_Result}}</td>
-                                        <td>{{NMHC_Unit}}</td>
-                                        <td>{{NMHC_Total}}</td>
-                                    </tr>
-                              </tbody>
-                        </table>
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Calculation Results</h3>
                     </div>
-                </div>             
+                    <div cg-busy="{promise:promise,message:message,backdrop:backdrop,delay:delay,minDuration:minDuration}">
+                    <div class="panel-body" id="ResultTable">                    
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Species</th>
+                                    <th>Data</th>
+                                    <th>Units</th>
+                                    <th>Total Mass</th>
+                                </tr>
+                            </thead>
+                            <tbody>                                
+                                <tr>
+                                    <td>{{CO2_Name}}</td>
+                                    <td>{{CO2_Result}}</td>
+                                    <td>{{CO2_Unit}}</td>
+                                    <td>{{CO2_Total}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{CO_Name}}</td>
+                                    <td>{{CO_Result}}</td>
+                                    <td>{{CO_Unit}}</td>
+                                    <td>{{CO_Total}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{NOX_Name}}</td>
+                                    <td>{{NOX_Result}}</td>
+                                    <td>{{NOX_Unit}}</td>
+                                    <td>{{NOX_Total}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{THC_Name}}</td>
+                                    <td>{{THC_Result}}</td>
+                                    <td>{{THC_Unit}}</td>
+                                    <td>{{THC_Total}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{NMHC_Name}}</td>
+                                    <td>{{NMHC_Result}}</td>
+                                    <td>{{NMHC_Unit}}</td>
+                                    <td>{{NMHC_Total}}</td>
+                                </tr>
+                            </tbody>
+                        </table>                    
+                    </div>             
+                </div>
             </div>
             <button type="button" class="btn btn-success btn-s"  ng-click="Report()">
                 <span class="glyphicon glyphicon-arrow-down"></span> Download Results

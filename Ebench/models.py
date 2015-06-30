@@ -16,6 +16,14 @@ class Ebench(models.Model):
     THC_Initial_Contamination = models.FloatField()
     CH4_Initial_Contamination = models.FloatField()
 
+    ##### Bottle Concentrations #####
+    Bottle_Concentration_CO2 = models.FloatField()
+    Bottle_Concentration_COH = models.FloatField()
+    Bottle_Concentration_COL = models.FloatField()
+    Bottle_Concentration_NOX = models.FloatField()
+    Bottle_Concentration_THC = models.FloatField()
+    Bottle_Concentration_NMHC = models.FloatField()
+
     def __str__(self):
         return self.Name
 
