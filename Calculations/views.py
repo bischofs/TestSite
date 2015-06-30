@@ -1,5 +1,7 @@
 import json
+import io
 import xlsxwriter
+import os
 from django.core.servers.basehttp import FileWrapper
 
 from django.core.cache import caches
@@ -18,65 +20,71 @@ from Calculations.models import Report
 class CalculationView(views.APIView):        
 
 
-        def post(self, request, format=None):
+    def post(self, request, format=None):
 
-                try:
+        try:
 
-                    ##### Load dataHandler from Cache #####
-                    cache = caches['default']
-                    dataHandler = cache.get(request.session._get_session_key())
-                    ##### Initialize Calculation #####
-                    calculator = Calculator(dataHandler, dataHandler.testDataMapDict, request.QUERY_PARAMS)
-                    ##### Save Results #####
-                    dataHandler.resultsLog['Calculation'] = calculator
-                    #jsonDict = {'Calculation':calculator,'errors': dataHandler.log}
-                    ##### Save Session #####
-                    cache.set(request.session._get_session_key(), dataHandler)            
-                    #jsonLog = json.dumps(jsonDict)
+            ##### Load dataHandler from Cache #####
+            cache = caches['default']
+            dataHandler = cache.get(request.session._get_session_key())  
 
-                    return Response(status=200)
+            if not dataHandler.resultsLog['Calculation']:   
+                                   
+                ##### Initialize Calculation #####
+                calculator = Calculator(dataHandler, dataHandler.masterDict, request.QUERY_PARAMS)
 
-                except Exception as e:
+                ##### Save Results #####
+                dataHandler.resultsLog['Calculation'] = {'ZeroSpan' : calculator.preparation.ZeroSpan.to_json(), 'Fuel' : calculator.preparation.FuelData.to_json(),
+                                                        'Array' : calculator.calculation.ArraySum, 'Results' : calculator.calculation.result}
 
-                    return Response({
-                    'status': 'Bad request',
-                    'message': str(e)
-                    }, status=status.HTTP_400_BAD_REQUEST)
+            jsonDict = {'Report':dataHandler.resultsLog['Calculation'],'errors': dataHandler.log}
+            jsonLog = json.dumps(jsonDict)
 
+            ##### Save Session #####
+            cache.set(request.session._get_session_key(), dataHandler)
 
-        def get(self, request, format=None):
+            return Response(jsonLog, status=200)
 
-                try:
+        except Exception as e:
 
-                    import ipdb
-                    ipdb.set_trace()
-
-                    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-                    response['Content-Disposition'] = 'attachment; filename=Final.xlsx'
-
-                    ##### Load dataHandler from Cache #####
-                    cache = caches['default']
-                    dataHandler = cache.get(request.session._get_session_key())
-                    ##### Initialize Calculation #####
-                    #fileReport = xlsxwriter.Workbook(response)
-                    report = Report(dataHandler)
+            return Response({
+            'status': 'Bad request',
+            'message': str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
-                    #wrapper = FileWrapper(fileReport)
-                    response = HttpResponse(report.file)
-                    #response['Content-Length'] = os.path.getsize(filename)
-                    #return response
-  
-                    #jsonDict = {'Report':report,'errors': dataHandler.log}
-                    ##### Save Session #####
-                    cache.set(request.session._get_session_key(), dataHandler)            
-                    #jsonLog = json.dumps(jsonDict)
+    def get(self, request, format=None):
 
-                    return response
+        try:
 
-                except Exception as e:
+            ##### Load dataHandler from Cache #####
+            cache = caches['default']
+            dataHandler = cache.get(request.session._get_session_key())
 
-                    return Response({
-                    'status': 'Bad request',
-                    'message': str(e)
-                    }, status=status.HTTP_400_BAD_REQUEST)
+            ##### Initialize Report #####
+            Output = io.BytesIO()
+            report = Report(dataHandler, dataHandler.masterDict, dataHandler.resultsLog['Calculation'], dataHandler.resultsLog['Data Alignment'], Output)
+
+            ##### Save Session #####
+            cache.set(request.session._get_session_key(), dataHandler)
+
+            ##### Prepare the Response #####
+            report.output.seek(0)
+            Response = HttpResponse(report.output.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            Response['Pragma'] = 'public'
+            Response['Expires'] = 0
+            Response['Cache-Control'] = 'must-revalidate, post-check=0, pre-check=0'
+            Response['Cache-Control'] = 'private:false'
+            Response['Content-Disposition'] = 'attachment; filename="Final.xlsx"'
+            #Response['Content-Transfer-Encoding'] = 'binary'
+            Response['Content-length'] = report.output.tell()
+            #Response['Connection'] = 'close'
+
+            return Response
+
+        except Exception as e:
+
+            return Response({
+            'status': 'Bad request',
+            'message': str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)

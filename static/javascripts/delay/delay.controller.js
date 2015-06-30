@@ -5,81 +5,30 @@
         .module('TestSite.delay.controllers')
         .controller('DelayController', DelayController);
 
-    DelayController.$inject = ['$scope', '$http'];
+    DelayController.$inject = ['$scope', '$http', 'toastr'];
     /**
      * @namespace UploadController
      */
-    function DelayController($scope, $http) {
+    function DelayController($scope, $http, toastr) {
 
 
         $scope.delay = 0;
         $scope.CH4Delay = $scope.NOxDelay = $scope.CODelay  = $scope.CO2Delay = $scope.O2Delay = $scope.NODelay = $scope.MAFDelay = $scope.THCDelay = 0;
         $scope.currentSpec = "Nitrogen_X_Dry";
+        $scope.save = {'NOx':0,'CH4':0,'THC':0,'CO':0,'CO2':0,'O2':0,'NO':0,'MFRAIR':0}
+        $scope.Array = {'NOx':'Nitrogen_X_Dry','CH4':'Methane_Wet','THC':'Total_Hydrocarbons_Wet','CO':'Carbon_Monoxide_High_Dry','CO2':'Carbon_Dioxide_Dry','O2':'Oxygen_Dry','NO':'Nitrogen_Monoxide_Dry','MFRAIR':'Air_Flow_Rate'}
 
-        $scope.nox = function() {
-            $scope.labels = _.keys($scope.spec.Nitrogen_X_Dry).splice(50, 100);
-            $scope.series = ['NOx', 'Torque'];
-            $scope.data = [_.values($scope.spec.Nitrogen_X_Dry).splice(50, 100), _.values($scope.spec.Engine_Torque).splice(50, 100)];
-            $scope.currentSpec = $scope.spec.Nitrogen_X_Dry;
-            $scope.currentDelay = $scope.NOxDelay;
-        };
-        $scope.ch4 = function() {
-            $scope.labels = _.keys($scope.spec.Methane_Wet).splice(50, 100);
-            $scope.series = ['CH4', 'Torque'];
-            $scope.data = [_.values($scope.spec.Methane_Wet).splice(50, 100), _.values($scope.spec.Engine_Torque).splice(50, 100)];
-            $scope.currentSpec = $scope.spec.Methane_Wet;
-            $scope.currentDelay = $scope.CH4Delay;
-        };
-        $scope.co = function() {
-            $scope.labels = _.keys($scope.spec.Carbon_Monoxide_High_Dry).splice(50, 100);
-            $scope.series = ['CO', 'Torque'];
-            $scope.data = [_.values($scope.spec.Carbon_Monoxide_High_Dry).splice(50, 100), _.values($scope.spec.Engine_Torque).splice(50, 100)];
-            $scope.currentSpec = $scope.spec.Carbon_Monoxide_High_Dry;
-            $scope.currentDelay = $scope.CODelay;
+        $scope.species = function() {
 
-        };
-        $scope.co2 = function() {
-            $scope.labels = _.keys($scope.spec.Carbon_Dioxide_Dry).splice(50, 100);
-            $scope.series = ['CO2', 'Torque'];
-            $scope.data = [_.values($scope.spec.Carbon_Dioxide_Dry).splice(50, 100), _.values($scope.spec.Engine_Torque).splice(50, 100)];
-            $scope.currentSpec = $scope.spec.Carbon_Dioxide_Dry;
-            $scope.currentDelay = $scope.CO2Delay;
-
-        };
-        $scope.o2 = function() {
-            $scope.labels = _.keys($scope.spec.Oxygen_Dry).splice(50, 100);
-            $scope.series = ['O2', 'Torque'];
-            $scope.data = [_.values($scope.spec.Oxygen_Dry).splice(50, 100), _.values($scope.spec.Engine_Torque).splice(50, 100)];
-            $scope.currentSpec = $scope.spec.Oxygen_Dry;
-            $scope.currentDelay = $scope.O2Delay;
-
-        };
-        $scope.no = function() {
-            $scope.labels = _.keys($scope.spec.Nitrogen_Monoxide_Dry).splice(50, 100);
-            $scope.series = ['NO', 'Torque'];
-            $scope.data = [_.values($scope.spec.Nitrogen_Monoxide_Dry).splice(50, 100), _.values($scope.spec.Engine_Torque).splice(50, 100)];
-            $scope.currentSpec = $scope.spec.Nitrogen_Monoxide_Dry;
-            $scope.currentDelay = $scope.NODelay;
-
-        };
-        $scope.maf = function() {
-            $scope.labels = _.keys($scope.spec.Air_Flow_Rate).splice(50, 100);
-            $scope.series = ['MFRAIR', 'Torque'];
-            $scope.data = [_.values($scope.spec.Air_Flow_Rate).splice(50, 100), _.values($scope.spec.Engine_Torque).splice(50, 100)];
-            $scope.currentSpec = $scope.spec.Air_Flow_Rate;
-            $scope.currentDelay = $scope.MAFDelay;
-
-        };
-        $scope.thc = function() {
-            $scope.labels = _.keys($scope.spec.Total_Hydrocarbons_Wet).splice(50, 100);
-            $scope.series = ['THC', 'Torque'];
-            $scope.data = [_.values($scope.spec.Total_Hydrocarbons_Wet).splice(50, 100), _.values($scope.spec.Engine_Torque).splice(50, 100)];
-            $scope.currentSpec = $scope.spec.Total_Hydrocarbons_Wet
-            $scope.currentDelay = $scope.THCDelay;
+            $scope.series = [$scope.ChosenSpecies, 'Torque'];
+            $scope.currentDelay = $scope.save[$scope.series[0]];
+            $scope.labels = _.keys($scope.spec[$scope.Array[$scope.ChosenSpecies]]).splice(50+$scope.currentDelay, 100);
+            $scope.data = [_.values($scope.spec[$scope.Array[$scope.ChosenSpecies]]).splice(50+$scope.currentDelay, 100), _.values($scope.spec.Engine_Torque).splice(50, 100)];
+            $scope.currentSpec = $scope.spec[$scope.Array[$scope.ChosenSpecies]];            
+            $scope.apply;
         };
 
         $scope.left = function() {
-
 
             var right = _.values($scope.currentSpec).splice((150 + $scope.currentDelay), 50);
             var left = _.values($scope.currentSpec).splice(0, (50 + $scope.currentDelay));
@@ -93,8 +42,10 @@
             data.push(item);
 
             $scope.data = [data, _.values($scope.spec.Engine_Torque).splice(50, 100)];
+            $scope.save[$scope.series[0]] = $scope.currentDelay;
 
         };
+
         $scope.right = function() {
 
             var right = _.values($scope.currentSpec).splice((150 + $scope.currentDelay), 50);
@@ -109,13 +60,26 @@
             data.unshift(item);
 
             $scope.data = [data, _.values($scope.spec.Engine_Torque).splice(50, 100)];
+            $scope.save[$scope.series[0]] = $scope.currentDelay;
 
         };
 
+        $scope.submit = function(){
+
+            $http.post('/api/v1/data/delay/',{'delay':$scope.save})
+                .success(function(response) {
+                    toastr.success('Delay submitted!');
+                    location.href = '/1065/results';
+
+                })
+                .error(function(response) {
+                    toastr.error(response.message, 'Delay submission failed!');                    
+                });
+        }
 
 
         var read = function() {
-            $http.get('/api/v1/data/delay/')
+            $http.get('/1065/api/v1/data/delay/')
                 .success(function(data) {
                     var spec = JSON.parse(data)
                     $scope.spec = spec
@@ -123,21 +87,21 @@
                         pointDot: false,
                         showTooltips: false
                     };
-                    $scope.series = ['Species', 'Torque'];
-                    createWindow();
+
+                    $scope.ChosenSpecies = 'NOx'
+                    $scope.currentDelay = 0
+                    $scope.series = ['NOx', 'Torque'];
+                    $scope.labels = _.keys($scope.spec[$scope.Array[$scope.ChosenSpecies]]).splice(50, 100);
+                    $scope.data = [_.values($scope.spec[$scope.Array[$scope.ChosenSpecies]]).splice(50, 100), _.values($scope.spec.Engine_Torque).splice(50, 100)];
+                    $scope.currentSpec = $scope.spec[$scope.Array[$scope.ChosenSpecies]];            
+                    $scope.apply;        
+                    toastr.success('Prepartion for Delay finished!');            
 
                 })
-                .error(function(data, status, headers, config) {
-                    throw new Error('Something went wrong with reading data');
+                .error(function(response) {
+                    toastr.error(response.message, 'Prepartion for Delay failed!');
                 });
-
         };
-
-
-
-
-        read();
-
 
     }
 
