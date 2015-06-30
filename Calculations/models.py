@@ -13,6 +13,9 @@ import io
 class Calculator:
 
   def __init__(self, DataHandler, MapDict, ReportParams):
+
+    import ipdb
+    ipdb.set_trace()
         
     self.preparation = Preparation(DataHandler, MapDict)   
     self.calculation = Calculation(self.preparation, MapDict)
@@ -533,6 +536,7 @@ class Report:
         ##### Write Emissions in Report ######
         self.sheet = self._write_emissions(self.sheet, self.DriftUncorrected, self.DriftCorrected, self.Final, ArraySumUn, ArraySumCor, ArraySumCorWon, Species)
         self.sheet = self._write_first_page(self.sheet, DataHandler.resultsLog, CalculatorLog['ZeroSpan'], DelayArray)
+        
         ##### Write Data according to choosen options #####
         #self.sheet2 = self._write_dataframe(self.sheet2, Test)
         #self.sheet3 = self._write_dataframe(self.sheet3, Uncorrected)
@@ -554,7 +558,7 @@ class Report:
     def _write_emissions(self, sheet, DriftUncorrected, DriftCorrected, Final, ArraySumUn, ArraySumCor, ArraySumCorWon, Species):
 
         Type = ['Drift-uncorrected', 'Drift-corrected', 'Final']
-        TypeNum = [19, 10 , 1]
+        TypeNum = [21, 11 , 1]
         DataList = [DriftUncorrected, DriftCorrected, Final]
         ArrayList = [ArraySumUn, ArraySumCor, ArraySumCorWon]     
 
@@ -628,37 +632,38 @@ class Report:
                     sheet.write(letter+str(index2+2),Regression[Type][result],self.red)
                     sheet.write('A'+str(index2+2),result,self.bright_grey)
 
-        import ipdb
-        ipdb.set_trace()
         sheet.merge_range('A10:C10','Data Alignment', self.merge)
-        Species = ['CO2','CO','NOx','THC','NMHC']
+        Species = ['CO2','CO','NOx','THC','NMHC','O2','MFRAIR']
         sheet.write_row('A11:C11',['Species','Units','Delay'],self.dark_grey)
         sheet.write_column('A12',Species,self.bright_grey)
-        sheet.write_column('B12',['seconds','seconds','seconds','seconds','seconds',],self.bright_grey)
-        #for spec, index in DelayArray
-        sheet.write('C12',5,self.border)
-        sheet.write('C13',4,self.border)
-        sheet.write('C14',8,self.border)
-        sheet.write('C15',7,self.border)
-        sheet.write('C16',3,self.border)
+        sheet.write_column('B12',['seconds','seconds','seconds','seconds','seconds','seconds','seconds'],self.bright_grey)
+
+        # Write Delay
+        sheet.write('C12',DelayArray['CO2'],self.border)
+        sheet.write('C13',DelayArray['CO'],self.border)
+        sheet.write('C14',DelayArray['NOx'],self.border)
+        sheet.write('C15',DelayArray['THC'],self.border)
+        sheet.write('C16',DelayArray['CH4'],self.border)
+        sheet.write('C17',DelayArray['O2'],self.border)
+        sheet.write('C18',DelayArray['MFRAIR'],self.border)
 
 
         ZeroSpan = pd.read_json(ZeroSpan)
         Species = ZeroSpan.columns.values
         Letters = ['C','D','E','F','G']
         TypeList = ['Chosen','PreZero','PostZero','PreSpan','PostSpan']
-        sheet.merge_range('A19:G19','Zero/Span - Table', self.merge)
-        sheet.write('A20','Species',self.dark_grey)
-        sheet.write('B20','Units',self.dark_grey)
-        sheet.write_row('C20:G20',TypeList,self.dark_grey)
+        sheet.merge_range('A21:G21','Zero/Span - Table', self.merge)
+        sheet.write('A22','Species',self.dark_grey)
+        sheet.write('B22','Units',self.dark_grey)
+        sheet.write_row('C22:G22',TypeList,self.dark_grey)
         for Type, letter in zip(TypeList, Letters):
             for spec, index in zip(Species,range(1,len(Species)+1)):
                 if ZeroSpan[spec][Type] > 100:
-                    sheet.write('B'+str(index+20),'ppm',self.bright_grey)
+                    sheet.write('B'+str(index+22),'ppm',self.bright_grey)
                 else:
-                    sheet.write('B'+str(index+20),'%',self.bright_grey)
-                sheet.write(letter+str(index+20), np.round(ZeroSpan[spec][Type],2),self.border)
-                sheet.write('A'+str(index+20), spec,self.bright_grey)
+                    sheet.write('B'+str(index+22),'%',self.bright_grey)
+                sheet.write(letter+str(index+22), np.round(ZeroSpan[spec][Type],2),self.border)
+                sheet.write('A'+str(index+22), spec,self.bright_grey)
 
     def _write_dataframe(self, Sheet, Data):
 
