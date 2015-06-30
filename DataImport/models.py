@@ -149,10 +149,11 @@ class Data:
   def _check_channels_util(self, species, channelNames, multipleBenches, data, fileName):
         
       for name in channelNames:
-        if name in data.columns:
+       import ipdb; ipdb.set_trace()
+       if name in data.columns:
           self.mapDict[species] = name
           break
-        else:
+      else:
           raise Exception("Cannot find %s channel %s in file %s" % (species.replace("_"," "), channelNames, fileName))          
                
 
