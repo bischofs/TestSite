@@ -13,7 +13,7 @@
 
         $scope.Calculation = function() {
             toastr.info('Calculations started!');
-            $scope.myPromise = $http.post('/api/v1/data/calculations/')
+            $scope.myPromise = $http.post('/1065/api/v1/data/calculations/')
                 .success(function(response) {
                     toastr.success('Calculations finished!');
                     var jsonLog = JSON.parse(response)
@@ -65,7 +65,7 @@
             $http.get('/api/v1/data/calculations/')
                 .success(function(response){
                     toastr.success(response.message, 'Report finished!');
-		            location.href =('/api/v1/data/calculations/');                    
+		            location.href =('/1065/api/v1/data/calculations/');                    
                 })
                 .error(function(response){
                     toastr.error(response.message, 'Report failed!');

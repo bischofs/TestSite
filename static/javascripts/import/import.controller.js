@@ -17,7 +17,7 @@
      function ImportController($scope, FileUploader, toastr, infoboxService) {
 
         $scope.uploader = new FileUploader();
-        $scope.uploader.url = 'api/v1/data/import/'
+        $scope.uploader.url = '/1065/api/v1/data/import/'
         $scope.uploader.method = 'POST'
         $scope.filetype = '';
         //$scope.uploader.formData.push({cycle: 'FTP'});
@@ -31,7 +31,7 @@
         $scope.Regression = function() {
 
             // Fill in Regression Data
-            $.get("api/v1/data/import/",{choice:document.getElementById("sel1").value}) 
+            $.get("/1065/api/v1/data/import/",{choice:document.getElementById("sel1").value}) 
                 .done(function(response){
                     var jsonObj = JSON.parse(response);
                     var List_channel = ['Power','Speed','Torque'];

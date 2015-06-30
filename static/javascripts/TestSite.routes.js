@@ -11,38 +11,40 @@
 
         $urlRouterProvider.when('', '/index');
 
-        $stateProvider.state('register', {
-                url: "/register",
-                templateUrl: "/static/javascripts/authentication/register.html",
-                controller: 'RegisterController',
-                controllerAs: 'vm'
-            })
+	$stateProvider.state('register', {
+            url: "/register",
+            templateUrl: "/1065/static/javascripts/authentication/register.html",
+            controller: 'RegisterController',
+            controllerAs: 'vm'
+        })
             .state('login', {
-                url: "/login",
-                templateUrl: "/static/javascripts/authentication/login.html",
+                url: "/1065/login/",
+                templateUrl: "/1065/static/javascripts/authentication/login.html",
                 controller: 'LoginController',
                 controllerAs: 'vm'
             })
-            .state('1065', {
-                url: "/1065",
-                templateUrl: "/static/javascripts/layout/1065.html",
+            .state('Eval', {
+                url: "/1065/evaluation/",
+                templateUrl: "/1065/static/javascripts/layout/1065.html",
                 controller: "InfoboxController"
             })
-            .state('1065.Import', {
-                url: "/import",
-                templateUrl: "/static/javascripts/import/upload.html",
+            .state('Eval.Import', {
+                url: "import",
+                templateUrl: "/1065/static/javascripts/import/upload.html",
                 controller: "ImportController"
             })
-            .state('1065.Delay', {
-                url: "/delay",
-                templateUrl: "/static/javascripts/delay/delay.html",
+            .state('Eval.Delay', {
+                url: "delay",
+                templateUrl: "/1065/static/javascripts/delay/delay.html",
                 controller: "DelayController"
             })
-            .state('1065.Results', {
-                url: "/results",
-                templateUrl: "/static/javascripts/results/results.html",
+            .state('Eval.Results', {
+                url: "results",
+                templateUrl: "/1065/static/javascripts/results/results.html",
                 controller: "ResultsController"
             });
+	
+	
     }
 
 

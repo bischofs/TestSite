@@ -43,7 +43,7 @@
     * @memberOf TestSite.authentication.services.Authentication
     */
       function register(email, password, username) {
-	  return $http.post('/api/v1/accounts/', {
+	  return $http.post('/1065/api/v1/accounts/', {
 	      username: username,
 	      password: password,
 	      email: email
@@ -62,7 +62,7 @@
        */
 
       function login(email, password) {
-          return $http.post('/api/v1/auth/login/', {
+          return $http.post('/1065/api/v1/auth/login/', {
               email: email, password: password
           }).then(loginSuccessFn,loginErrorFn);
 
@@ -73,7 +73,7 @@
 	  function loginSuccessFn(data, status, headers, config) {
 	      Authentication.setAuthenticatedAccount(data.data);
 
-	      window.location = '/';
+	      window.location = '/1065/evaluation/import';
 	  }
 
 	  /**
@@ -142,7 +142,7 @@
  * @memberOf thinkster.authentication.services.Authentication
  */
  function logout() {
-  return $http.post('/api/v1/auth/logout/')
+  return $http.post('/1065/api/v1/auth/logout/')
   .then(logoutSuccessFn, logoutErrorFn);
 
   /**
