@@ -35,9 +35,9 @@ class CalculationView(views.APIView):
 
                 ##### Save Results #####
                 dataHandler.resultsLog['Calculation'] = {'ZeroSpan' : calculator.preparation.ZeroSpan.to_json(), 'Fuel' : calculator.preparation.FuelData.to_json(),
-                                                        'Array' : calculator.calculation.ArraySum, 'Results' : calculator.calculation.result}
+                                                        'Array' : calculator.calculation.ArraySum, 'Results' : calculator.calculation.result, 'Data':calculator.calculation.Data}
 
-            jsonDict = {'Report':dataHandler.resultsLog['Calculation'],'errors': dataHandler.log}
+            jsonDict = {'Report':dataHandler.resultsLog['Calculation']['Results'][2],'errors': dataHandler.log}
             jsonLog = json.dumps(jsonDict)
 
             ##### Save Session #####

@@ -22,7 +22,6 @@ class DelayView(views.APIView):
 
             delayPrep = DelayPrep(dataHandler.testData.data, dataHandler.masterDict, dataHandler.CoHigh)
             js = delayPrep.create_windows()
-            #if(dataHandler.allFilesUploaded == False):
                 
             return Response(js,status=200)
 
@@ -57,8 +56,3 @@ class DelayView(views.APIView):
             'message': str(e)
             }, status=status.HTTP_400_BAD_REQUEST)
 
-
-
-
-
-    #def post(self)  post delays

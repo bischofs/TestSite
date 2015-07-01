@@ -77,7 +77,8 @@
             "channel_names": [
                 "N_MFO"
             ]
-        },
+        },                      
+
         "Carbon_Monoxide_High_Dry": {
             "unit": "%",
             "maximum_value": "20",
@@ -89,7 +90,8 @@
                 "ZeroSpan"
             ],
             "channel_names": [
-                "E_COHD2"
+                "E_COHD2",
+                "E_COHD"
             ]
         },
         "Carbon_Monoxide_Low_Dry": {
@@ -103,7 +105,8 @@
                 "ZeroSpan"
             ],
 	    "channel_names": [
-                "E_COLD2"
+                "E_COLD2",
+                "E_COLD"
             ]
         },
         "Carbon_Dioxide_Dry": {
@@ -117,7 +120,8 @@
                 "ZeroSpan"
             ],
 	    "channel_names": [
-                "E_CO2D2"
+                "E_CO2D2",
+                "E_CO2D"
             ]
         },
         "Total_Hydrocarbons_Wet": {
@@ -131,7 +135,8 @@
                 "ZeroSpan"
             ],
 	    "channel_names": [
-                "E_THCW2"
+                "E_THCW2",
+                "E_THCW"
             ]
         },
         "Methane_Wet": {
@@ -145,7 +150,8 @@
                 "ZeroSpan"
             ],
 	    "channel_names": [
-                "E_CH4W2"
+                "E_CH4W2",
+                "E_CH4W"
             ]
         },
         "Oxygen_Dry": {
@@ -159,7 +165,8 @@
                 "ZeroSpan"
             ],
 	    "channel_names": [
-                "E_O2D2"
+                "E_O2D2",
+                "E_O2D"
             ]
         },
         "Nitrogen_Monoxide_Dry": {
@@ -173,7 +180,8 @@
                 "ZeroSpan"
             ],
 	    "channel_names": [
-                "E_NOD2"
+                "E_NOD2",
+                "E_NOD"
             ]
         },
         "Nitrogen_X_Dry": {
@@ -187,7 +195,8 @@
                 "ZeroSpan"
             ],
 	    "channel_names": [
-                "E_NOXD2"
+                "E_NOXD2",
+                "E_NOXD"
             ]
         },
         "Air_Inlet_Pressure": {

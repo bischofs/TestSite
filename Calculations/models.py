@@ -14,9 +14,6 @@ class Calculator:
 
   def __init__(self, DataHandler, MapDict, ReportParams):
 
-    import ipdb
-    ipdb.set_trace()
-        
     self.preparation = Preparation(DataHandler, MapDict)   
     self.calculation = Calculation(self.preparation, MapDict)
     DataHandler, MapDict, ReportParams = None, None, None
@@ -42,13 +39,13 @@ class Preparation:
          COString = 'COL'
 
     ##### Prepare Fuel and E-bench data #####
-    self.FuelData = self._fuel_data(DataHandler.testData.metaData, MapDict)
+    self.FuelData = self._fuel_data(DataHandler.testData.metaData, DataHandler.CycleAttr, MapDict)
     self.EbenchData = self._ebench_data(DataHandler.ebenchData, DataHandler.testData.data,MapDict, COString)               
 
     ##### Prepare Pre/Post-Data #####
     self.Species = [MapDict['Carbon_Dioxide_Dry'],self.CO,MapDict['Nitrogen_X_Dry'],
                     MapDict['Total_Hydrocarbons_Wet'],MapDict['Methane_Wet']]                  
-    self.ZeroSpan = self._zeroSpan(self.pre, self.post, self.Species, self.EbenchData)        
+    self.ZeroSpan = self._zeroSpan(self.pre, self.post, self.Species, self.EbenchData,DataHandler.CoHigh)        
 
     ##### Prepare Test parameter
     if (self.TestType == 'Transient').bool:
@@ -57,7 +54,7 @@ class Preparation:
          self.TransientBool = False
 
 
-  def _fuel_data(self, HeaderData, MapDict):
+  def _fuel_data(self, HeaderData, CycleAttr, MapDict):
 
 
     ##### Carbon Mass Fraction and Fuel Composition -- CFR 1065.655 #####
@@ -93,6 +90,10 @@ class Preparation:
 
     FuelData.xH2Ogas = 3.5 # Constant Value does not belong to fuel (water-gas reaction equilibrium coefficient)
 
+    ##### Choose Factors for xNOxcorrwet Reference: CFR 1065.670, according to Fuel
+    FuelData.FactorMult = CycleAttr['FactorMult']
+    FuelData.FactorAdd = CycleAttr['FactorAdd']
+
     return FuelData
 
 
@@ -126,18 +127,23 @@ class Preparation:
     return EbenchData
 
 
-  def _zeroSpan(self, Pre, Post, Species, Ebench):
+  def _zeroSpan(self, Pre, Post, Species, Ebench,CoHigh):
       
     ListFactor = [10000,10000,1,1,1]          
     ZeroSpan = pd.DataFrame(data=np.zeros([5,5]),index=['PreZero','PreSpan','PostZero','PostSpan','Chosen'],columns=Species)
     TimeWindow = self._prepare_time_window(Species)
 
-    ##### Chosen-Data From Ebench
-    ZeroSpan[Species[0]]['Chosen'] = Ebench.Bottle_Concentration_CO2
-    ZeroSpan[Species[1]]['Chosen'] = Ebench.Bottle_Concentration_CO
+    ##### Chosen-Data From Ebench, Bottle Concentrations in ppm in Database ######
+    ZeroSpan[Species[0]]['Chosen'] = Ebench.Bottle_Concentration_CO2/10000
+    if CoHigh == True:
+        ZeroSpan[Species[1]]['Chosen'] = Ebench.Bottle_Concentration_CO/10000
+    else:
+        ZeroSpan[Species[1]]['Chosen'] = Ebench.Bottle_Concentration_CO
     ZeroSpan[Species[2]]['Chosen'] = Ebench.Bottle_Concentration_NOX
     ZeroSpan[Species[3]]['Chosen'] = Ebench.Bottle_Concentration_THC
     ZeroSpan[Species[4]]['Chosen'] = Ebench.Bottle_Concentration_NMHC
+
+
 
     ##### Pre Zero/Span #####
     Name = {'Zero':'PreZero','Span':'PreSpan'}
@@ -211,6 +217,7 @@ class Calculation:
     def __init__(self, Preparation, MapDict):
 
         if Preparation.TransientBool == True:
+
              self._transient_calculation(Preparation, MapDict)
              self.result = self._result()             
         else:
@@ -225,12 +232,12 @@ class Calculation:
         DataCor = pd.DataFrame()
 
         ##### Drif-uncorrected Calc #####
-        [DataUn, self.ArraySumUn] = self._inner_calc(Preparation, DataUn, Species)
+        [DataUn, self.ArraySumUn] = self._inner_calc(Preparation, DataUn, Species, MapDict)
 
         ##### Drift-corrected Calc #####
         PreparationDrift = Preparation
         PreparationDrift.test = self._drift_correction(DataUn, ZeroSpan, Preparation.test, Species)
-        [DataCor, self.ArraySumCor] = self._inner_calc(PreparationDrift, DataCor, Species)  
+        [DataCor, self.ArraySumCor] = self._inner_calc(PreparationDrift, DataCor, Species, MapDict)  
         [self.ArraySumCorWon, self.U_BPOW_Factor] = self._remove_negatives(DataCor, Preparation.test, MapDict)
 
         self.ArraySum = [self.ArraySumUn, self.ArraySumCor, self.ArraySumCorWon]
@@ -246,7 +253,7 @@ class Calculation:
         pass
 
 
-    def _inner_calc(self, Preparation, Data, Species):
+    def _inner_calc(self, Preparation, Data, Species, MapDict):
 
         ##### Load Data #####
         TestData = Preparation.test
@@ -254,8 +261,8 @@ class Calculation:
         Fuel = Preparation.FuelData 
 
         ##### Steps of calculation #####
-        Data = self._unit_conversion(Data, TestData, Species)
-        Data = self._prepare_iteration(Data, TestData, Ebench)
+        Data = self._unit_conversion(Data, TestData, Species, MapDict)
+        Data = self._prepare_iteration(Data, TestData, Ebench, MapDict)
         Data = self._iteration(Data, Fuel, Ebench)
         [Data, ArraySum] = self._rest_calculation(Data, Fuel)
 
@@ -265,13 +272,13 @@ class Calculation:
         return Data, ArraySum
 
 
-    def _unit_conversion(self, Data, TestData, Species):
+    def _unit_conversion(self, Data, TestData, Species, MapDict):
 
         # Species
         Data["E_CO2D2"] = TestData[Species[0]]*10000 # % --> ppm
         Data[Species[1]] = TestData[Species[1]]*10000 # % --> ppm
-        Data["E_NOXD2"] = TestData.E_NOXD2 # in ppm
-        Data["E_THCW2"] = TestData.E_THCW2 # in ppm        
+        Data["E_NOXD2"] = TestData[MapDict["Nitrogen_X_Dry"]] # in ppm
+        Data["E_THCW2"] = TestData[MapDict["Total_Hydrocarbons_Wet"]] # in ppm        
 
         Data["xCH4wet"] = TestData[Species[4]]/1000000 # ppm --> mol/mol
         Data["xCO2meas"] = Data.E_CO2D2/1000000 # ppm --> mol/mol
@@ -280,13 +287,13 @@ class Calculation:
         Data["xTHCmeas"] = Data.E_THCW2/1000000 # ppm --> mol/mol
 
         # Flows
-        Data["mfuel"] = TestData.M_FRFUEL*1000/3600 # kg/h --> g/s
+        Data["mfuel"] = TestData[MapDict["Fuel_Flow_Rate"]]*1000/3600 # kg/h --> g/s
         Data["Molar Flow Wet"] = TestData.C_FRAIRWS*1000/3600 # kg/h --> g/s
         Data["Intake Air flow"] = Data.get("Molar Flow Wet")/28.96 # g/sec --> mol/sec
 
         # Rest
-        Data["BARO Press"] = TestData.P_INLET*10000 # bar --> Pa
-        Data["T_INLET"] = TestData.T_INLET + 273.15 # °C --> K
+        Data["BARO Press"] = TestData[MapDict["Air_Inlet_Pressure"]]*10000 # bar --> Pa
+        Data["T_INLET"] = TestData[MapDict["Air_Inlet_Temperature"]] + 273.15 # °C --> K
 
         # Clear Variables
         TestData, Species = None, None
@@ -294,11 +301,11 @@ class Calculation:
         return Data
 
 
-    def _prepare_iteration(self, Data, TestData, Ebench):    
+    def _prepare_iteration(self, Data, TestData, Ebench, MapDict):    
 
         # Intake
         Data["pH2O @ inlet"] = 10**(10.79574*(1-(273.16/(Data.T_INLET)))-5.028*np.log10((Data.T_INLET)/273.16)+0.000150475*(1-10**(-8.2969*(((Data.T_INLET)/273.16)-1)))+0.00042873*(10**(4.76955*(1-(273.16/(Data.T_INLET))))-1)-0.2138602)
-        Data["xH2O"] = TestData.M_RELHUM*Data.get("pH2O @ inlet")/(Data.get("BARO Press"))
+        Data["xH2O"] = TestData[MapDict["Relative_Humidity"]]*Data.get("pH2O @ inlet")/(Data.get("BARO Press"))
         Data["xH2Oint"] = Data.xH2O
         Data["Mmix"] = 28.96559*(1-Data.xH2O)+18.01528*Data.xH2O
         Data["nint (Intake Air Flow)"] = Data.get("Molar Flow Wet")/Data.Mmix
@@ -402,8 +409,8 @@ class Calculation:
         Mode = 0
         ResultList = np.zeros((len(Data),18))     
 
-        while i < len(Data)-1:
-            i +=1  
+        while i < len(Data):
+             
             g = 0.5 # First guess for iteration start
 
             Solution = opt.fsolve(function_iteration,(g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g))
@@ -413,6 +420,7 @@ class Calculation:
                 Solution = opt.fsolve(function_iteration,(g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g))
                 Mode = 0
             ResultList[:][i] = Solution
+            i +=1 
 
         Iteration = pd.DataFrame(ResultList,columns =['xdil/exh','xH2Oexh','xCcombdry','xH2Oexhdry','xdil/exhdry','xint/exhdry',
                                                       'xraw/exhdry','xH2OCOmeas','xH2OTHCmeas','xH2ONOxmeas','xH2ONO2meas','xH2OCO2meas',
@@ -439,7 +447,7 @@ class Calculation:
         Data["xNO2wet"] = Data.xNO2meas*((1-Data.xH2Oexh)/(1-Data.xH2ONO2meas))
         Data["xNOwet"] = Data.xNOmeas*((1-Data.xH2Oexh)/(1-Data.xH2ONOmeas))
         Data["xCO2wet"] = Data.xCO2meas*((1-Data.xH2Oexh)/(1-Data.xH2OCO2meas))
-        Data["xNOxcorrwet"] = Data.xNOxwet*(18.84 *Data.xH2O + 0.68094) ## Reference: CFR 1065.670 !!!!!@!@!@@!??? Change the value to take from json
+        Data["xNOxcorrwet"] = Data.xNOxwet*(float(Fuel.FactorMult) * Data.xH2O + float(Fuel.FactorAdd)) ## Reference: CFR 1065.670 !!!!!@!@!@@!??? Change the value to take from json
 
         # Masses of emissions
         Data["nexh"] = Data.get("nint (Intake Air Flow)")/(1+((Data.get("xint/exhdry")-Data.get("xraw/exhdry"))/(1+Data.xH2Oexhdry)))
@@ -525,7 +533,7 @@ class Report:
 
         ###### Load Variables #####
         self.output = output
-        #Test, Uncorrected, Corrected = Calculator.Data
+        Test, Uncorrected, Corrected = CalculatorLog['Data']
         ArraySumUn, ArraySumCor, ArraySumCorWon = CalculatorLog['Array']
         self.DriftUncorrected, self.DriftCorrected, self.Final = CalculatorLog['Results']
         Species = ['CO2','CO','NOx','THC','NMHC']  
@@ -538,9 +546,9 @@ class Report:
         self.sheet = self._write_first_page(self.sheet, DataHandler.resultsLog, CalculatorLog['ZeroSpan'], DelayArray)
         
         ##### Write Data according to choosen options #####
-        #self.sheet2 = self._write_dataframe(self.sheet2, Test)
-        #self.sheet3 = self._write_dataframe(self.sheet3, Uncorrected)
-        #self.sheet4 = self._write_dataframe(self.sheet4, Corrected)
+        self.sheet2 = self._write_dataframe(self.sheet2, Test)
+        self.sheet3 = self._write_dataframe(self.sheet3, Uncorrected)
+        self.sheet4 = self._write_dataframe(self.sheet4, Corrected)
 
         self.file.close()
 
@@ -549,9 +557,9 @@ class Report:
 
         file = xlsxwriter.Workbook(output, {'in_memory':True})
         self.sheet = file.add_worksheet('Emissions_Calculations')
-        #self.sheet2 = file.add_worksheet('Raw Data')
-        #self.sheet3 = file.add_worksheet('Drift-uncorrected Data')
-        #self.sheet4 = file.add_worksheet('Drift-corrected Data')
+        self.sheet2 = file.add_worksheet('Raw Data')
+        self.sheet3 = file.add_worksheet('Drift-uncorrected Data')
+        self.sheet4 = file.add_worksheet('Drift-corrected Data')
 
         return file
 
@@ -599,53 +607,57 @@ class Report:
         Regression_bool = ResultsLog['Regression_bool']
         Delay = ResultsLog['Data Alignment']
 
-        TypeList = ['Power', 'Speed', 'Torque']
-        Letters = ['B','C','D']
-        ResultsList = ['Intercept', 'Rsquared', 'Slope', 'Standard Error']
-        sheet.write_row('B2',TypeList,self.dark_grey)
-        sheet.write('A2','Parameter',self.dark_grey)
-        sheet.merge_range('A7:B7','Omit Choice :',self.bright_grey)
-        if OmitChoice == 0:
-            text = 'W/o omit'
-        elif OmitChoice == 1:
-            text = 'Omit 1 (Power & Torque)'
-        elif OmitChoice == 2:
-            text = 'Omit 2 (Power & Speed)'
-        elif OmitChoice == 3:
-            text = 'Omit 3.1 (Power & Torque)'
-        elif OmitChoice == 4:
-            text = 'Omit 3.2 (Power & Speed)'
-        elif OmitChoice == 5:
-            text = 'OOmit 4.1 (Power & Torque)'  
-        elif OmitChoice == 6:
-            text = 'Omit 4.2 (Power & Speed)'
-        sheet.merge_range('C7:D7',text,self.border)                                            
+        if (not Regression) == False:
+
+            TypeList = ['Power', 'Speed', 'Torque']
+            Letters = ['B','C','D']
+            ResultsList = ['Intercept', 'Rsquared', 'Slope', 'Standard Error']
+            sheet.write_row('B2',TypeList,self.dark_grey)
+            sheet.write('A2','Parameter',self.dark_grey)
+            sheet.merge_range('A7:B7','Omit Choice :',self.bright_grey)
+            if OmitChoice == 0:
+                text = 'W/o omit'
+            elif OmitChoice == 1:
+                text = 'Omit 1 (Power & Torque)'
+            elif OmitChoice == 2:
+                text = 'Omit 2 (Power & Speed)'
+            elif OmitChoice == 3:
+                text = 'Omit 3.1 (Power & Torque)'
+            elif OmitChoice == 4:
+                text = 'Omit 3.2 (Power & Speed)'
+            elif OmitChoice == 5:
+                text = 'OOmit 4.1 (Power & Torque)'  
+            elif OmitChoice == 6:
+                text = 'Omit 4.2 (Power & Speed)'
+            sheet.merge_range('C7:D7',text,self.border)                                            
 
 
-        sheet.merge_range('A1:D1','Regression', self.merge)
-        for Type, letter in zip(TypeList, Letters):
-            for result, index2 in zip(ResultsList, range(1,len(ResultsList)+1)):
-                if Regression_bool[Type][result] == True:
-                    sheet.write(letter+str(index2+2),Regression[Type][result],self.green)
-                    sheet.write('A'+str(index2+2),result,self.bright_grey)
-                else:
-                    sheet.write(letter+str(index2+2),Regression[Type][result],self.red)
-                    sheet.write('A'+str(index2+2),result,self.bright_grey)
+            sheet.merge_range('A1:D1','Regression', self.merge)
+            for Type, letter in zip(TypeList, Letters):
+                for result, index2 in zip(ResultsList, range(1,len(ResultsList)+1)):
+                    if Regression_bool[Type][result] == True:
+                        sheet.write(letter+str(index2+2),Regression[Type][result],self.green)
+                        sheet.write('A'+str(index2+2),result,self.bright_grey)
+                    else:
+                        sheet.write(letter+str(index2+2),Regression[Type][result],self.red)
+                        sheet.write('A'+str(index2+2),result,self.bright_grey)
 
-        sheet.merge_range('A10:C10','Data Alignment', self.merge)
-        Species = ['CO2','CO','NOx','THC','NMHC','O2','MFRAIR']
-        sheet.write_row('A11:C11',['Species','Units','Delay'],self.dark_grey)
-        sheet.write_column('A12',Species,self.bright_grey)
-        sheet.write_column('B12',['seconds','seconds','seconds','seconds','seconds','seconds','seconds'],self.bright_grey)
+        if (not DelayArray) == False:                     
 
-        # Write Delay
-        sheet.write('C12',DelayArray['CO2'],self.border)
-        sheet.write('C13',DelayArray['CO'],self.border)
-        sheet.write('C14',DelayArray['NOx'],self.border)
-        sheet.write('C15',DelayArray['THC'],self.border)
-        sheet.write('C16',DelayArray['CH4'],self.border)
-        sheet.write('C17',DelayArray['O2'],self.border)
-        sheet.write('C18',DelayArray['MFRAIR'],self.border)
+            sheet.merge_range('A10:C10','Data Alignment', self.merge)
+            Species = ['CO2','CO','NOx','THC','NMHC','O2','MFRAIR']
+            sheet.write_row('A11:C11',['Species','Units','Delay'],self.dark_grey)
+            sheet.write_column('A12',Species,self.bright_grey)
+            sheet.write_column('B12',['seconds','seconds','seconds','seconds','seconds','seconds','seconds'],self.bright_grey)
+
+            # Write Delay
+            sheet.write('C12',DelayArray['CO2'],self.border)
+            sheet.write('C13',DelayArray['CO'],self.border)
+            sheet.write('C14',DelayArray['NOx'],self.border)
+            sheet.write('C15',DelayArray['THC'],self.border)
+            sheet.write('C16',DelayArray['CH4'],self.border)
+            sheet.write('C17',DelayArray['O2'],self.border)
+            sheet.write('C18',DelayArray['MFRAIR'],self.border)
 
 
         ZeroSpan = pd.read_json(ZeroSpan)

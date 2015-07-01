@@ -49,8 +49,7 @@ class FileUploadView(views.APIView):
                 jsonDict = {'errors': dataHandler.log}
 
             elif(request.data['ftype'] == 'test'):#file is test data
-                request.data['bench'] = 0 ###### HARD CODED BENCH NUMBER ######
-                dataHandler.import_test_data(request.data['bench'], request.data['file'])  
+                dataHandler.import_test_data(request.data['file'])  
                 jsonDict = {'errors': dataHandler.log}     
 
             elif(request.data['ftype'] == 'post'):#file is post span check 

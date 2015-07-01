@@ -19,6 +19,7 @@ class DataHandler:
       self.masterDict = {}
       self.masterMetaData = {}
       self.masterFileName = {}
+      self.CycleAttr = {}
       self.ebenches = Ebench.objects.all()
       self.allFilesLoaded = False
       self.CoHigh = False
@@ -35,11 +36,12 @@ class DataHandler:
   [self.zeroSpanMapDict, self.masterMetaData, self.masterFileName, _] = self.preZeroSpan.load_data(dataFile, self.masterMetaData, self.masterFileName)
   self._check_files_loaded()     
 
- def import_test_data(self, numBenches, dataFile):
+ def import_test_data(self, dataFile):
   self._clear_all_files_loaded()
-  self.testData = TestData(dataFile, numBenches) 
+  self.testData = TestData(dataFile) 
   [self.masterDict, self.masterMetaData, self.masterFileName, self.CoHigh] = self.testData.load_data(dataFile, self.masterMetaData, self.masterFileName)     
-  self.ebenchData = self._load_ebench(self.ebenches[0].history, self.testData.TimeStamp)
+  self.CycleAttr = self._load_cycle_attr(self.CycleAttr, self.testData.metaData)
+  self.ebenchData = self._load_ebench(self.ebenches[int(self.CycleAttr['EbenchNum'])-1].history, self.testData.TimeStamp)
   self._check_files_loaded()
                
  def import_post_zero_span(self, dataFile):
@@ -65,6 +67,25 @@ class DataHandler:
 
     else:
       self.allFilesLoaded = True
+
+
+ def _load_cycle_attr(self, CycleAttr, MetaData):
+
+    CyclesData = pd.read_json("cycles.json").Cycles
+    Cycle = MetaData['CycleType1065'][0]
+    CycleAttr['Cycle'] = Cycle
+    CycleAttr['EbenchNum'] = MetaData['EbenchID']
+    CycleAttr['Name'] = CyclesData[Cycle]['Name']    
+    CycleAttr['Engine'] = CyclesData[Cycle]['Engine']
+    CycleAttr['CycleType'] = CyclesData[Cycle]['CycleType']
+    CycleAttr['Fuel'] = CyclesData[Cycle]['Fuel']
+    CycleAttr['FactorMult'] = CyclesData[Cycle]['NOxFactorMult']
+    CycleAttr['FactorAdd'] = CyclesData[Cycle]['NOxFactorAdd']
+
+    # Clear Variables
+    Cycle = None
+
+    return CycleAttr     
 
 
  def _load_ebench(self, Ebenches, TimeStamp):
@@ -100,6 +121,7 @@ class Data:
       
     self.mapDict = {}
     self.logDict = {}
+    self.CycelAttr = {}
 
     self.dataFile = dataFile
     self.fileName = dataFile.name
@@ -112,7 +134,7 @@ class Data:
     self.speciesData = pd.read_json("spec.json")
     self.data = pd.read_csv(dataFile, encoding='windows-1258')
     self.metaData, self.data = self._load_metadata(self.data)
-    [masterMetaData, masterFileName] = self._check_metadata(self.metaData, self.fileName, masterMetaData, masterFileName)
+    [masterMetaData, masterFileName] = self._check_metadata(self.metaData, self.fileName, masterMetaData, masterFileName)    
 
     ##### Perform Checks on Data #####
     self.data = self.data.dropna(how="all",axis=(1))
@@ -122,7 +144,6 @@ class Data:
     self.data.index = range(0,len(self.data))
     self._check_channels()
     CoHigh = self._check_ranges()
-
 
     return self.mapDict, masterMetaData, masterFileName, CoHigh
 
@@ -152,7 +173,7 @@ class Data:
         if name in data.columns:
           self.mapDict[species] = name
           break
-        else:
+      else:
           raise Exception("Cannot find %s channel %s in file %s" % (species.replace("_"," "), channelNames, fileName))          
                
 
@@ -245,7 +266,6 @@ class Data:
       return metaData, data
 
 
-
 class FullLoad(Data):
 
      def __init__(self, dataFile):
@@ -260,9 +280,8 @@ class ZeroSpan(Data):
 
 class TestData(Data):
 
-     def __init__(self, dataFile, numBenches):
+     def __init__(self, dataFile):
           super().__init__(dataFile)
-          self.numBenches = numBenches
 
 
 

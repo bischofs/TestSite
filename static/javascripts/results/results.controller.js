@@ -52,7 +52,7 @@
                 .success(function(response) {
                     toastr.success('Calculations finished!');
                     var jsonLog = JSON.parse(response)
-                    var report = JSON.parse(jsonLog.Report.Results[2])
+                    var report = JSON.parse(jsonLog.Report)
                     var Species = report.Species
                     var Result = report.Test
                     var Units = report.Units
