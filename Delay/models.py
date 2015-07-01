@@ -55,8 +55,27 @@ class DelayPrep:
         
                 #         specWindow = species[low.values[0]:high.values[0]]
                 #         jsonDict[species.name] = specWindow.to_json()
-                        
 
 
+class DelaySubmit:
 
-                
+    def __init__(self, Data, MasterDict, DelayArray, COH):
+
+        self.MapDict = MasterDict
+        self.Data = Data
+        self.CoHigh = COH
+        self.Array = DelayArray
+
+        if(self.CoHigh == False):
+            CO = 'Carbon_Monoxide_Low_Dry'
+        else:
+            CO = 'Carbon_Monoxide_High_Dry'        
+
+        ChannelList = ['Air_Flow_Rate','Nitrogen_X_Dry','Total_Hydrocarbons_Wet','Methane_Wet','Oxygen_Dry','Nitrogen_Monoxide_Dry','Carbon_Dioxide_Dry',CO]
+        AbbrList = ['MFRAIR','NO','THC','CH4','O2','NOx','CO2','CO']
+
+        for Channel, Abbr in zip(ChannelList,AbbrList):
+            self.Data[[self.MapDict[Channel]]] = self.Data[[self.MapDict[Channel]]].shift(-1*self.Array[Abbr])
+            self.Data[[self.MapDict[Channel]]] = self.Data[[self.MapDict[Channel]]].fillna(self.Data[[self.MapDict[Channel]]].irow(-1))
+
+

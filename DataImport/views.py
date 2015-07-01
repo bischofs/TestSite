@@ -38,20 +38,24 @@ class FileUploadView(views.APIView):
             if(not cache.get(request.session.session_key)):
                  dataHandler = DataHandler()
             else:
-                dataHandler = cache.get(request.session.session_key)
+                dataHandler = cache.get(request.session.session_key)               
 
             if(request.data['ftype'] == 'full'):#file is full load curve
                 dataHandler.import_full_load(request.data['file'])
                 jsonDict = {'errors': dataHandler.log}
+
             elif(request.data['ftype'] == 'pre'):#file is pre span check
                 dataHandler.import_pre_zero_span(request.data['file'])
                 jsonDict = {'errors': dataHandler.log}
+
+            elif(request.data['ftype'] == 'test'):#file is test data
+                request.data['bench'] = 0 ###### HARD CODED BENCH NUMBER ######
+                dataHandler.import_test_data(request.data['bench'], request.data['file'])  
+                jsonDict = {'errors': dataHandler.log}     
+
             elif(request.data['ftype'] == 'post'):#file is post span check 
                 dataHandler.import_post_zero_span(request.data['file'])
-                jsonDict = {'errors': dataHandler.log}
-            elif(request.data['ftype'] == 'test'):#file is test data
-                dataHandler.import_test_data(request.data['bench'], request.data['file'])  
-                jsonDict = {'errors': dataHandler.log}          
+                jsonDict = {'errors': dataHandler.log}       
 
             cache.set(request.session.session_key, dataHandler)
             
@@ -70,29 +74,34 @@ class FileUploadView(views.APIView):
 
         try:
             
-            if request.QUERY_PARAMS['bool'] == 'With Filter':
-                Filter_bool = True
-            else:
-                Filter_bool = False
+            ##### Read in the choice to omit #####
+            OmitChoice = int(request.QUERY_PARAMS['choice'])
+
             cache = caches['default']
             dataHandler = cache.get(request.session.session_key)
-            cycleValidator = CycleValidator(dataHandler.testData, dataHandler.testDataMapDict,
-                                            dataHandler.fullLoad, dataHandler.fullLoad.metaData['n_CurbIdle'], Filter_bool)
-            dataHandler.resultsLog['Regression'] = cycleValidator.reg_results
+
+            cycleValidator = CycleValidator(dataHandler.testData, dataHandler.masterDict,
+                                            dataHandler.fullLoad, dataHandler.fullLoad.metaData['n_CurbIdle'], OmitChoice)
+
+            ##### Saving Results in Log #####
+            dataHandler.resultsLog['Regression'] = [cycleValidator.reg_results,cycleValidator.FilterChoice]
             dataHandler.resultsLog['Regression_bool'] = cycleValidator.reg_results_bool      
+
+            ##### Saving Results in Json-File #####
             jsonDict = {'Regression':cycleValidator.reg_results,
                         'Regression_bool':cycleValidator.reg_results_bool,
                         'errors': dataHandler.log}
             cache.set(request.session.session_key, dataHandler)            
             jsonLog = json.dumps(jsonDict)
+
             return Response(jsonLog, status=200)
 
         except Exception as e:
         
-                    return Response({
-                    'status': 'Bad request',
-                    'message': str(e)
-                    }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+            'status': 'Bad request',
+            'message': str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MetaDataView(views.APIView):
