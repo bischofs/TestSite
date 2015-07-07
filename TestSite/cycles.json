@@ -1,167 +1,167 @@
 {
     "Cycles": {
-        "ORDHDTC_P86": {
-            "Name": "On-Road Diesel Heavy-Duty Diesel Transient Cycle Part 86",
+        "ORHDT_CI_86": {
+            "Name": "On-Road Heavy-Duty Transient Compression Ignition Part 86",
             "Fuel": "Diesel",
             "Engine": "Compression",
             "CycleType": "Transient",
             "NOxFactorMult": "9.953",
             "NOxFactorAdd": "0.832"
         },
-        "OROHDTC_P86": {
-            "Name": "On-Road Otto Heavy-Duty Diesel Transient Cycle part 86",
+        "ORHDT_SI_86": {
+            "Name": "On-Road Heavy-Duty Transient Spark Ignition part 86",
             "Fuel": "Gasoline",
             "Engine": "Spark",
             "CycleType": "Transient",
             "NOxFactorMult": "18.84",
             "NOxFactorAdd": "0.68094"
         },
-        "ORSECMY_P86": {
-            "Name": "On-Road Supplemental Emission Cycle MY2007-2010 Part 86.1362",
+        "ORSE_CISI_2010_86": {
+            "Name": "On-Road Supplemental Emission Compression Spark Ignition MY2007-2010 Part 86.1362",
+            "Fuel": "",
+            "Engine": ["Compression","Spark"],
+            "CycleType": "",
+            "NOxFactorMult": ["18.84","9.953"],
+            "NOxFactorAdd": ["0.68094","0.832"]
+        },
+        "ORSE_CISI_86": {
+            "Name": "On-Road Supplemental Emission Compression Spark Ignition Part 86.1362",
             "Fuel": "",
             "Engine": "",
             "CycleType": "",
             "NOxFactorMult": "18.84",
             "NOxFactorAdd": "0.68094"
         },
-        "ORSEC_P86": {
-            "Name": "On-Road Supplemental Emission cycle Part 86.1362",
+        "ORNTET_CISI_86": {
+            "Name": "On-Road Not-To-Exceed Test Compression Spark Ignition Part 86.1370",
             "Fuel": "",
-            "Engine": "",
-            "CycleType": "",
-            "NOxFactorMult": "18.84",
-            "NOxFactorAdd": "0.68094"
+            "Engine": ["Compression","Spark"],
+            "CycleType": "Steady",
+            "NOxFactorMult": ["18.84","9.953"],
+            "NOxFactorAdd": ["0.68094","0.832"]
         },
-        "ORHDDTC_P86": {
-            "Name": "On-Road Not-To-Exceed Test Cycle Part 86.1370",
-            "Fuel": "",
-            "Engine": "",
-            "CycleType": "",
-            "NOxFactorMult": "18.84",
-            "NOxFactorAdd": "0.68094"
+        "NRDM_CSCISI_1039": {
+            "Name": "Non-Road Discrete-mode Constant Speed Compression Spark Ignition CFR 1039",
+            "Fuel": "Diesel",
+            "Engine": ["Compression","Spark"],
+            "CycleType": "Steady",
+            "NOxFactorMult": ["18.84","9.953"],
+            "NOxFactorAdd": ["0.68094","0.832"]
         },
-        "NRCSEDMC_1039": {
-            "Name": "Non-Road Constant Speed Engine Discrete-mode Cycle CFR 1039",
+        "NRRM_CSCISI_1039": {
+            "Name": "Non-Road Ramped-modal Constant Speed Compression Spark Ignition CFR 1039",
+            "Fuel": "Diesel",
+            "Engine": ["Compression","Spark"],
+            "CycleType": "Steady",
+            "NOxFactorMult": ["18.84","9.953"],
+            "NOxFactorAdd": ["0.68094","0.832"]
+        },
+        "NRDM_VSCISIB19kW_1039": {
+            "Name": "Non-Road Discrete-mode Variable Speed Compression Spark Ignition below 19kW CFR 1039",
+            "Fuel": "Diesel",
+            "Engine": ["Compression","Spark"],
+            "CycleType": "Steady",
+            "NOxFactorMult": ["18.84","9.953"],
+            "NOxFactorAdd": ["0.68094","0.832"]
+        },
+        "NRRM_VSCISIB19kW_1039": {
+            "Name": "Non-Road Ramped-modal Variable Speed Compression Spark Ignition below 19kW CFR 1039",
+            "Fuel": "Diesel",
+            "Engine": ["Compression","Spark"],
+            "CycleType": "Steady",
+            "NOxFactorMult": ["18.84","9.953"],
+            "NOxFactorAdd": ["0.68094","0.832"]
+        },
+        "NRDM_VSCISIA19kW_1039": {
+            "Name": "Non-Road Discrete-mode Variable Speed Compression Spark Ignition above 19kW CFR 1039",
+            "Fuel": "Diesel",
+            "Engine": ["Compression","Spark"],
+            "CycleType": "Steady",
+            "NOxFactorMult": ["18.84","9.953"],
+            "NOxFactorAdd": ["0.68094","0.832"]
+        },
+        "NRRM_VSCISIA19kW_1039": {
+            "Name": "Non-Road Ramped-modal Variable Speed Compression Spark Ignition above 19kW CFR 1039",
+            "Fuel": "Diesel",
+            "Engine": ["Compression","Spark"],
+            "CycleType": "Steady",
+            "NOxFactorMult": ["18.84","9.953"],
+            "NOxFactorAdd": ["0.68094","0.832"]
+        },
+        "NRCT_CI_1039": {
+            "Name": "Non-Road Composite Transient Compression Ignition CFR 1039",
             "Fuel": "Diesel",
             "Engine": "Compression",
             "CycleType": "Steady",
             "NOxFactorMult": "9.953",
             "NOxFactorAdd": "0.832"
         },
-        "NRCSERMC_1039": {
-            "Name": "Non-Road Constant Speed Engine Ramped-modal Cycle CFR 1039",
-            "Fuel": "Diesel",
-            "Engine": "Compression",
-            "CycleType": "Transient",
-            "NOxFactorMult": "9.953",
-            "NOxFactorAdd": "0.832"
-        },
-        "NRVSEDMCB19_1039": {
-            "Name": "Non-Road Variable Speed Engine Discrete-mode Cycle below 19kW CFR 1039",
-            "Fuel": "Diesel",
-            "Engine": "Compression",
-            "CycleType": "Transient",
-            "NOxFactorMult": "9.953",
-            "NOxFactorAdd": "0.832"
-        },
-        "NRVSERMCB19_1039": {
-            "Name": "Non-Road Variable Speed Engine Ramped-modal Cycle below 19kW CFR 1039",
-            "Fuel": "Diesel",
-            "Engine": "Compression",
-            "CycleType": "Transient",
-            "NOxFactorMult": "9.953",
-            "NOxFactorAdd": "0.832"
-        },
-        "NRVSEDMCA19_1039": {
-            "Name": "Non-Road Variable Speed Engine Discrete-mode Cycle above 19kW CFR 1039",
-            "Fuel": "Diesel",
-            "Engine": "Compression",
-            "CycleType": "Transient",
-            "NOxFactorMult": "9.953",
-            "NOxFactorAdd": "0.832"
-        },
-        "NRVSERMCA19_1039": {
-            "Name": "Non-Road Variable Speed Engine Ramped-modal Cycle above 19kW CFR 1039",
-            "Fuel": "Diesel",
-            "Engine": "Compression",
-            "CycleType": "Transient",
-            "NOxFactorMult": "9.953",
-            "NOxFactorAdd": "0.832"
-        },
-        "NRCICTC_1039": {
-            "Name": "Non-Road Compression-ignition Composite Transient Cycle CFR 1039",
-            "Fuel": "Diesel",
-            "Engine": "Compression",
-            "CycleType": "Transient",
-            "NOxFactorMult": "9.953",
-            "NOxFactorAdd": "0.832"
-        },
-        "MCI4MDC_1042": {
-            "Name": "Marine CI 4-mode Duty Cycle CFR 1042",
+        "M4MD_CI1042": {
+            "Name": "Marine 4-mode Duty Compression Ignition CFR 1042",
             "Fuel": "Diesel",
             "Engine": "Compression",
             "CycleType": "Steady",
             "NOxFactorMult": "9.953",
             "NOxFactorAdd": "0.832"
         },
-        "MCIRMC_1042": {
-            "Name": "Marine CI Ramped Modal Cycle CFR 1042",
+        "MRM_CI_1042": {
+            "Name": "Marine Ramped Modal Compression Ignition CFR 1042",
             "Fuel": "Diesel",
             "Engine": "Compression",
             "CycleType": "Steady",
             "NOxFactorMult": "9.953",
             "NOxFactorAdd": "0.832"
         },
-        "RMCIDMC_1042": {
-            "Name": "Recreational Marine CI Discrete-Mode Cycle CFR 1042",
+        "RMDM_CI_1042": {
+            "Name": "Recreational Marine Discrete-Mode Compression Ignition CFR 1042",
             "Fuel": "Diesel",
             "Engine": "Compression",
             "CycleType": "Steady",
             "NOxFactorMult": "9.953",
             "NOxFactorAdd": "0.832"
         },
-        "RMCIRMC_1042": {
-            "Name": "Recreational Marine CI Ramped Modal Cycle CFR 1042",
+        "RMRM_CI_1042": {
+            "Name": "Recreational Marine Ramped Modal Compression Ignition CFR 1042",
             "Fuel": "Diesel",
             "Engine": "Compression",
             "CycleType": "Steady",
             "NOxFactorMult": "9.953",
             "NOxFactorAdd": "0.832"
         },
-        "PCMCIDMC_1042": {
-            "Name": "Propeller Coupled Marine CI Discrete-Mode Cycle CFR 1042",
+        "PCMDM_CI_1042": {
+            "Name": "Propeller Coupled Marine Discrete-Mode Compression Ignition CFR 1042",
             "Fuel": "Diesel",
             "Engine": "Compression",
             "CycleType": "Steady",
             "NOxFactorMult": "9.953",
             "NOxFactorAdd": "0.832"
         },
-        "PCMCIRM_1042": {
-            "Name": "Propeller Coupled Marine CI Ramped Modal CFR 1042",
+        "PCMRM_CI_1042": {
+            "Name": "Propeller Coupled Marine Ramped Modal Compression Ignition CFR 1042",
             "Fuel": "Diesel",
             "Engine": "Compression",
             "CycleType": "Steady",
             "NOxFactorMult": "9.953",
             "NOxFactorAdd": "0.832"
         },
-        "MCINTETC_1042": {
-            "Name": "Marine CI Not-To-Exceed Test Cycle CFR 1042",
+        "MNTET_CI_1042": {
+            "Name": "Marine Not-To-Exceed Test Compression Ignition CFR 1042",
             "Fuel": "Diesel",
             "Engine": "Compression",
             "CycleType": "Steady",
             "NOxFactorMult": "9.953",
             "NOxFactorAdd": "0.832"
         },
-        "MSIDMC_1045": {
-            "Name": "Marine SI Discrete-Mode Cycle CFR 1045",
+        "MDM_SI_1045": {
+            "Name": "Marine Discrete-Mode Spark Ignition CFR 1045",
             "Fuel": "Gasoline",
             "Engine": "Spark",
             "CycleType": "Steady",
             "NOxFactorMult": "18.84",
             "NOxFactorAdd": "0.68094"
         },
-        "MSIRMC_1045": {
-            "Name": "Marine SI Ramped-Modal Cycle CFR 1045",
+        "MRM_SI_1045": {
+            "Name": "Marine Ramped-Modal Spark Ignition CFR 1045",
             "Fuel": "Gasoline",
             "Engine": "Spark",
             "CycleType": "Steady",

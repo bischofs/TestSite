@@ -200,7 +200,7 @@
             ]
         },
         "Air_Inlet_Pressure": {
-            "unit": "bar",
+            "unit": "Bar A",
             "maximum_value": "1.0325",
             "minimum_value": "0.80",
             "multiple_benches": false,
@@ -226,7 +226,7 @@
             ]
         },
         "Air_Ambient_Pressure": {
-            "unit": "bar",
+            "unit": "Bar A",
             "maximum_value": "1.0325",
             "minimum_value": "0.80",
             "multiple_benches": false,
@@ -240,7 +240,7 @@
         },
         "Air_Ambient_Temperature": {
             "unit": "°C",
-            "maximum_value": "30",
+            "maximum_value": "40",
             "minimum_value": "20",
             "multiple_benches": false,
             "header_data": false,
@@ -265,7 +265,7 @@
             ]
         },
         "Fuel_Flow_Rate": {
-            "unit": "kg/hr",
+            "unit": "kg/h",
             "maximum_value": "100000",
             "minimum_value": "-1",
             "multiple_benches": false,
@@ -280,7 +280,7 @@
         "Air_Flow_Rate": {
             "unit": "kg/hr",
             "maximum_value": "100000",
-            "minimum_value": "-1",
+            "minimum_value": "-100",
             "multiple_benches": false,
             "header_data": false,
 	    "files": [
@@ -311,7 +311,7 @@
             "multiple_benches": false,
             "header_data": false,
 	    "files": [
-                "TestData",
+
 		"FullLoad"
             ],
 	    "channel_names": [

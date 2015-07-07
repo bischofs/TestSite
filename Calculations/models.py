@@ -14,6 +14,8 @@ class Calculator:
 
   def __init__(self, DataHandler, MapDict, ReportParams):
 
+    import ipdb; ipdb.set_trace()
+
     self.preparation = Preparation(DataHandler, MapDict)   
     self.calculation = Calculation(self.preparation, MapDict)
     DataHandler, MapDict, ReportParams = None, None, None
@@ -28,7 +30,7 @@ class Preparation:
     self.pre = DataHandler.preZeroSpan.data
     self.post = DataHandler.postZeroSpan.data
     self.test = DataHandler.testData.data
-    self.TestType = DataHandler.testData.metaData['test_type']
+    self.TestType = DataHandler.CycleAttr['CycleType']
 
     ##### CoHigh or COL #####
     if DataHandler.CoHigh:
@@ -107,7 +109,7 @@ class Preparation:
     EbenchData.RFPF = ebenchData['RFPF']
     EbenchData.CH4_RF = ebenchData['CH4_RF']
     EbenchData.Tchiller = ebenchData['Tchiller'] + 273.15 # in K      
-    EbenchData.Pamb = np.mean(TestData[MapDict['Air_Ambient_Pressure']])*100 # bar --> kPa
+    EbenchData.Pamb = 99.16  #np.mean(TestData[MapDict['Air_Ambient_Pressure']])*100 # bar --> kPa
     EbenchData.Pchiller = ebenchData['Pchiller'] + EbenchData.Pamb
     EbenchData.xCO2intdry = 0.000375 ## CFR 1065.655
     EbenchData.xCO2dildry = 0.000375 ## CFR 1065.655
@@ -141,9 +143,7 @@ class Preparation:
         ZeroSpan[Species[1]]['Chosen'] = Ebench.Bottle_Concentration_CO
     ZeroSpan[Species[2]]['Chosen'] = Ebench.Bottle_Concentration_NOX
     ZeroSpan[Species[3]]['Chosen'] = Ebench.Bottle_Concentration_THC
-    ZeroSpan[Species[4]]['Chosen'] = Ebench.Bottle_Concentration_NMHC
-
-
+    ZeroSpan[Species[4]]['Chosen'] = Ebench.Bottle_Concentration_NMHC      
 
     ##### Pre Zero/Span #####
     Name = {'Zero':'PreZero','Span':'PreSpan'}
@@ -234,7 +234,7 @@ class Calculation:
         ##### Drif-uncorrected Calc #####
         [DataUn, self.ArraySumUn] = self._inner_calc(Preparation, DataUn, Species, MapDict)
 
-        ##### Drift-corrected Calc #####
+        ##### Drift-corrected Calc #####     
         PreparationDrift = Preparation
         PreparationDrift.test = self._drift_correction(DataUn, ZeroSpan, Preparation.test, Species)
         [DataCor, self.ArraySumCor] = self._inner_calc(PreparationDrift, DataCor, Species, MapDict)  
@@ -284,7 +284,6 @@ class Calculation:
         Data["xCO2meas"] = Data.E_CO2D2/1000000 # ppm --> mol/mol
         Data["xCOmeas"] = Data.get(Species[1])/1000000 # ppm --> mol/mol
         Data["xNOxmeas"] = Data.E_NOXD2/1000000 # ppm --> mol/mol
-        Data["xTHCmeas"] = Data.E_THCW2/1000000 # ppm --> mol/mol
 
         # Flows
         Data["mfuel"] = TestData[MapDict["Fuel_Flow_Rate"]]*1000/3600 # kg/h --> g/s
@@ -320,6 +319,8 @@ class Calculation:
 
         # Rest
         Data["xTHC[THC_FID]cor"] = Data.E_THCW2-Ebench.xTHC_THC_FID_init
+        Data.E_THCW2 = Data["xTHC[THC_FID]cor"]
+        Data["xTHCmeas"] = Data.E_THCW2/1000000 # ppm --> mol/mol
         Data["xNO2meas"] = Data.xNOxmeas*0 # NO2 not measured
         Data["xNOmeas"] = Data.xNOxmeas*1
         Data["xTHCwet"] = Data.xTHCmeas
@@ -602,12 +603,11 @@ class Report:
 
     def _write_first_page(self, sheet, ResultsLog, ZeroSpan, DelayArray):
 
-        Regression = ResultsLog['Regression'][0]
-        OmitChoice = ResultsLog['Regression'][1]
-        Regression_bool = ResultsLog['Regression_bool']
-        Delay = ResultsLog['Data Alignment']
+        if (not ResultsLog['Regression']) == False:
 
-        if (not Regression) == False:
+            Regression = ResultsLog['Regression'][0]
+            OmitChoice = ResultsLog['Regression'][1]
+            Regression_bool = ResultsLog['Regression_bool']            
 
             TypeList = ['Power', 'Speed', 'Torque']
             Letters = ['B','C','D']
@@ -642,7 +642,9 @@ class Report:
                         sheet.write(letter+str(index2+2),Regression[Type][result],self.red)
                         sheet.write('A'+str(index2+2),result,self.bright_grey)
 
-        if (not DelayArray) == False:                     
+        if (not ResultsLog['Data Alignment']) == False: 
+
+            Delay = ResultsLog['Data Alignment']                    
 
             sheet.merge_range('A10:C10','Data Alignment', self.merge)
             Species = ['CO2','CO','NOx','THC','NMHC','O2','MFRAIR']

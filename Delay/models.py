@@ -24,9 +24,9 @@ class DelayPrep:
                                                              ('Engine_Torque',self.data[self.mapDict['Engine_Torque']])])
                 
                 if(self.coHigh == False):
-                        self.delaySpecies['Carbon_Monoxide_Low_Dry'] = self.data[self.mapDict['Carbon_Monoxide_Low_Dry']]
+                        self.delaySpecies['Carbon_Monoxide'] = self.data[self.mapDict['Carbon_Monoxide_Low_Dry']]
                 else:
-                        self.delaySpecies['Carbon_Monoxide_High_Dry'] = self.data[self.mapDict['Carbon_Monoxide_High_Dry']]
+                        self.delaySpecies['Carbon_Monoxide'] = self.data[self.mapDict['Carbon_Monoxide_High_Dry']]
                 
 
         def create_windows(self):
@@ -72,10 +72,11 @@ class DelaySubmit:
             CO = 'Carbon_Monoxide_High_Dry'        
 
         ChannelList = ['Air_Flow_Rate','Nitrogen_X_Dry','Total_Hydrocarbons_Wet','Methane_Wet','Oxygen_Dry','Nitrogen_Monoxide_Dry','Carbon_Dioxide_Dry',CO]
-        AbbrList = ['MFRAIR','NO','THC','CH4','O2','NOx','CO2','CO']
+        AbbrList = ['MFRAIR','NOx','THC','CH4','O2','NO','CO2','CO']
 
         for Channel, Abbr in zip(ChannelList,AbbrList):
             self.Data[[self.MapDict[Channel]]] = self.Data[[self.MapDict[Channel]]].shift(-1*self.Array[Abbr])
             self.Data[[self.MapDict[Channel]]] = self.Data[[self.MapDict[Channel]]].fillna(self.Data[[self.MapDict[Channel]]].irow(-1))
 
+        self.Data = self.Data.ix[:len(self.Data)-29]
 

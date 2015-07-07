@@ -28,7 +28,7 @@ class CalculationView(views.APIView):
             cache = caches['default']
             dataHandler = cache.get(request.session._get_session_key())  
 
-            if not dataHandler.resultsLog['Calculation']:   
+            if not dataHandler.resultsLog['Calculation']:
                                    
                 ##### Initialize Calculation #####
                 calculator = Calculator(dataHandler, dataHandler.masterDict, request.QUERY_PARAMS)
