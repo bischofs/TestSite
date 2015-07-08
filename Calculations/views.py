@@ -56,7 +56,7 @@ class CalculationView(views.APIView):
     def get(self, request, format=None):
 
         try:
-
+            import ipdb; ipdb.set_trace()
             ##### Load dataHandler from Cache #####
             cache = caches['default']
             dataHandler = cache.get(request.session._get_session_key())

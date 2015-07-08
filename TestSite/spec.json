@@ -90,7 +90,6 @@
                 "ZeroSpan"
             ],
             "channel_names": [
-                "E_COHD2",
                 "E_COHD"
             ]
         },
@@ -105,7 +104,6 @@
                 "ZeroSpan"
             ],
 	    "channel_names": [
-                "E_COLD2",
                 "E_COLD"
             ]
         },
@@ -120,7 +118,6 @@
                 "ZeroSpan"
             ],
 	    "channel_names": [
-                "E_CO2D2",
                 "E_CO2D"
             ]
         },
@@ -135,7 +132,6 @@
                 "ZeroSpan"
             ],
 	    "channel_names": [
-                "E_THCW2",
                 "E_THCW"
             ]
         },
@@ -150,7 +146,6 @@
                 "ZeroSpan"
             ],
 	    "channel_names": [
-                "E_CH4W2",
                 "E_CH4W"
             ]
         },
@@ -165,7 +160,6 @@
                 "ZeroSpan"
             ],
 	    "channel_names": [
-                "E_O2D2",
                 "E_O2D"
             ]
         },
@@ -180,7 +174,6 @@
                 "ZeroSpan"
             ],
 	    "channel_names": [
-                "E_NOD2",
                 "E_NOD"
             ]
         },
@@ -195,7 +188,6 @@
                 "ZeroSpan"
             ],
 	    "channel_names": [
-                "E_NOXD2",
                 "E_NOXD"
             ]
         },
@@ -287,7 +279,7 @@
                 "TestData"
             ],
 	    "channel_names": [
-		"C_FRAIRWS"
+                "C_FRAIRWS"
             ]
         },
         "Engine_Power": {

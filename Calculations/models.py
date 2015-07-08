@@ -13,9 +13,7 @@ import io
 class Calculator:
 
   def __init__(self, DataHandler, MapDict, ReportParams):
-
     import ipdb; ipdb.set_trace()
-
     self.preparation = Preparation(DataHandler, MapDict)   
     self.calculation = Calculation(self.preparation, MapDict)
     DataHandler, MapDict, ReportParams = None, None, None
@@ -50,7 +48,7 @@ class Preparation:
     self.ZeroSpan = self._zeroSpan(self.pre, self.post, self.Species, self.EbenchData,DataHandler.CoHigh)        
 
     ##### Prepare Test parameter
-    if (self.TestType == 'Transient').bool:
+    if self.TestType == 'Transient':
          self.TransientBool = True
     else:
          self.TransientBool = False
@@ -218,10 +216,13 @@ class Calculation:
 
         if Preparation.TransientBool == True:
 
-             self._transient_calculation(Preparation, MapDict)
-             self.result = self._result()             
+            self._transient_calculation(Preparation, MapDict)
+            self.result = self._result()  
+
         else:
-             self._steady_state_calculation(Preparation, MapDict)
+            Preparation.test = self._prepare_steady_state(Preparation.test, MapDict)
+            self._transient_calculation(Preparation, MapDict)
+            self.result = self._result()
 
 
     def _transient_calculation(self, Preparation, MapDict):
@@ -236,7 +237,7 @@ class Calculation:
 
         ##### Drift-corrected Calc #####     
         PreparationDrift = Preparation
-        PreparationDrift.test = self._drift_correction(DataUn, ZeroSpan, Preparation.test, Species)
+        PreparationDrift.test = self._drift_correction(DataUn, ZeroSpan, Preparation.test, MapDict, Species)
         [DataCor, self.ArraySumCor] = self._inner_calc(PreparationDrift, DataCor, Species, MapDict)  
         [self.ArraySumCorWon, self.U_BPOW_Factor] = self._remove_negatives(DataCor, Preparation.test, MapDict)
 
@@ -247,10 +248,17 @@ class Calculation:
         Species, ZeroSpan, DataUn, DataCor = None, None, None, None
 
 
-    def _steady_state_calculation(self, Preparation):
+    def _prepare_steady_state(self, data, MapDict):
 
         ## Calculate steady state Cycle
-        pass
+        TestData = data
+        ModeArray = pd.Series(TestData['N_CERTMODE']).unique()
+        MeanFrame = pd.DataFrame(columns=TestData.columns.values)
+        for Mode, i in zip(ModeArray, range(0,len(ModeArray))):
+            AvgArray = TestData[TestData['N_CERTMODE']==Mode].mean()
+            MeanFrame.loc[i] = AvgArray
+
+        return MeanFrame
 
 
     def _inner_calc(self, Preparation, Data, Species, MapDict):
@@ -275,15 +283,15 @@ class Calculation:
     def _unit_conversion(self, Data, TestData, Species, MapDict):
 
         # Species
-        Data["E_CO2D2"] = TestData[Species[0]]*10000 # % --> ppm
+        Data[MapDict["Carbon_Dioxide_Dry"]] = TestData[MapDict["Carbon_Dioxide_Dry"]]*10000 # % --> ppm
         Data[Species[1]] = TestData[Species[1]]*10000 # % --> ppm
-        Data["E_NOXD2"] = TestData[MapDict["Nitrogen_X_Dry"]] # in ppm
-        Data["E_THCW2"] = TestData[MapDict["Total_Hydrocarbons_Wet"]] # in ppm        
+        Data[MapDict["Nitrogen_X_Dry"]] = TestData[MapDict["Nitrogen_X_Dry"]] # in ppm
+        Data[MapDict["Total_Hydrocarbons_Wet"]] = TestData[MapDict["Total_Hydrocarbons_Wet"]] # in ppm        
 
         Data["xCH4wet"] = TestData[Species[4]]/1000000 # ppm --> mol/mol
-        Data["xCO2meas"] = Data.E_CO2D2/1000000 # ppm --> mol/mol
+        Data["xCO2meas"] = Data[MapDict["Carbon_Dioxide_Dry"]]/1000000 # ppm --> mol/mol
         Data["xCOmeas"] = Data.get(Species[1])/1000000 # ppm --> mol/mol
-        Data["xNOxmeas"] = Data.E_NOXD2/1000000 # ppm --> mol/mol
+        Data["xNOxmeas"] = Data[MapDict["Nitrogen_X_Dry"]]/1000000 # ppm --> mol/mol
 
         # Flows
         Data["mfuel"] = TestData[MapDict["Fuel_Flow_Rate"]]*1000/3600 # kg/h --> g/s
@@ -318,9 +326,9 @@ class Calculation:
         Data["xCO2dil"] = Ebench.xCO2dildry/(1+Data.xH2Odildry)
 
         # Rest
-        Data["xTHC[THC_FID]cor"] = Data.E_THCW2-Ebench.xTHC_THC_FID_init
-        Data.E_THCW2 = Data["xTHC[THC_FID]cor"]
-        Data["xTHCmeas"] = Data.E_THCW2/1000000 # ppm --> mol/mol
+        Data["xTHC[THC_FID]cor"] = Data[MapDict["Total_Hydrocarbons_Wet"]]-Ebench.xTHC_THC_FID_init
+        Data[MapDict["Total_Hydrocarbons_Wet"]] = Data["xTHC[THC_FID]cor"]
+        Data["xTHCmeas"] = Data[MapDict["Total_Hydrocarbons_Wet"]]/1000000 # ppm --> mol/mol
         Data["xNO2meas"] = Data.xNOxmeas*0 # NO2 not measured
         Data["xNOmeas"] = Data.xNOxmeas*1
         Data["xTHCwet"] = Data.xTHCmeas
@@ -467,14 +475,14 @@ class Calculation:
         return Data, ArraySum
 
 
-    def _drift_correction(self, DataUn, ZeroSpan, TestData, Species):
+    def _drift_correction(self, DataUn, ZeroSpan, TestData, MapDict, Species):
 
         ## Correct Raw-Emissions ##
-        TestData['E_CO2D2'] = ZeroSpan.E_CO2D2['Chosen']*((2*DataUn.E_CO2D2)-(ZeroSpan.E_CO2D2['PreZero']+ZeroSpan.E_CO2D2['PostZero']))/((ZeroSpan.E_CO2D2['PreSpan']+ZeroSpan.E_CO2D2['PostSpan'])-(ZeroSpan.E_CO2D2['PreZero']+ZeroSpan.E_CO2D2['PostZero']))/10000 # in % because of later calculation
+        TestData[MapDict['Carbon_Dioxide_Dry']] = ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['Chosen']*((2*DataUn[MapDict['Carbon_Dioxide_Dry']])-(ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PreZero']+ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PostZero']))/((ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PreSpan']+ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PostSpan'])-(ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PreZero']+ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PostZero']))/10000 # in % because of later calculation
         TestData[Species[1]] = ZeroSpan[Species[1]]['Chosen']*((2*DataUn.get(Species[1]))-(ZeroSpan[Species[1]]['PreZero']+ZeroSpan[Species[1]]['PostZero']))/((ZeroSpan[Species[1]]['PreSpan']+ZeroSpan[Species[1]]['PostSpan'])-(ZeroSpan[Species[1]]['PreZero']+ZeroSpan[Species[1]]['PostZero']))/10000 # in % because of later calculation
-        TestData['E_NOXD2'] = ZeroSpan.E_NOXD2['Chosen']*((2*TestData.E_NOXD2)-(ZeroSpan.E_NOXD2['PreZero']+ZeroSpan.E_NOXD2['PostZero']))/((ZeroSpan.E_NOXD2['PreSpan']+ZeroSpan.E_NOXD2['PostSpan'])-(ZeroSpan.E_NOXD2['PreZero']+ZeroSpan.E_NOXD2['PostZero']))
-        TestData['E_THCW2'] = ZeroSpan.E_THCW2['Chosen']*((2*DataUn.get('xTHC[THC_FID]cor'))-(ZeroSpan.E_THCW2['PreZero']+ZeroSpan.E_THCW2['PostZero']))/((ZeroSpan.E_THCW2['PreSpan']+ZeroSpan.E_THCW2['PostSpan'])-(ZeroSpan.E_THCW2['PreZero']+ZeroSpan.E_THCW2['PostZero']))
-        TestData['E_CH4W2'] = ZeroSpan.E_CH4W2['Chosen']*((2*TestData.E_CH4W2)-(ZeroSpan.E_CH4W2['PreZero']+ZeroSpan.E_CH4W2['PostZero']))/((ZeroSpan.E_CH4W2['PreSpan']+ZeroSpan.E_CH4W2['PostSpan'])-(ZeroSpan.E_CH4W2['PreZero']+ZeroSpan.E_CH4W2['PostZero']))
+        TestData[MapDict['Nitrogen_X_Dry']] = ZeroSpan[MapDict['Nitrogen_X_Dry']]['Chosen']*((2*TestData[MapDict['Nitrogen_X_Dry']])-(ZeroSpan[MapDict['Nitrogen_X_Dry']]['PreZero']+ZeroSpan[MapDict['Nitrogen_X_Dry']]['PostZero']))/((ZeroSpan[MapDict['Nitrogen_X_Dry']]['PreSpan']+ZeroSpan[MapDict['Nitrogen_X_Dry']]['PostSpan'])-(ZeroSpan[MapDict['Nitrogen_X_Dry']]['PreZero']+ZeroSpan[MapDict['Nitrogen_X_Dry']]['PostZero']))
+        TestData[MapDict['Total_Hydrocarbons_Wet']] = ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['Chosen']*((2*DataUn.get('xTHC[THC_FID]cor'))-(ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PreZero']+ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PostZero']))/((ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PreSpan']+ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PostSpan'])-(ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PreZero']+ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PostZero']))
+        TestData[MapDict['Methane_Wet']] = ZeroSpan[MapDict['Methane_Wet']]['Chosen']*((2*TestData[MapDict['Methane_Wet']])-(ZeroSpan[MapDict['Methane_Wet']]['PreZero']+ZeroSpan[MapDict['Methane_Wet']]['PostZero']))/((ZeroSpan[MapDict['Methane_Wet']]['PreSpan']+ZeroSpan[MapDict['Methane_Wet']]['PostSpan'])-(ZeroSpan[MapDict['Methane_Wet']]['PreZero']+ZeroSpan[MapDict['Methane_Wet']]['PostZero']))
 
         # Clear Variables
         DataUn, ZeroSpan, Species = None, None, None
@@ -531,6 +539,8 @@ class Calculation:
 class Report:
 
     def __init__(self, DataHandler, MapDict, CalculatorLog, DelayArray, output):
+
+        import ipdb; ipdb.set_trace()
 
         ###### Load Variables #####
         self.output = output
