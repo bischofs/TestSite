@@ -13,7 +13,6 @@ import io
 class Calculator:
 
   def __init__(self, DataHandler, MapDict, ReportParams):
-    import ipdb; ipdb.set_trace()
     self.preparation = Preparation(DataHandler, MapDict)   
     self.calculation = Calculation(self.preparation, MapDict)
     DataHandler, MapDict, ReportParams = None, None, None
@@ -188,10 +187,10 @@ class Preparation:
       
       for i in range(0,len(ColumnZero)):
 
-          if ColumnZero[i]> ZeroSpan[spec]['Chosen']*0.01: # Accetable Range of noise 1%
+          if ColumnZero[i]> ZeroSpan[spec]['Chosen']*0.05: # Accetable Range of noise 1%
               ColumnZero = ColumnZero.drop(i)
 
-          if (ColumnSpan[i]< ZeroSpan[spec]['Chosen']*0.98) | (ColumnSpan[i] > ZeroSpan[spec]['Chosen']*1.02): # Acceptable Range of noise +-2%
+          if (ColumnSpan[i]< ZeroSpan[spec]['Chosen']*0.95) | (ColumnSpan[i] > ZeroSpan[spec]['Chosen']*1.05): # Acceptable Range of noise +-2%
               ColumnSpan = ColumnSpan.drop(i)
 
       if (len(ColumnZero)) > 30 and (len(ColumnSpan) > 30): # At least 30 points to calculate the average of Zero and Span
@@ -540,11 +539,10 @@ class Report:
 
     def __init__(self, DataHandler, MapDict, CalculatorLog, DelayArray, output):
 
-        import ipdb; ipdb.set_trace()
-
         ###### Load Variables #####
         self.output = output
         Test, Uncorrected, Corrected = CalculatorLog['Data']
+        Test = DataHandler.testData.data
         ArraySumUn, ArraySumCor, ArraySumCorWon = CalculatorLog['Array']
         self.DriftUncorrected, self.DriftCorrected, self.Final = CalculatorLog['Results']
         Species = ['CO2','CO','NOx','THC','NMHC']  

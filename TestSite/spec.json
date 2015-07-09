@@ -95,7 +95,7 @@
         },
         "Carbon_Monoxide_Low_Dry": {
             "unit": "ppm",
-            "maximum_value": "5000",
+            "maximum_value": "5500",
             "minimum_value": "-50",
             "multiple_benches": true,
 	    "header_data": false,
@@ -124,7 +124,7 @@
         "Total_Hydrocarbons_Wet": {
             "unit": "ppm",
             "maximum_value": "97000",
-            "minimum_value": "-5",
+            "minimum_value": "-10",
             "multiple_benches": true,
             "header_data": false,
 	    "files": [
@@ -180,7 +180,7 @@
         "Nitrogen_X_Dry": {
             "unit": "ppm",
             "maximum_value": "20000",
-            "minimum_value": "-5",
+            "minimum_value": "-10",
             "multiple_benches": true,
             "header_data": false,
 	    "files": [

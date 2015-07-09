@@ -27,7 +27,7 @@ class DataHandler:
     self.CycleAttr = {}
     self.log = {}
 
-  def import_data(self, dataFile):        
+  def import_data(self, dataFile):      
 
     self._clear_all_files_loaded()
     RawData = pd.read_csv(dataFile, encoding='windows-1258')
@@ -46,9 +46,8 @@ class DataHandler:
     elif File == 'POST':
       fileType = ZeroSpan(dataFile)
 
-    [masterDict, masterMetaData, masterFileName, CoHigh] = fileType.load_data(RawData, self.masterMetaData, self.masterFileName, self.masterDict, self.speciesData)  
-    setattr(self, self.fileDict[File], fileType)
-    self._set_variables(masterDict, masterMetaData, masterFileName, CoHigh, fileType)
+    [masterDict, masterMetaData, masterFileName] = fileType.load_data(RawData, self.masterMetaData, self.masterFileName, self.masterDict, self.speciesData)
+    self._set_variables(masterDict, masterMetaData, masterFileName, fileType, File)
 
     if File == 'MAIN':
       self.ebenchData = self._load_ebench(self.ebenches[int(self.CycleAttr['EbenchNum'])-1].history, self.testData.TimeStamp)
@@ -56,16 +55,16 @@ class DataHandler:
     self._check_files_loaded()
 
 
-  def _set_variables(self, masterDict, masterMetaData, masterFileName, CoHigh, fileType):
+  def _set_variables(self, masterDict, masterMetaData, masterFileName, fileType, File):
+
+    setattr(self, self.fileDict[File], fileType)
 
     if fileType.fileType == 'ZeroSpan' or fileType.fileType == 'TestData':
       self.masterDict.update(masterDict)
     if self.masterMetaData.empty:
       self.masterMetaData = masterMetaData
     if (self.masterFileName == None):
-      self.masterFileName = masterFileName
-    if CoHigh != None:
-      self.CoHigh = CoHigh   
+      self.masterFileName = masterFileName  
 
 
   def _clear_all_files_loaded(self):
@@ -89,13 +88,19 @@ class DataHandler:
       self.allFilesLoaded = True
       self.masterDict = self.testData.mapDict
       self.masterDict.update(self.preZeroSpan.mapDict)
+      self.testData.mapDict = self.masterDict
+      for File in attrs:
+        CoHigh = vars(self)[File]._check_ranges()
+        if File == 'testData':
+          self.CoHigh = CoHigh
+      self.masterDict.update(self.testData.mapDict)
       
       
   def _load_cycle_attr(self, CycleAttr, MetaData, CyclesData):
 
     Cycle = MetaData['CycleType1065'][0]
     CycleAttr['Cycle'] = Cycle
-    CycleAttr['EbenchNum'] = MetaData['EbenchID']
+    CycleAttr['EbenchNum'] = MetaData['EbenchID'][0]
     CycleAttr['Name'] = CyclesData[Cycle]['Name']    
     CycleAttr['Engine'] = CyclesData[Cycle]['Engine']
     CycleAttr['CycleType'] = CyclesData[Cycle]['CycleType']
@@ -162,9 +167,9 @@ class Data:
     self._check_channels()
     self._check_units()
     
-    CoHigh = self._check_ranges()
+    #CoHigh = self._check_ranges()
 
-    return self.mapDict, masterMetaData, masterFileName, CoHigh
+    return self.mapDict, masterMetaData, masterFileName
 
 
   def _load_metadata(self, data, FileName, masterMetaData, masterFileName):
@@ -306,20 +311,8 @@ class FullLoad(Data):
 
   def load_data(self, dataFile, masterMetaData, masterFileName, masterDict, speciesData):
 
-    [_, masterMetaData, masterFileName, _] = super().load_data(dataFile, masterMetaData, masterFileName, masterDict, speciesData)          
-    return _, masterMetaData, masterFileName, _
-
-
-  def _check_channels_util(self, species, channelNames, multipleBenches, data, fileName):  
-    ##### For Loop through all entries of of mapDict        
-    for name in channelNames:
-      if name in data.columns:
-        break
-    else:
-        raise Exception("Cannot find %s channel %s in file %s" % (species.replace("_"," "), channelNames, fileName))   
-
-    # Clear Variables
-    name = None        
+    [_, masterMetaData, masterFileName] = super().load_data(dataFile, masterMetaData, masterFileName, masterDict, speciesData)          
+    return _, masterMetaData, masterFileName
 
 
 
@@ -330,20 +323,27 @@ class ZeroSpan(Data):
 
   def load_data(self, dataFile, masterMetaData, masterFileName, masterDict, speciesData):
 
-    [mapDict, masterMetaData, masterFileName, _] = super().load_data(dataFile, masterMetaData, masterFileName, masterDict, speciesData)   
-    return mapDict, masterMetaData, masterFileName, _
+    [mapDict, masterMetaData, masterFileName] = super().load_data(dataFile, masterMetaData, masterFileName, masterDict, speciesData)   
+    return mapDict, masterMetaData, masterFileName
+
+
+  def _check_channels(self):
+
+    self.Channel = self._set_bench_channel()
+    super()._check_channels()
+
+    # Clear Variables
+    species = None
 
   def _check_channels_util(self, species, channelNames, multipleBenches, data, fileName):
 
-    ##### For Loop through all entries of of mapDict     
+    ##### For Loop through all entries of of mapDict
     for name in channelNames:
       if name in data.columns:
         if multipleBenches == True:
-          BenchChannel = self._set_bench_channel(data, name)
+          self.mapDict[species] =  name + self.Channel
         else:
-          BenchChannel = ''
-        
-        self.mapDict[species] = name + BenchChannel
+          self.mapDict[species] =  name
         break
     else:
         raise Exception("Cannot find %s channel %s in file %s" % (species.replace("_"," "), channelNames, fileName))   
@@ -352,13 +352,20 @@ class ZeroSpan(Data):
     name = None
 
 
-  def _set_bench_channel(self, data, name):
+  def _set_bench_channel(self):
 
-    MaxPctChange = np.nanmax(data[name].pct_change())[0]
-    if MaxPctChange > 0.5:
-      return ''
+    BenchList = {}
+
+    for species in self.speciesData.Species.items():
+      if species[1]['multiple_benches'] == True:
+        BenchList[species[0]] = species[1]['channel_names'][0]       
+
+    for species in BenchList.values():
+      MaxPctChange = np.nanmax(abs(self.data[species]).pct_change())[0]
+      if MaxPctChange < 0.9:
+        return '2'
     else:
-      return '2'    
+        return ''    
 
 
 
@@ -371,10 +378,10 @@ class TestData(Data):
 
   def load_data(self, dataFile, masterMetaData, masterFileName, masterDict, speciesData):
 
-    [_, masterMetaData, masterFileName, CoHigh] = super().load_data(dataFile, masterMetaData, masterFileName, masterDict, speciesData)
+    [_, masterMetaData, masterFileName] = super().load_data(dataFile, masterMetaData, masterFileName, masterDict, speciesData)
     self.TimeStamp = time.mktime(datetime.datetime.strptime(self.data['Date'][0] + ' ' + self.data['Time'][0], "%m/%d/%Y %H:%M:%S.%f").timetuple())
 
-    return _, masterMetaData, masterFileName, CoHigh
+    return _, masterMetaData, masterFileName,
 
 
   def _load_data_units(self, RawData):
