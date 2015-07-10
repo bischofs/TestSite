@@ -232,7 +232,7 @@
         },
         "Air_Ambient_Temperature": {
             "unit": "°C",
-            "maximum_value": "40",
+            "maximum_value": "50",
             "minimum_value": "20",
             "multiple_benches": false,
             "header_data": false,

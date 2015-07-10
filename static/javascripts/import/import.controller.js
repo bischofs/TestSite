@@ -98,14 +98,6 @@
 
             toastr.success('File Uploaded', 'Success');
             $scope.uploadSuccess = true;
-            var jsonObj = JSON.parse(response);
-            if (Object.keys(jsonObj['CycleAttr']).length > 0){
-                if (jsonObj['CycleAttr']['CycleType'] == 'Transient') {
-                    document.getElementById('delay').style.display = "inline";
-                    document.getElementById('delay_arrow').style.display = "inline";
-                };
-
-            };
 
 
             if (response.indexOf("Meta-Data missing") > -1) {

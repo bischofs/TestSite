@@ -29,22 +29,14 @@ class Preparation:
     self.test = DataHandler.testData.data
     self.TestType = DataHandler.CycleAttr['CycleType']
 
-    ##### CoHigh or COL #####
-    if DataHandler.CoHigh:
-         self.CO = MapDict['Carbon_Monoxide_High_Dry']
-         COString = 'COH'
-    else:
-         self.CO = MapDict['Carbon_Monoxide_Low_Dry']
-         COString = 'COL'
-
     ##### Prepare Fuel and E-bench data #####
     self.FuelData = self._fuel_data(DataHandler.testData.metaData, DataHandler.CycleAttr, MapDict)
-    self.EbenchData = self._ebench_data(DataHandler.ebenchData, DataHandler.testData.data,MapDict, COString)               
+    self.EbenchData = self._ebench_data(DataHandler.ebenchData, DataHandler.testData.data,MapDict)               
 
     ##### Prepare Pre/Post-Data #####
-    self.Species = [MapDict['Carbon_Dioxide_Dry'],self.CO,MapDict['Nitrogen_X_Dry'],
+    self.Species = [MapDict['Carbon_Dioxide_Dry'],MapDict['Carbon_Monoxide_Dry'],MapDict['Nitrogen_X_Dry'],
                     MapDict['Total_Hydrocarbons_Wet'],MapDict['Methane_Wet']]                  
-    self.ZeroSpan = self._zeroSpan(self.pre, self.post, self.Species, self.EbenchData,DataHandler.CoHigh)        
+    self.ZeroSpan = self._zeroSpan(self.pre, self.post, MapDict, self.EbenchData)        
 
     ##### Prepare Test parameter
     if self.TestType == 'Transient':
@@ -96,7 +88,7 @@ class Preparation:
     return FuelData
 
 
-  def _ebench_data(self, ebenchData,TestData,MapDict,COString):    
+  def _ebench_data(self, ebenchData,TestData,MapDict):    
 
     EbenchData = pd.DataFrame(data=np.zeros([14,1]),index=['RFPF','CH4_RF','Tchiller','Pchiller','Pamb','Factorchiller',
                                                          'xTHC_THC_FID_init','xCO2intdry','xCO2dildry','Bottle_Concentration_CO2',
@@ -115,7 +107,7 @@ class Preparation:
 
     ##### Bottle Concentrations from Ebench #####
     EbenchData.Bottle_Concentration_CO2 = ebenchData['Bottle_Concentration_CO2']
-    EbenchData.Bottle_Concentration_CO = ebenchData['Bottle_Concentration_' + COString]
+    EbenchData.Bottle_Concentration_CO = ebenchData['Bottle_Concentration_CO']
     EbenchData.Bottle_Concentration_NOX = ebenchData['Bottle_Concentration_NOX']
     EbenchData.Bottle_Concentration_THC = ebenchData['Bottle_Concentration_THC']
     EbenchData.Bottle_Concentration_NMHC =  ebenchData['Bottle_Concentration_NMHC']
@@ -126,29 +118,28 @@ class Preparation:
     return EbenchData
 
 
-  def _zeroSpan(self, Pre, Post, Species, Ebench,CoHigh):
+  def _zeroSpan(self, Pre, Post, MapDict, Ebench):     
       
     ListFactor = [10000,10000,1,1,1]          
-    ZeroSpan = pd.DataFrame(data=np.zeros([5,5]),index=['PreZero','PreSpan','PostZero','PostSpan','Chosen'],columns=Species)
-    TimeWindow = self._prepare_time_window(Species)
+    ZeroSpan = pd.DataFrame(data=np.zeros([5,5]),index=['PreZero','PreSpan','PostZero','PostSpan','Chosen'],
+                                                 columns=[MapDict['Carbon_Dioxide_Dry'], MapDict['Carbon_Monoxide_Dry'], MapDict['Nitrogen_X_Dry'],
+                                                          MapDict['Total_Hydrocarbons_Wet'], MapDict['Methane_Wet']])
+    TimeWindow = self._prepare_time_window(MapDict)
 
     ##### Chosen-Data From Ebench, Bottle Concentrations in ppm in Database ######
-    ZeroSpan[Species[0]]['Chosen'] = Ebench.Bottle_Concentration_CO2/10000
-    if CoHigh == True:
-        ZeroSpan[Species[1]]['Chosen'] = Ebench.Bottle_Concentration_CO/10000
-    else:
-        ZeroSpan[Species[1]]['Chosen'] = Ebench.Bottle_Concentration_CO
-    ZeroSpan[Species[2]]['Chosen'] = Ebench.Bottle_Concentration_NOX
-    ZeroSpan[Species[3]]['Chosen'] = Ebench.Bottle_Concentration_THC
-    ZeroSpan[Species[4]]['Chosen'] = Ebench.Bottle_Concentration_NMHC      
+    ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['Chosen'] = Ebench.Bottle_Concentration_CO2
+    ZeroSpan[MapDict['Carbon_Monoxide_Dry']]['Chosen'] = Ebench.Bottle_Concentration_CO
+    ZeroSpan[MapDict['Nitrogen_X_Dry']]['Chosen'] = Ebench.Bottle_Concentration_NOX
+    ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['Chosen'] = Ebench.Bottle_Concentration_THC
+    ZeroSpan[MapDict['Methane_Wet']]['Chosen'] = Ebench.Bottle_Concentration_NMHC      
 
     ##### Pre Zero/Span #####
     Name = {'Zero':'PreZero','Span':'PreSpan'}
-    ZeroSpan = self._prepare_type(ZeroSpan,Species,TimeWindow,Pre,Name)
+    ZeroSpan = self._prepare_type(ZeroSpan,MapDict,TimeWindow,Pre,Name)
 
     ##### Post Zero/Span #####
     Name = {'Zero':'PostZero','Span':'PostSpan'}
-    ZeroSpan = self._prepare_type(ZeroSpan,Species,TimeWindow,Post,Name)
+    ZeroSpan = self._prepare_type(ZeroSpan,MapDict,TimeWindow,Post,Name)
 
     # Clear Variables
     ListFactor, TimeWindow, Name = None, None, None
@@ -156,28 +147,32 @@ class Preparation:
     return ZeroSpan
 
 
-  def _prepare_time_window(self,Species):
+  def _prepare_time_window(self, MapDict):
 
-    ## Species = ['CO2','CO','NOX','THC','CH4'] these are the Species in the array but with the channel names
     TypeTime = ['Zero_start','Zero_end','Span_start','Span_end']
     SpecTime = [0,59,60,119] # Time window for Zero and Span Data
-    TimeWindow = pd.DataFrame(data = np.ones([4,5]), columns=Species, index=TypeTime)
+    TimeWindow = pd.DataFrame(data = np.ones([4,5]), columns=[MapDict['Carbon_Dioxide_Dry'],MapDict['Carbon_Monoxide_Dry'],
+                                                              MapDict['Nitrogen_X_Dry'],MapDict['Total_Hydrocarbons_Wet'],
+                                                              MapDict['Methane_Wet']], index=TypeTime)
 
     for TimePoint, SpecTime in zip(TypeTime,SpecTime):
       TimeWindow.loc[TimePoint,:] = SpecTime
         
-    TimeWindow[Species[0]]['Span_start'] = 120
-    TimeWindow[Species[0]]['Span_end'] = 179
-    TimeWindow[Species[4]]['Span_start'] = 120
-    TimeWindow[Species[4]]['Span_end'] = 179
+    TimeWindow[MapDict['Carbon_Dioxide_Dry']]['Span_start'] = 120
+    TimeWindow[MapDict['Carbon_Dioxide_Dry']]['Span_end'] = 179
+    TimeWindow[MapDict['Methane_Wet']]['Span_start'] = 120
+    TimeWindow[MapDict['Methane_Wet']]['Span_end'] = 179
 
     # Clear Variables
-    Species, TypeTime, SpecTime = None, None, None
+    TypeTime, SpecTime = None, None
 
     return TimeWindow
 
 
-  def _prepare_type(self, ZeroSpan, Species, TimeWindow, Data, name): 
+  def _prepare_type(self, ZeroSpan, MapDict, TimeWindow, Data, name):
+
+    Species = [MapDict['Carbon_Dioxide_Dry'], MapDict['Carbon_Monoxide_Dry'], MapDict['Nitrogen_X_Dry'],
+               MapDict['Total_Hydrocarbons_Wet'], MapDict['Methane_Wet']]
 
     for spec in Species:
       ColumnZero = Data.loc[TimeWindow[spec][0]:TimeWindow[spec][1], spec]
@@ -226,25 +221,24 @@ class Calculation:
 
     def _transient_calculation(self, Preparation, MapDict):
 
-        Species = Preparation.Species
         ZeroSpan = Preparation.ZeroSpan
         DataUn = pd.DataFrame()
         DataCor = pd.DataFrame()
 
         ##### Drif-uncorrected Calc #####
-        [DataUn, self.ArraySumUn] = self._inner_calc(Preparation, DataUn, Species, MapDict)
+        [DataUn, self.ArraySumUn] = self._inner_calc(Preparation, DataUn, MapDict)
 
         ##### Drift-corrected Calc #####     
         PreparationDrift = Preparation
-        PreparationDrift.test = self._drift_correction(DataUn, ZeroSpan, Preparation.test, MapDict, Species)
-        [DataCor, self.ArraySumCor] = self._inner_calc(PreparationDrift, DataCor, Species, MapDict)  
+        PreparationDrift.test = self._drift_correction(DataUn, ZeroSpan, Preparation.test, MapDict)
+        [DataCor, self.ArraySumCor] = self._inner_calc(PreparationDrift, DataCor, MapDict)  
         [self.ArraySumCorWon, self.U_BPOW_Factor] = self._remove_negatives(DataCor, Preparation.test, MapDict)
 
         self.ArraySum = [self.ArraySumUn, self.ArraySumCor, self.ArraySumCorWon]
         self.Data = [Preparation.test, DataUn, DataCor]
 
         # Clear Variables
-        Species, ZeroSpan, DataUn, DataCor = None, None, None, None
+        ZeroSpan, DataUn, DataCor = None, None, None
 
 
     def _prepare_steady_state(self, data, MapDict):
@@ -260,7 +254,7 @@ class Calculation:
         return MeanFrame
 
 
-    def _inner_calc(self, Preparation, Data, Species, MapDict):
+    def _inner_calc(self, Preparation, Data, MapDict):
 
         ##### Load Data #####
         TestData = Preparation.test
@@ -268,28 +262,28 @@ class Calculation:
         Fuel = Preparation.FuelData 
 
         ##### Steps of calculation #####
-        Data = self._unit_conversion(Data, TestData, Species, MapDict)
+        Data = self._unit_conversion(Data, TestData, MapDict)
         Data = self._prepare_iteration(Data, TestData, Ebench, MapDict)
         Data = self._iteration(Data, Fuel, Ebench)
         [Data, ArraySum] = self._rest_calculation(Data, Fuel)
 
         # Clear Variables
-        Preparation, Species, TestData, Ebench, Fuel = None, None, None, None, None
+        Preparation, TestData, Ebench, Fuel = None, None, None, None
 
         return Data, ArraySum
 
 
-    def _unit_conversion(self, Data, TestData, Species, MapDict):
+    def _unit_conversion(self, Data, TestData, MapDict):
 
         # Species
         Data[MapDict["Carbon_Dioxide_Dry"]] = TestData[MapDict["Carbon_Dioxide_Dry"]]*10000 # % --> ppm
-        Data[Species[1]] = TestData[Species[1]]*10000 # % --> ppm
+        Data[MapDict["Carbon_Monoxide_Dry"]] = TestData[MapDict["Carbon_Monoxide_Dry"]]*10000 # % --> ppm
         Data[MapDict["Nitrogen_X_Dry"]] = TestData[MapDict["Nitrogen_X_Dry"]] # in ppm
         Data[MapDict["Total_Hydrocarbons_Wet"]] = TestData[MapDict["Total_Hydrocarbons_Wet"]] # in ppm        
 
-        Data["xCH4wet"] = TestData[Species[4]]/1000000 # ppm --> mol/mol
+        Data["xCH4wet"] = TestData[MapDict['Methane_Wet']]/1000000 # ppm --> mol/mol
         Data["xCO2meas"] = Data[MapDict["Carbon_Dioxide_Dry"]]/1000000 # ppm --> mol/mol
-        Data["xCOmeas"] = Data.get(Species[1])/1000000 # ppm --> mol/mol
+        Data["xCOmeas"] = Data.get(MapDict["Carbon_Monoxide_Dry"])/1000000 # ppm --> mol/mol
         Data["xNOxmeas"] = Data[MapDict["Nitrogen_X_Dry"]]/1000000 # ppm --> mol/mol
 
         # Flows
@@ -302,7 +296,7 @@ class Calculation:
         Data["T_INLET"] = TestData[MapDict["Air_Inlet_Temperature"]] + 273.15 # °C --> K
 
         # Clear Variables
-        TestData, Species = None, None
+        TestData = None
 
         return Data
 
@@ -469,22 +463,22 @@ class Calculation:
         ArraySum = {'CO2':Data.Mass_CO2.sum(),'CO':Data.Mass_CO.sum(),'NOx':Data.Mass_NOx.sum(),'THC':Data.Mass_THC.sum(),'NMHC':Data.Mass_NMHC.sum()}
 
         # Clear Variables
-        Fuel = None, None, None, None, None, None
+        Fuel = None
 
         return Data, ArraySum
 
 
-    def _drift_correction(self, DataUn, ZeroSpan, TestData, MapDict, Species):
+    def _drift_correction(self, DataUn, ZeroSpan, TestData, MapDict):
 
         ## Correct Raw-Emissions ##
         TestData[MapDict['Carbon_Dioxide_Dry']] = ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['Chosen']*((2*DataUn[MapDict['Carbon_Dioxide_Dry']])-(ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PreZero']+ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PostZero']))/((ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PreSpan']+ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PostSpan'])-(ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PreZero']+ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PostZero']))/10000 # in % because of later calculation
-        TestData[Species[1]] = ZeroSpan[Species[1]]['Chosen']*((2*DataUn.get(Species[1]))-(ZeroSpan[Species[1]]['PreZero']+ZeroSpan[Species[1]]['PostZero']))/((ZeroSpan[Species[1]]['PreSpan']+ZeroSpan[Species[1]]['PostSpan'])-(ZeroSpan[Species[1]]['PreZero']+ZeroSpan[Species[1]]['PostZero']))/10000 # in % because of later calculation
+        TestData[MapDict["Carbon_Monoxide_Dry"]] = ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['Chosen']*((2*DataUn.get(MapDict["Carbon_Monoxide_Dry"]))-(ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PreZero']+ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PostZero']))/((ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PreSpan']+ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PostSpan'])-(ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PreZero']+ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PostZero']))/10000 # in % because of later calculation
         TestData[MapDict['Nitrogen_X_Dry']] = ZeroSpan[MapDict['Nitrogen_X_Dry']]['Chosen']*((2*TestData[MapDict['Nitrogen_X_Dry']])-(ZeroSpan[MapDict['Nitrogen_X_Dry']]['PreZero']+ZeroSpan[MapDict['Nitrogen_X_Dry']]['PostZero']))/((ZeroSpan[MapDict['Nitrogen_X_Dry']]['PreSpan']+ZeroSpan[MapDict['Nitrogen_X_Dry']]['PostSpan'])-(ZeroSpan[MapDict['Nitrogen_X_Dry']]['PreZero']+ZeroSpan[MapDict['Nitrogen_X_Dry']]['PostZero']))
         TestData[MapDict['Total_Hydrocarbons_Wet']] = ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['Chosen']*((2*DataUn.get('xTHC[THC_FID]cor'))-(ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PreZero']+ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PostZero']))/((ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PreSpan']+ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PostSpan'])-(ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PreZero']+ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PostZero']))
         TestData[MapDict['Methane_Wet']] = ZeroSpan[MapDict['Methane_Wet']]['Chosen']*((2*TestData[MapDict['Methane_Wet']])-(ZeroSpan[MapDict['Methane_Wet']]['PreZero']+ZeroSpan[MapDict['Methane_Wet']]['PostZero']))/((ZeroSpan[MapDict['Methane_Wet']]['PreSpan']+ZeroSpan[MapDict['Methane_Wet']]['PostSpan'])-(ZeroSpan[MapDict['Methane_Wet']]['PreZero']+ZeroSpan[MapDict['Methane_Wet']]['PostZero']))
 
         # Clear Variables
-        DataUn, ZeroSpan, Species = None, None, None
+        DataUn, ZeroSpan = None, None
 
         return TestData
 
