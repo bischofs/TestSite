@@ -1,99 +1,97 @@
 <div class="row">
-    <div class="panel panel-default  col-md-2">
-        <div class="panel-body">
-            <table style="width:100%">
-                <tr>
-                    <td>Test Data</td>
-                    <td>{{myList[2]}}</td>
-                </tr>
-                <tr>
-                    <td>Data Frequency </td>
-                    <td>10HZ</td>
-                </tr>
-                <tr>
-                    <td>Detected Cycle</td>
-                    <td>FTP</td>
-                </tr>
-            </table>
-            <br>
-            <ol class="treeview">
-                <li>
-                    <p>Full Load</p>
-                    <table style="width:100%">
-                        <tr>
-                            <td>Meta Data </td>
-                            <td>True</td>
-                        </tr>
-                        <tr>
-                            <td>Channels</td>
-                            <td>True</td>
-                        </tr>
-                        <tr>
-                            <td>Correct Cycle</td>
-                            <td>True</td>
-                        </tr>
-                    </table>
-                </li>
-                <li>
-                    <p>Pre-Zero/Span</p>
-                    <table style="width:100%">
-                        <tr>
-                            <td>Meta Data </td>
-                            <td>True</td>
-                        </tr>
-                        <tr>
-                            <td>Channels</td>
-                            <td>True</td>
-                        </tr>
-                        <tr>
-                            <td>Correct Cycle</td>
-                            <td>True</td>
-                        </tr>
-                    </table>
-                </li>
-                <li>
-                    <p>Post Zero/Span</p>
-                    <table style="width:100%">
-                        <tr>
-                            <td>Meta Data </td>
-                            <td>True</td>
-                        </tr>
-                        <tr>
-                            <td>Channels</td>
-                            <td>True</td>
-                        </tr>
-                        <tr>
-                            <td>Correct Cycle</td>
-                            <td>True</td>
-                        </tr>
-                    </table>
-                </li>
-                <li>
-                    <p>Test Data</p>
-                    <table style="width:100%">
-                        <tr>
-                            <td>Meta Data </td>
-                            <td>True</td>
-                        </tr>
-                        <tr>
-                            <td>Channels</td>
-                            <td>True</td>
-                        </tr>
-                        <tr>
-                            <td>Correct Cycle</td>
-                            <td>True</td>
-                        </tr>
-                        <tr>
-                            <td>Ambient Cond.</td>
-                            <td>True</td>
-                        </tr>
-                        <tr>
-                            <td>Data Ranges</td>
-                            <td>True</td>
-                        </tr>
-                    </table>
-                </li>
-            </ol>            
+    <div ng-controller="InfoboxController">
+        <div class="panel panel-default  col-md-2">
+            <div class="panel-body">
+                <table style="width:100%">
+                    <tr>
+                        <td>Detected Cycle</td>
+                        <td>{{cycle}}</td>
+                    </tr>
+                    <tr>
+                        <td>Data Frequency</td>
+                        <td>{{frequency}}</td>
+                    </tr>
+                </table>
+                <br>
+                <ol class="treeview">
+                    <li>
+                        <p>Full Load</p>
+                        <table style="width:100%">
+                            <tr>
+                                <td>Meta Data</td>
+                                <td>{{full_meta}}</td>
+                            </tr>
+                            <tr>
+                                <td>Channels</td>
+                                <td>{{full_channels}}</td>
+                            </tr>
+                            <tr>
+                                <td>Units</td>
+                                <td>{{full_units}}</td>
+                            </tr>
+                        </table>
+                    </li>
+                    <li>
+                        <p>Pre-Zero/Span</p>
+                        <table style="width:100%">
+                            <tr>
+                                <td>Meta Data</td>
+                                <td>{{pre_meta}}</td>
+                            </tr>
+                            <tr>
+                                <td>Channels</td>
+                                <td>{{pre_channels}}</td>
+                            </tr>
+                            <tr>
+                                <td>Units</td>
+                                <td>{{pre_units}}</td>
+                            </tr>
+                        </table>
+                    </li>
+                    <li>
+                        <p>Post Zero/Span</p>
+                        <table style="width:100%">
+                            <tr>
+                                <td>Meta Data</td>
+                                <td>{{post_meta}}</td>
+                            </tr>
+                            <tr>
+                                <td>Channels</td>
+                                <td>{{post_channels}}</td>
+                            </tr>
+                            <tr>
+                                <td>Units</td>
+                                <td>{{post_units}}</td>
+                            </tr>
+                        </table>
+                    </li>
+                    <li>
+                        <p>Test Data</p>
+                        <table style="width:100%">
+                            <tr>
+                                <td>Meta Data</td>
+                                <td>{{test_meta}}</td>
+                            </tr>
+                            <tr>
+                                <td>Channels</td>
+                                <td>{{test_channels}}</td>
+                            </tr>
+                            <tr>
+                                <td>Units</td>
+                                <td>{{test_units}}</td>
+                            </tr>
+                            <tr>
+                                <td>Ambient Cond.</td>
+                                <td>{{test_amb}}</td>
+                            </tr>
+                            <tr>
+                                <td>Data Ranges</td>
+                                <td>{{test_ranges}}</td>
+                            </tr>
+                        </table>
+                    </li>
+                </ol>            
+            </div>
         </div>
     </div>
     <div class="col-md-10">

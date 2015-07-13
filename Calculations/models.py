@@ -182,10 +182,10 @@ class Preparation:
       
       for i in range(0,len(ColumnZero)):
 
-          if ColumnZero[i]> ZeroSpan[spec]['Chosen']*0.05: # Accetable Range of noise 1%
+          if ColumnZero[i]> ZeroSpan[spec]['Chosen']*0.01: # Accetable Range of noise 1%
               ColumnZero = ColumnZero.drop(i)
 
-          if (ColumnSpan[i]< ZeroSpan[spec]['Chosen']*0.95) | (ColumnSpan[i] > ZeroSpan[spec]['Chosen']*1.05): # Acceptable Range of noise +-2%
+          if (ColumnSpan[i]< ZeroSpan[spec]['Chosen']*0.98) | (ColumnSpan[i] > ZeroSpan[spec]['Chosen']*1.02): # Acceptable Range of noise +-2%
               ColumnSpan = ColumnSpan.drop(i)
 
       if (len(ColumnZero)) > 30 and (len(ColumnSpan) > 30): # At least 30 points to calculate the average of Zero and Span
@@ -407,22 +407,20 @@ class Calculation:
             
             return [eq1,eq2,eq3,eq4,eq5,eq6,eq7,eq8,eq9,eq10,eq11,eq12,eq13,eq14,eq15,eq16,eq17,eq18]
 
-        i = 0
         Mode = 0
-        ResultList = np.zeros((len(Data),18))     
+        ResultList = np.zeros((len(Data),18))
+        g = 0.5 # First guess for iteration start
+        Solution = (g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g)    
 
-        while i < len(Data):
+        for i in range(0,len(Data)-1):
              
-            g = 0.5 # First guess for iteration start
-
-            Solution = opt.fsolve(function_iteration,(g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g))
+            Solution = opt.fsolve(function_iteration,Solution)
             
             if Solution[2]<Ebench.Factorchiller:
                 Mode = 1 # Different Calculation with mode 1 or 0
-                Solution = opt.fsolve(function_iteration,(g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g))
+                Solution = opt.fsolve(function_iteration,Solution)
                 Mode = 0
             ResultList[:][i] = Solution
-            i +=1 
 
         Iteration = pd.DataFrame(ResultList,columns =['xdil/exh','xH2Oexh','xCcombdry','xH2Oexhdry','xdil/exhdry','xint/exhdry',
                                                       'xraw/exhdry','xH2OCOmeas','xH2OTHCmeas','xH2ONOxmeas','xH2ONO2meas','xH2OCO2meas',

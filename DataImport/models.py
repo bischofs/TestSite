@@ -21,41 +21,44 @@ class DataHandler:
     self.ebenches = Ebench.objects.all()
     self.masterDict = {}
     self.masterMetaData = pd.DataFrame()
+    self.File = None
     self.masterFileName = None
     self.allFilesLoaded = False
     self.CycleAttr = {}
     self.log = {}
 
-  def import_data(self, dataFile):      
+  def import_data(self, dataFile):   
 
+
+    ##### Prepare DataHandler and File #####
     self._clear_all_files_loaded()
     RawData = pd.read_csv(dataFile, encoding='windows-1258')
-    File = RawData[:1]['CycleState1065'][0] # Reads the filetype out of header page
+    self.File = RawData[:1]['CycleState1065'][0] # Reads the filetype out of header page
 
-    if File == 'FULL':
+    ##### Create FileClass #####
+    if self.File == 'FULL':
       fileType = FullLoad(dataFile)
 
-    elif File == 'PRE':
+    elif self.File == 'PRE':
       fileType = ZeroSpan(dataFile)
 
-    elif File == 'MAIN':
+    elif self.File == 'MAIN':
       self.CycleAttr = self._load_cycle_attr(self.CycleAttr, RawData[:1], self.CyclesData)
       fileType = TestData(dataFile, self.CycleAttr['CycleType'])
 
-    elif File == 'POST':
+    elif self.File == 'POST':
       fileType = ZeroSpan(dataFile)
+    ##### Load File #####
     [masterMetaData, masterFileName] = fileType.load_data(RawData, self.masterMetaData, self.masterFileName, self.masterDict, self.ChannelData)
-    self._set_variables(masterMetaData, masterFileName, fileType, File)
-    self._check_all_files_loaded()
+    setattr(self,self.fileDict[self.File],fileType)
 
-
-  def _set_variables(self, masterMetaData, masterFileName, fileType, File):
-
-    setattr(self, self.fileDict[File], fileType)
-    if self.masterMetaData.empty:
-      self.masterMetaData = masterMetaData
+    ##### Set MasterFile #####
     if (self.masterFileName == None):
-      self.masterFileName = masterFileName  
+      self.masterFileName = masterFileName
+      self.masterMetaData = masterMetaData 
+
+    ##### Finish Upload #####
+    self._check_all_files_loaded()
 
 
   def _clear_all_files_loaded(self):
@@ -64,6 +67,21 @@ class DataHandler:
     if(self.allFilesLoaded == True):
       del self.testData, self.preZeroSpan, self.postZeroSpan, self.fullLoad
       self.__init__()
+
+      
+  def _load_cycle_attr(self, CycleAttr, MetaData, CyclesData):
+
+    Cycle = MetaData['CycleType1065'][0]
+    CycleAttr['Cycle'] = Cycle
+    CycleAttr['EbenchNum'] = MetaData['EbenchID'][0]
+    CycleAttr['Name'] = CyclesData[Cycle]['Name']    
+    CycleAttr['Engine'] = CyclesData[Cycle]['Engine']
+    CycleAttr['CycleType'] = CyclesData[Cycle]['CycleType']
+    CycleAttr['Fuel'] = CyclesData[Cycle]['Fuel']
+    CycleAttr['FactorMult'] = CyclesData[Cycle]['NOxFactorMult']
+    CycleAttr['FactorAdd'] = CyclesData[Cycle]['NOxFactorAdd']
+
+    return CycleAttr
 
 
   def _check_all_files_loaded(self):
@@ -78,8 +96,9 @@ class DataHandler:
         break
 
     else:
-
       self.allFilesLoaded = True
+
+      ##### Create MaterDict, Set Co-Channel, Load E-Bench-Data #####
       [self.masterDict, CoHigh] = self._create_master_dict(attrs)
       self.ebenchData = self._load_ebench(self.ebenches[int(self.CycleAttr['EbenchNum'])-1].history, self.testData.TimeStamp, CoHigh)   
 
@@ -88,6 +107,8 @@ class DataHandler:
 
       masterDict = self.testData.mapDict
       masterDict.update(self.preZeroSpan.mapDict) # testData.mapDict is changed as well
+
+      ##### Check Channel-Ranges of all files and create MasterDict #####
       for File in attrs:
         CoHigh = vars(self)[File].check_ranges(self.ChannelData)
         if File == 'testData':
@@ -95,26 +116,10 @@ class DataHandler:
             masterDict['Carbon_Monoxide_Dry'] = masterDict['Carbon_Monoxide_High_Dry']
           else:
             masterDict['Carbon_Monoxide_Dry'] = masterDict['Carbon_Monoxide_Low_Dry']
-      del masterDict['Carbon_Monoxide_Low_Dry']
-      del masterDict['Carbon_Monoxide_High_Dry']
+          del masterDict['Carbon_Monoxide_Low_Dry']
+          del masterDict['Carbon_Monoxide_High_Dry']
 
       return masterDict, CoHigh
-
-      
-      
-  def _load_cycle_attr(self, CycleAttr, MetaData, CyclesData):
-
-    Cycle = MetaData['CycleType1065'][0]
-    CycleAttr['Cycle'] = Cycle
-    CycleAttr['EbenchNum'] = MetaData['EbenchID'][0]
-    CycleAttr['Name'] = CyclesData[Cycle]['Name']    
-    CycleAttr['Engine'] = CyclesData[Cycle]['Engine']
-    CycleAttr['CycleType'] = CyclesData[Cycle]['CycleType']
-    CycleAttr['Fuel'] = CyclesData[Cycle]['Fuel']
-    CycleAttr['FactorMult'] = CyclesData[Cycle]['NOxFactorMult']
-    CycleAttr['FactorAdd'] = CyclesData[Cycle]['NOxFactorAdd']
-
-    return CycleAttr     
 
 
   def _load_ebench(self, Ebenches, TimeStamp, CoHigh):
@@ -181,6 +186,7 @@ class Data:
 
     metaData = data[:1]     
 
+    ##### Loop through all entries of ChannelData in the header page #####
     for channel in ChannelData.items():
       if channel[1]['header_data'] == True:
         for channelName in channel[1]['channel_names']:
@@ -204,7 +210,7 @@ class Data:
       self.data.columns = RawData.loc[1].values
       self.data = RawData[2:]
       units = RawData[2:3]
-      self.data = self.data.dropna(how="all",axis=(1))
+      self.data = self.data.dropna(how="all",axis=(1)) # Drop Zero-Columns
       self.data = (self.data.convert_objects(convert_numeric=True)).dropna() # Convert and drop NA
       self.data.index = range(0,len(self.data))
 
@@ -216,92 +222,95 @@ class Data:
     SkipList = ['N_TR','no_run','Comment1','Comment2','Proj#', 'N_TQ', 'CycleCondition1065','CycleState1065', 'N_FLAG2'] # Remove CycleCondition later e.g COS = Coldstart
 
     ##### Compare Metadata with Master-MetaData #####
-    for x, y, z in zip(masterMetaData.values[0],MetaData.values[0],MetaData):
-      if (not x == y) and (z not in SkipList):
-        raise Exception("%s in file %s is not the same as in file %s" % (z, FileName, masterFileName))              
-               
+    for MasterChannel, FileChannel, ChannelName in zip(masterMetaData.values[0],MetaData.values[0],MetaData):
+      if (not MasterChannel == FileChannel) and (ChannelName not in SkipList):
+        raise Exception("%s in file %s is not the same as in file %s" % (ChannelName, FileName, masterFileName))
 
-  def _check_units(self, ChannelData):
-
-    for species in self.mapDict:
-      unit = ChannelData[species]['unit']
-      if ChannelData[species]['header_data'] == False:
-        booleanCond = self.units[self.mapDict[species]].str.contains(unit)
-
-        if not (booleanCond.any()):
-          self.logDict['error'] = "%s units are not in %s" % (self.mapDict[species], unit)          
-          raise Exception("%s units are not in %s" % (self.mapDict[species], unit))
+    MasterChannel, FileChannel, ChannelName, SkipList = None, None, None, None
 
 
   def _check_channels(self, ChannelData):
       
-    for species in ChannelData.items():
-      if species[1]['files'].__contains__(self.fileType) and species[1]['header_data'] == False:
-        if (species[1]['multiple_benches'] == True):
-          self._check_channels_util(species[0], species[1]['channel_names'], True, self.data, self.fileName)
+    for channel in ChannelData.items():
+      if channel[1]['files'].__contains__(self.fileType) and channel[1]['header_data'] == False:
+        if (channel[1]['multiple_benches'] == True):
+          self._check_channels_util(channel[0], channel[1]['channel_names'], True, self.data, self.fileName)
         else:
-          self._check_channels_util(species[0], species[1]['channel_names'], False, self.data, self.fileName)                   
-      elif species[1]['header_data'] == True:
-          self._check_channels_util(species[0], species[1]['channel_names'], False, self.metaData, self.fileName)
+          self._check_channels_util(channel[0], channel[1]['channel_names'], False, self.data, self.fileName)                   
+      elif channel[1]['header_data'] == True:
+          self._check_channels_util(channel[0], channel[1]['channel_names'], False, self.metaData, self.fileName)
 
     # Clear Variables
-    species = None
+    channel = None
 
 
-  def _check_channels_util(self, species, channelNames, multipleBenches, data, fileName):   
+  def _check_channels_util(self, channel, channelNames, multipleBenches, data, fileName):   
 
     ##### For Loop through all entries of of mapDict        
     for name in channelNames:
       if name in data.columns:
-        self.mapDict[species] = name
+        self.mapDict[channel] = name
         break
     else:
-        raise Exception("Cannot find %s channel %s in file %s" % (species.replace("_"," "), channelNames, fileName))   
+        raise Exception("Cannot find %s channel %s in file %s" % (channel.replace("_"," "), channelNames, fileName))   
 
     # Clear Variables
-    name = None
+    name = None                      
+               
+
+  def _check_units(self, ChannelData):
+
+    for channel in self.mapDict:
+      unit = ChannelData[channel]['unit']
+      if ChannelData[channel]['header_data'] == False:
+        booleanCond = self.units[self.mapDict[channel]].str.contains(unit)
+
+        if not (booleanCond.any()):
+          self.logDict['error'] = "%s units are not in %s" % (self.mapDict[channel], unit)          
+          raise Exception("%s units are not in %s" % (self.mapDict[channel], unit))
 
 
   def check_ranges(self, ChannelData):
 
     CoHigh = False
         
-    for species in self.mapDict:       
+    for channel in self.mapDict:       
 
       ##### Read Max/Min-Vaues from json-file #####
-      maxValue = ChannelData[species]['maximum_value']
-      minValue = ChannelData[species]['minimum_value']
+      maxValue = ChannelData[channel]['maximum_value']
+      minValue = ChannelData[channel]['minimum_value']
 
       ##### Load Values from Data #####
-      if ChannelData[species]['header_data'] == False:
-        source = self.data
-        maxCompare = np.nanmax(source[self.mapDict[species]])[0]
-        minCompare = np.nanmin(source[self.mapDict[species]])[0]
+      if ChannelData[channel]['header_data'] == False:
+        maxCompare = np.nanmax(self.data[self.mapDict[channel]])[0]
+        minCompare = np.nanmin(self.data[self.mapDict[channel]])[0]
 
       ##### Load Values from Metadata #####
       else:
-        source = self.metaData
-        maxCompare = float(source[self.mapDict[species]][0])
-        minCompare = float(source[self.mapDict[species]][0])
+        maxCompare = float(self.metaData[self.mapDict[channel]][0])
+        minCompare = float(self.metaData[self.mapDict[channel]][0])
 
       ##### Check whether maximum out of Range #####
       if (maxCompare > float(maxValue)) == True:
-        self._output_oor(species, maxValue, 'above required maximum', ChannelData)       
+        self._output_oor(channel, maxValue, 'above required maximum', ChannelData)       
 
       ##### Check whether minimum out of Range #####
       if (minCompare < float(minValue)) == True:
-        if species == 'Carbon_Monoxide_Low_Dry':
+        if channel == 'Carbon_Monoxide_Low_Dry':
           CoHigh = True
         else:
-          self._output_oor(species, minValue, 'below required minimum', ChannelData)
+          self._output_oor(channel, minValue, 'below required minimum', ChannelData)
+
+    # Clear Variables
+    channel, maxValue, minValue, maxCompare, minCompare = None, None, None, None, None
 
     return CoHigh
 
   # oor = Out of Range
-  def _output_oor(self, species, Value, ErrorString, ChannelData):   
+  def _output_oor(self, channel, Value, ErrorString, ChannelData):   
 
-    self.logDict['error'] = "%s is %s of %s %s" % (self.mapDict[species], ErrorString, str(Value), ChannelData[species]['unit'])
-    raise Exception ("%s is %s of %s %s" % (self.mapDict[species], ErrorString, str(Value), ChannelData[species]['unit']))
+    self.logDict['error'] = "%s is %s of %s %s" % (self.mapDict[channel], ErrorString, str(Value), ChannelData[channel]['unit'])
+    raise Exception ("%s is %s of %s %s" % (self.mapDict[channel], ErrorString, str(Value), ChannelData[channel]['unit']))
 
 
 
@@ -323,18 +332,18 @@ class ZeroSpan(Data):
     super()._check_channels(ChannelData)
 
 
-  def _check_channels_util(self, species, channelNames, multipleBenches, data, fileName):
+  def _check_channels_util(self, channel, channelNames, multipleBenches, data, fileName):
 
-    ##### For Loop through all entries of of mapDict
+    ##### Write used Ebench-Channel #####
     for name in channelNames:
       if name in data.columns:
         if multipleBenches == True:
-          self.mapDict[species] =  name + self.Channel
+          self.mapDict[channel] =  name + self.Channel
         else:
-          self.mapDict[species] =  name
+          self.mapDict[channel] =  name
         break
     else:
-        raise Exception("Cannot find %s channel %s in file %s" % (species.replace("_"," "), channelNames, fileName))   
+        raise Exception("Cannot find %s channel %s in file %s" % (channel.replace("_"," "), channelNames, fileName))   
 
     # Clear Variables
     name = None
@@ -344,12 +353,14 @@ class ZeroSpan(Data):
 
     BenchList = {}
 
-    for species in ChannelData.items():
-      if species[1]['multiple_benches'] == True:
-        BenchList[species[0]] = species[1]['channel_names'][0]       
+    ##### Scrape Species-List to identify Ebench-Channel #####
+    for channel in ChannelData.items():
+      if channel[1]['multiple_benches'] == True:
+        BenchList[channel[0]] = channel[1]['channel_names'][0]       
 
-    for species in BenchList.values():
-      MaxPctChange = np.nanmax(abs(self.data[species]).pct_change())[0]
+    ##### Set Ebench-Channel by percentage Change of Data during ZeroSpan #####
+    for channel in BenchList.values():
+      MaxPctChange = np.nanmax(abs(self.data[channel]).pct_change())[0]
       if MaxPctChange < 0.9:
         return '2'
     else:
@@ -376,13 +387,18 @@ class TestData(Data):
 
   def _load_steady_state(self, Data): 
 
-    Torque71_6 = max(Data['N_CERTTRQ'])
-    Data = Data[Data['N_CERTMODE'].isin(pd.Series(Data['N_CERTMODE'].astype(int)).unique())]
+    Torque71_6 = max(Data['N_CERTTRQ']) # Torque channel will be changed
+    Data = Data[Data['N_CERTMODE'].isin(pd.Series(Data['N_CERTMODE'].astype(int)).unique())] # Choose Data where Channel N_CERTMODE is int
     Data = Data[Data['N_CERTMODE']>0]
+
+    ##### Write Torque in original TorqueChannel (same for Speed)
     Data['UDPi_TorqueDemand'] = Data['N_CERTTRQ']
     Data['UDPi_TorqueDemand'][Data['N_CERTMODE'] == 1] = Torque71_6/0.716
     Data['UDPi_SpeedDemand'] = Data['N_CERTSPD']
     Data.index = range(0,len(Data))
+
+    # Clear Variables
+    Torque71_6r = None
 
     return Data
 
@@ -393,8 +409,9 @@ class CycleValidator:
 
     def __init__(self, Testdata, Mapdict, Fullload, Warmidle, filterChoice):
 
+
+
         ##### Load Data #####
-        
         self.FilterChoice = filterChoice     
         self.data = Testdata.data
         self.data_full = Fullload.data

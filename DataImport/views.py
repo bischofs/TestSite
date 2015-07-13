@@ -38,7 +38,7 @@ class FileUploadView(views.APIView):
                 dataHandler = cache.get(request.session.session_key)
 
             dataHandler.import_data(request.data['file'])
-            jsonDict = {'errors': dataHandler.log, 'CycleAttr': dataHandler.CycleAttr}
+            jsonDict = {'errors': dataHandler.log, 'CycleAttr': dataHandler.CycleAttr,'FilesLoaded':dataHandler.allFilesLoaded,'File':dataHandler.File}
 
             cache.set(request.session.session_key, dataHandler)
             
