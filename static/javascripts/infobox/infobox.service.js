@@ -32,9 +32,10 @@
             $rootScope.$broadcast("PreUploaded");
         }        
 
-        service.updateTest = function(cycle){
+        service.updateTest = function(CycleAttr){
 
-            service.cycle  = cycle;
+            service.cycle  = CycleAttr['Cycle'];
+            service.CycleType = CycleAttr['CycleType'];
 
             service.test_meta = 'True';
             service.test_units = 'True';

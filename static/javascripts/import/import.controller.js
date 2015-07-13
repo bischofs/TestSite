@@ -124,7 +124,7 @@
             } else if(jsonObj.File == 'PRE'){
                 infoboxService.updatePre();
             } else if(jsonObj.File == 'MAIN'){
-                infoboxService.updateTest(jsonObj.CycleAttr['Cycle']);
+                infoboxService.updateTest(jsonObj.CycleAttr);
             } else if(jsonObj.File == 'POST'){
                 infoboxService.updatePost();
             }
