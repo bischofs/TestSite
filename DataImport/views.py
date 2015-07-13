@@ -26,48 +26,31 @@ class FileUploadView(views.APIView):
     def post(self, request, format=None):
 
         
-        try:
+        #try:
             
-            if (bool(request.data['bench'] == ' ')):
-                raise Exception("Please select the number of benches used")
-
             cache = caches['default']
 
             request.session.set_test_cookie()
 
             if(not cache.get(request.session.session_key)):
-                 dataHandler = DataHandler()
+                dataHandler = DataHandler()
             else:
-                dataHandler = cache.get(request.session.session_key)               
+                dataHandler = cache.get(request.session.session_key)
 
-            if(request.data['ftype'] == 'full'):#file is full load curve
-                dataHandler.import_full_load(request.data['file'])
-                jsonDict = {'errors': dataHandler.log}
-
-            elif(request.data['ftype'] == 'pre'):#file is pre span check
-                dataHandler.import_pre_zero_span(request.data['file'])
-                jsonDict = {'errors': dataHandler.log}
-
-            elif(request.data['ftype'] == 'test'):#file is test data
-                request.data['bench'] = 0 ###### HARD CODED BENCH NUMBER ######
-                dataHandler.import_test_data(request.data['bench'], request.data['file'])  
-                jsonDict = {'errors': dataHandler.log}     
-
-            elif(request.data['ftype'] == 'post'):#file is post span check 
-                dataHandler.import_post_zero_span(request.data['file'])
-                jsonDict = {'errors': dataHandler.log}       
+            dataHandler.import_data(request.data['file'])
+            jsonDict = {'errors': dataHandler.log, 'CycleAttr': dataHandler.CycleAttr,'FilesLoaded':dataHandler.allFilesLoaded,'File':dataHandler.File}
 
             cache.set(request.session.session_key, dataHandler)
             
             jsonLog = json.dumps(jsonDict)
             return Response(jsonLog, status=200)
             
-        except Exception as e:
+        # except Exception as e:
          
-            return Response({
-                'status': 'Bad request',
-                'message': str(e)
-            }, status=status.HTTP_400_BAD_REQUEST)
+        #     return Response({
+        #         'status': 'Bad request',
+        #         'message': str(e)
+        #     }, status=status.HTTP_400_BAD_REQUEST)
 
 
     def get(self, request):
@@ -96,7 +79,7 @@ class FileUploadView(views.APIView):
 
             return Response(jsonLog, status=200)
 
-        except Exception as e:
+        except Exception as e:        
         
             return Response({
             'status': 'Bad request',

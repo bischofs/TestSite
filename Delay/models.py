@@ -8,11 +8,10 @@ import numpy as np
 class DelayPrep:    
 
 
-        def __init__(self, data, mapDict, coHigh):
+        def __init__(self, data, mapDict):
 
                 self.data = data
                 self.mapDict = mapDict
-                self.coHigh = coHigh
 
                 self.delaySpecies = pd.DataFrame.from_items([('Air_Flow_Rate', self.data[self.mapDict['Air_Flow_Rate']]),
                                                              ('Nitrogen_X_Dry',self.data[self.mapDict['Nitrogen_X_Dry']]),
@@ -21,12 +20,9 @@ class DelayPrep:
                                                              ('Oxygen_Dry',self.data[self.mapDict['Oxygen_Dry']]),
                                                              ('Nitrogen_Monoxide_Dry',self.data[self.mapDict['Nitrogen_Monoxide_Dry']]),
                                                              ('Carbon_Dioxide_Dry',self.data[self.mapDict['Carbon_Dioxide_Dry']]),
-                                                             ('Engine_Torque',self.data[self.mapDict['Engine_Torque']])])
+                                                             ('Engine_Torque',self.data[self.mapDict['Engine_Torque']]),
+                                                             ('Carbon_Monoxide_Dry',self.data[self.mapDict['Carbon_Monoxide_Dry']])])
                 
-                if(self.coHigh == False):
-                        self.delaySpecies['Carbon_Monoxide_Low_Dry'] = self.data[self.mapDict['Carbon_Monoxide_Low_Dry']]
-                else:
-                        self.delaySpecies['Carbon_Monoxide_High_Dry'] = self.data[self.mapDict['Carbon_Monoxide_High_Dry']]
                 
 
         def create_windows(self):
@@ -59,23 +55,18 @@ class DelayPrep:
 
 class DelaySubmit:
 
-    def __init__(self, Data, MasterDict, DelayArray, COH):
+    def __init__(self, Data, MasterDict, DelayArray):
 
         self.MapDict = MasterDict
         self.Data = Data
-        self.CoHigh = COH
-        self.Array = DelayArray
+        self.Array = DelayArray      
 
-        if(self.CoHigh == False):
-            CO = 'Carbon_Monoxide_Low_Dry'
-        else:
-            CO = 'Carbon_Monoxide_High_Dry'        
-
-        ChannelList = ['Air_Flow_Rate','Nitrogen_X_Dry','Total_Hydrocarbons_Wet','Methane_Wet','Oxygen_Dry','Nitrogen_Monoxide_Dry','Carbon_Dioxide_Dry',CO]
-        AbbrList = ['MFRAIR','NO','THC','CH4','O2','NOx','CO2','CO']
+        ChannelList = ['Air_Flow_Rate','Nitrogen_X_Dry','Total_Hydrocarbons_Wet','Methane_Wet','Oxygen_Dry','Nitrogen_Monoxide_Dry','Carbon_Dioxide_Dry','Carbon_Monoxide_Dry']
+        AbbrList = ['MFRAIR','NOx','THC','CH4','O2','NO','CO2','CO']
 
         for Channel, Abbr in zip(ChannelList,AbbrList):
             self.Data[[self.MapDict[Channel]]] = self.Data[[self.MapDict[Channel]]].shift(-1*self.Array[Abbr])
             self.Data[[self.MapDict[Channel]]] = self.Data[[self.MapDict[Channel]]].fillna(self.Data[[self.MapDict[Channel]]].irow(-1))
 
+        self.Data = self.Data.ix[:len(self.Data)-29]
 

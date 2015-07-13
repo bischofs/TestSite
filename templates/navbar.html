@@ -8,7 +8,6 @@
         <span class="icon-bar"></span>
       </button>
       <a class="navbar-brand" href="/">Evaluation Tool 0.9.1 (BETA)</a>
-      <a class="navbar-brand" href="/1065">1065</a>
     </div> <!-- ./navbar-header -->
 
     <div class="collapse navbar-collapse" id="not-google-plus-nav">
@@ -17,10 +16,8 @@
           <li><a href="/+{{ user.username }}">+{{ user.username }}</a></li>
           <li><a href="/+{{ user.username }}/settings">Settings</a></li>
           <li><a href="javascript:void(0)"  ng-click="vm.logout()">Logout</a></li>
-          <li><a href="1065/1065">1065</a></li>
-        {% else %}
+         {% else %}
 	  <li><a href="1065/login/">Login</a></li>
-          <li><a href="1065/register/">Register</a></li>
         {% endif %}
       </ul>
     </div> <!-- /.collapse.navbar-collapse -->

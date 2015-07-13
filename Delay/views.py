@@ -16,13 +16,11 @@ class DelayView(views.APIView):
     def get(self, request, format=None):
 
         try:
-
             cache = caches['default']
             dataHandler = cache.get(request.session.session_key)
 
-            delayPrep = DelayPrep(dataHandler.testData.data, dataHandler.masterDict, dataHandler.CoHigh)
+            delayPrep = DelayPrep(dataHandler.testData.data, dataHandler.masterDict)
             js = delayPrep.create_windows()
-            #if(dataHandler.allFilesUploaded == False):
                 
             return Response(js,status=200)
 
@@ -41,7 +39,7 @@ class DelayView(views.APIView):
             cache = caches['default']
             dataHandler = cache.get(request.session.session_key)
 
-            Submit = DelaySubmit(dataHandler.testData.data, dataHandler.masterDict, request.DATA['delay'], dataHandler.CoHigh)
+            Submit = DelaySubmit(dataHandler.testData.data, dataHandler.masterDict, request.DATA['delay'])
             dataHandler.testData.data = Submit.Data
             dataHandler.resultsLog['Data Alignment'] = Submit.Array
 
@@ -57,8 +55,3 @@ class DelayView(views.APIView):
             'message': str(e)
             }, status=status.HTTP_400_BAD_REQUEST)
 
-
-
-
-
-    #def post(self)  post delays

@@ -14,9 +14,8 @@
 
         $scope.delay = 0;
         $scope.CH4Delay = $scope.NOxDelay = $scope.CODelay  = $scope.CO2Delay = $scope.O2Delay = $scope.NODelay = $scope.MAFDelay = $scope.THCDelay = 0;
-        $scope.currentSpec = "Nitrogen_X_Dry";
-        $scope.save = {'NOx':0,'CH4':0,'THC':0,'CO':0,'CO2':0,'O2':0,'NO':0,'MFRAIR':0}
-        $scope.Array = {'NOx':'Nitrogen_X_Dry','CH4':'Methane_Wet','THC':'Total_Hydrocarbons_Wet','CO':'Carbon_Monoxide_High_Dry','CO2':'Carbon_Dioxide_Dry','O2':'Oxygen_Dry','NO':'Nitrogen_Monoxide_Dry','MFRAIR':'Air_Flow_Rate'}
+        $scope.currentSpec = "Nitrogen_X_Dry";        
+        $scope.Array = {'NOx':'Nitrogen_X_Dry','CH4':'Methane_Wet','THC':'Total_Hydrocarbons_Wet','CO':'Carbon_Monoxide_Dry','CO2':'Carbon_Dioxide_Dry','O2':'Oxygen_Dry','NO':'Nitrogen_Monoxide_Dry','MFRAIR':'Air_Flow_Rate'}
 
         $scope.species = function() {
 
@@ -93,7 +92,8 @@
                     $scope.series = ['NOx', 'Torque'];
                     $scope.labels = _.keys($scope.spec[$scope.Array[$scope.ChosenSpecies]]).splice(50, 100);
                     $scope.data = [_.values($scope.spec[$scope.Array[$scope.ChosenSpecies]]).splice(50, 100), _.values($scope.spec.Engine_Torque).splice(50, 100)];
-                    $scope.currentSpec = $scope.spec[$scope.Array[$scope.ChosenSpecies]];            
+                    $scope.currentSpec = $scope.spec[$scope.Array[$scope.ChosenSpecies]];     
+                    $scope.save = {'NOx':0,'CH4':0,'THC':0,'CO':0,'CO2':0,'O2':0,'NO':0,'MFRAIR':0}       
                     $scope.apply;        
                     toastr.success('Prepartion for Delay finished!');            
 

@@ -13,10 +13,6 @@ import io
 class Calculator:
 
   def __init__(self, DataHandler, MapDict, ReportParams):
-
-    import ipdb
-    ipdb.set_trace()
-        
     self.preparation = Preparation(DataHandler, MapDict)   
     self.calculation = Calculation(self.preparation, MapDict)
     DataHandler, MapDict, ReportParams = None, None, None
@@ -31,33 +27,25 @@ class Preparation:
     self.pre = DataHandler.preZeroSpan.data
     self.post = DataHandler.postZeroSpan.data
     self.test = DataHandler.testData.data
-    self.TestType = DataHandler.testData.metaData['test_type']
-
-    ##### CoHigh or COL #####
-    if DataHandler.CoHigh:
-         self.CO = MapDict['Carbon_Monoxide_High_Dry']
-         COString = 'COH'
-    else:
-         self.CO = MapDict['Carbon_Monoxide_Low_Dry']
-         COString = 'COL'
+    self.TestType = DataHandler.CycleAttr['CycleType']
 
     ##### Prepare Fuel and E-bench data #####
-    self.FuelData = self._fuel_data(DataHandler.testData.metaData, MapDict)
-    self.EbenchData = self._ebench_data(DataHandler.ebenchData, DataHandler.testData.data,MapDict, COString)               
+    self.FuelData = self._fuel_data(DataHandler.testData.metaData, DataHandler.CycleAttr, MapDict)
+    self.EbenchData = self._ebench_data(DataHandler.ebenchData, DataHandler.testData.data,MapDict)               
 
     ##### Prepare Pre/Post-Data #####
-    self.Species = [MapDict['Carbon_Dioxide_Dry'],self.CO,MapDict['Nitrogen_X_Dry'],
+    self.Species = [MapDict['Carbon_Dioxide_Dry'],MapDict['Carbon_Monoxide_Dry'],MapDict['Nitrogen_X_Dry'],
                     MapDict['Total_Hydrocarbons_Wet'],MapDict['Methane_Wet']]                  
-    self.ZeroSpan = self._zeroSpan(self.pre, self.post, self.Species, self.EbenchData)        
+    self.ZeroSpan = self._zeroSpan(self.pre, self.post, MapDict, self.EbenchData)        
 
     ##### Prepare Test parameter
-    if (self.TestType == 'Transient').bool:
+    if self.TestType == 'Transient':
          self.TransientBool = True
     else:
          self.TransientBool = False
 
 
-  def _fuel_data(self, HeaderData, MapDict):
+  def _fuel_data(self, HeaderData, CycleAttr, MapDict):
 
 
     ##### Carbon Mass Fraction and Fuel Composition -- CFR 1065.655 #####
@@ -93,10 +81,14 @@ class Preparation:
 
     FuelData.xH2Ogas = 3.5 # Constant Value does not belong to fuel (water-gas reaction equilibrium coefficient)
 
+    ##### Choose Factors for xNOxcorrwet Reference: CFR 1065.670, according to Fuel
+    FuelData.FactorMult = CycleAttr['FactorMult']
+    FuelData.FactorAdd = CycleAttr['FactorAdd']
+
     return FuelData
 
 
-  def _ebench_data(self, ebenchData,TestData,MapDict,COString):    
+  def _ebench_data(self, ebenchData,TestData,MapDict):    
 
     EbenchData = pd.DataFrame(data=np.zeros([14,1]),index=['RFPF','CH4_RF','Tchiller','Pchiller','Pamb','Factorchiller',
                                                          'xTHC_THC_FID_init','xCO2intdry','xCO2dildry','Bottle_Concentration_CO2',
@@ -106,7 +98,7 @@ class Preparation:
     EbenchData.RFPF = ebenchData['RFPF']
     EbenchData.CH4_RF = ebenchData['CH4_RF']
     EbenchData.Tchiller = ebenchData['Tchiller'] + 273.15 # in K      
-    EbenchData.Pamb = np.mean(TestData[MapDict['Air_Ambient_Pressure']])*100 # bar --> kPa
+    EbenchData.Pamb = 99.16  #np.mean(TestData[MapDict['Air_Ambient_Pressure']])*100 # bar --> kPa
     EbenchData.Pchiller = ebenchData['Pchiller'] + EbenchData.Pamb
     EbenchData.xCO2intdry = 0.000375 ## CFR 1065.655
     EbenchData.xCO2dildry = 0.000375 ## CFR 1065.655
@@ -115,7 +107,7 @@ class Preparation:
 
     ##### Bottle Concentrations from Ebench #####
     EbenchData.Bottle_Concentration_CO2 = ebenchData['Bottle_Concentration_CO2']
-    EbenchData.Bottle_Concentration_CO = ebenchData['Bottle_Concentration_' + COString]
+    EbenchData.Bottle_Concentration_CO = ebenchData['Bottle_Concentration_CO']
     EbenchData.Bottle_Concentration_NOX = ebenchData['Bottle_Concentration_NOX']
     EbenchData.Bottle_Concentration_THC = ebenchData['Bottle_Concentration_THC']
     EbenchData.Bottle_Concentration_NMHC =  ebenchData['Bottle_Concentration_NMHC']
@@ -126,26 +118,28 @@ class Preparation:
     return EbenchData
 
 
-  def _zeroSpan(self, Pre, Post, Species, Ebench):
+  def _zeroSpan(self, Pre, Post, MapDict, Ebench):     
       
     ListFactor = [10000,10000,1,1,1]          
-    ZeroSpan = pd.DataFrame(data=np.zeros([5,5]),index=['PreZero','PreSpan','PostZero','PostSpan','Chosen'],columns=Species)
-    TimeWindow = self._prepare_time_window(Species)
+    ZeroSpan = pd.DataFrame(data=np.zeros([5,5]),index=['PreZero','PreSpan','PostZero','PostSpan','Chosen'],
+                                                 columns=[MapDict['Carbon_Dioxide_Dry'], MapDict['Carbon_Monoxide_Dry'], MapDict['Nitrogen_X_Dry'],
+                                                          MapDict['Total_Hydrocarbons_Wet'], MapDict['Methane_Wet']])
+    TimeWindow = self._prepare_time_window(MapDict)
 
-    ##### Chosen-Data From Ebench
-    ZeroSpan[Species[0]]['Chosen'] = Ebench.Bottle_Concentration_CO2
-    ZeroSpan[Species[1]]['Chosen'] = Ebench.Bottle_Concentration_CO
-    ZeroSpan[Species[2]]['Chosen'] = Ebench.Bottle_Concentration_NOX
-    ZeroSpan[Species[3]]['Chosen'] = Ebench.Bottle_Concentration_THC
-    ZeroSpan[Species[4]]['Chosen'] = Ebench.Bottle_Concentration_NMHC
+    ##### Chosen-Data From Ebench, Bottle Concentrations in ppm in Database ######
+    ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['Chosen'] = Ebench.Bottle_Concentration_CO2
+    ZeroSpan[MapDict['Carbon_Monoxide_Dry']]['Chosen'] = Ebench.Bottle_Concentration_CO
+    ZeroSpan[MapDict['Nitrogen_X_Dry']]['Chosen'] = Ebench.Bottle_Concentration_NOX
+    ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['Chosen'] = Ebench.Bottle_Concentration_THC
+    ZeroSpan[MapDict['Methane_Wet']]['Chosen'] = Ebench.Bottle_Concentration_NMHC      
 
     ##### Pre Zero/Span #####
     Name = {'Zero':'PreZero','Span':'PreSpan'}
-    ZeroSpan = self._prepare_type(ZeroSpan,Species,TimeWindow,Pre,Name)
+    ZeroSpan = self._prepare_type(ZeroSpan,MapDict,TimeWindow,Pre,Name)
 
     ##### Post Zero/Span #####
     Name = {'Zero':'PostZero','Span':'PostSpan'}
-    ZeroSpan = self._prepare_type(ZeroSpan,Species,TimeWindow,Post,Name)
+    ZeroSpan = self._prepare_type(ZeroSpan,MapDict,TimeWindow,Post,Name)
 
     # Clear Variables
     ListFactor, TimeWindow, Name = None, None, None
@@ -153,28 +147,32 @@ class Preparation:
     return ZeroSpan
 
 
-  def _prepare_time_window(self,Species):
+  def _prepare_time_window(self, MapDict):
 
-    ## Species = ['CO2','CO','NOX','THC','CH4'] these are the Species in the array but with the channel names
     TypeTime = ['Zero_start','Zero_end','Span_start','Span_end']
     SpecTime = [0,59,60,119] # Time window for Zero and Span Data
-    TimeWindow = pd.DataFrame(data = np.ones([4,5]), columns=Species, index=TypeTime)
+    TimeWindow = pd.DataFrame(data = np.ones([4,5]), columns=[MapDict['Carbon_Dioxide_Dry'],MapDict['Carbon_Monoxide_Dry'],
+                                                              MapDict['Nitrogen_X_Dry'],MapDict['Total_Hydrocarbons_Wet'],
+                                                              MapDict['Methane_Wet']], index=TypeTime)
 
     for TimePoint, SpecTime in zip(TypeTime,SpecTime):
       TimeWindow.loc[TimePoint,:] = SpecTime
         
-    TimeWindow[Species[0]]['Span_start'] = 120
-    TimeWindow[Species[0]]['Span_end'] = 179
-    TimeWindow[Species[4]]['Span_start'] = 120
-    TimeWindow[Species[4]]['Span_end'] = 179
+    TimeWindow[MapDict['Carbon_Dioxide_Dry']]['Span_start'] = 120
+    TimeWindow[MapDict['Carbon_Dioxide_Dry']]['Span_end'] = 179
+    TimeWindow[MapDict['Methane_Wet']]['Span_start'] = 120
+    TimeWindow[MapDict['Methane_Wet']]['Span_end'] = 179
 
     # Clear Variables
-    Species, TypeTime, SpecTime = None, None, None
+    TypeTime, SpecTime = None, None
 
     return TimeWindow
 
 
-  def _prepare_type(self, ZeroSpan, Species, TimeWindow, Data, name): 
+  def _prepare_type(self, ZeroSpan, MapDict, TimeWindow, Data, name):
+
+    Species = [MapDict['Carbon_Dioxide_Dry'], MapDict['Carbon_Monoxide_Dry'], MapDict['Nitrogen_X_Dry'],
+               MapDict['Total_Hydrocarbons_Wet'], MapDict['Methane_Wet']]
 
     for spec in Species:
       ColumnZero = Data.loc[TimeWindow[spec][0]:TimeWindow[spec][1], spec]
@@ -211,42 +209,52 @@ class Calculation:
     def __init__(self, Preparation, MapDict):
 
         if Preparation.TransientBool == True:
-             self._transient_calculation(Preparation, MapDict)
-             self.result = self._result()             
+
+            self._transient_calculation(Preparation, MapDict)
+            self.result = self._result()  
+
         else:
-             self._steady_state_calculation(Preparation, MapDict)
+            Preparation.test = self._prepare_steady_state(Preparation.test, MapDict)
+            self._transient_calculation(Preparation, MapDict)
+            self.result = self._result()
 
 
     def _transient_calculation(self, Preparation, MapDict):
 
-        Species = Preparation.Species
         ZeroSpan = Preparation.ZeroSpan
         DataUn = pd.DataFrame()
         DataCor = pd.DataFrame()
 
         ##### Drif-uncorrected Calc #####
-        [DataUn, self.ArraySumUn] = self._inner_calc(Preparation, DataUn, Species)
+        [DataUn, self.ArraySumUn] = self._inner_calc(Preparation, DataUn, MapDict)
 
-        ##### Drift-corrected Calc #####
+        ##### Drift-corrected Calc #####     
         PreparationDrift = Preparation
-        PreparationDrift.test = self._drift_correction(DataUn, ZeroSpan, Preparation.test, Species)
-        [DataCor, self.ArraySumCor] = self._inner_calc(PreparationDrift, DataCor, Species)  
+        PreparationDrift.test = self._drift_correction(DataUn, ZeroSpan, Preparation.test, MapDict)
+        [DataCor, self.ArraySumCor] = self._inner_calc(PreparationDrift, DataCor, MapDict)  
         [self.ArraySumCorWon, self.U_BPOW_Factor] = self._remove_negatives(DataCor, Preparation.test, MapDict)
 
         self.ArraySum = [self.ArraySumUn, self.ArraySumCor, self.ArraySumCorWon]
         self.Data = [Preparation.test, DataUn, DataCor]
 
         # Clear Variables
-        Species, ZeroSpan, DataUn, DataCor = None, None, None, None
+        ZeroSpan, DataUn, DataCor = None, None, None
 
 
-    def _steady_state_calculation(self, Preparation):
+    def _prepare_steady_state(self, data, MapDict):
 
         ## Calculate steady state Cycle
-        pass
+        TestData = data
+        ModeArray = pd.Series(TestData['N_CERTMODE']).unique()
+        MeanFrame = pd.DataFrame(columns=TestData.columns.values)
+        for Mode, i in zip(ModeArray, range(0,len(ModeArray))):
+            AvgArray = TestData[TestData['N_CERTMODE']==Mode].mean()
+            MeanFrame.loc[i] = AvgArray
+
+        return MeanFrame
 
 
-    def _inner_calc(self, Preparation, Data, Species):
+    def _inner_calc(self, Preparation, Data, MapDict):
 
         ##### Load Data #####
         TestData = Preparation.test
@@ -254,51 +262,50 @@ class Calculation:
         Fuel = Preparation.FuelData 
 
         ##### Steps of calculation #####
-        Data = self._unit_conversion(Data, TestData, Species)
-        Data = self._prepare_iteration(Data, TestData, Ebench)
+        Data = self._unit_conversion(Data, TestData, MapDict)
+        Data = self._prepare_iteration(Data, TestData, Ebench, MapDict)
         Data = self._iteration(Data, Fuel, Ebench)
         [Data, ArraySum] = self._rest_calculation(Data, Fuel)
 
         # Clear Variables
-        Preparation, Species, TestData, Ebench, Fuel = None, None, None, None, None
+        Preparation, TestData, Ebench, Fuel = None, None, None, None
 
         return Data, ArraySum
 
 
-    def _unit_conversion(self, Data, TestData, Species):
+    def _unit_conversion(self, Data, TestData, MapDict):
 
         # Species
-        Data["E_CO2D2"] = TestData[Species[0]]*10000 # % --> ppm
-        Data[Species[1]] = TestData[Species[1]]*10000 # % --> ppm
-        Data["E_NOXD2"] = TestData.E_NOXD2 # in ppm
-        Data["E_THCW2"] = TestData.E_THCW2 # in ppm        
+        Data[MapDict["Carbon_Dioxide_Dry"]] = TestData[MapDict["Carbon_Dioxide_Dry"]]*10000 # % --> ppm
+        Data[MapDict["Carbon_Monoxide_Dry"]] = TestData[MapDict["Carbon_Monoxide_Dry"]]*10000 # % --> ppm
+        Data[MapDict["Nitrogen_X_Dry"]] = TestData[MapDict["Nitrogen_X_Dry"]] # in ppm
+        Data[MapDict["Total_Hydrocarbons_Wet"]] = TestData[MapDict["Total_Hydrocarbons_Wet"]] # in ppm        
 
-        Data["xCH4wet"] = TestData[Species[4]]/1000000 # ppm --> mol/mol
-        Data["xCO2meas"] = Data.E_CO2D2/1000000 # ppm --> mol/mol
-        Data["xCOmeas"] = Data.get(Species[1])/1000000 # ppm --> mol/mol
-        Data["xNOxmeas"] = Data.E_NOXD2/1000000 # ppm --> mol/mol
-        Data["xTHCmeas"] = Data.E_THCW2/1000000 # ppm --> mol/mol
+        Data["xCH4wet"] = TestData[MapDict['Methane_Wet']]/1000000 # ppm --> mol/mol
+        Data["xCO2meas"] = Data[MapDict["Carbon_Dioxide_Dry"]]/1000000 # ppm --> mol/mol
+        Data["xCOmeas"] = Data.get(MapDict["Carbon_Monoxide_Dry"])/1000000 # ppm --> mol/mol
+        Data["xNOxmeas"] = Data[MapDict["Nitrogen_X_Dry"]]/1000000 # ppm --> mol/mol
 
         # Flows
-        Data["mfuel"] = TestData.M_FRFUEL*1000/3600 # kg/h --> g/s
+        Data["mfuel"] = TestData[MapDict["Fuel_Flow_Rate"]]*1000/3600 # kg/h --> g/s
         Data["Molar Flow Wet"] = TestData.C_FRAIRWS*1000/3600 # kg/h --> g/s
         Data["Intake Air flow"] = Data.get("Molar Flow Wet")/28.96 # g/sec --> mol/sec
 
         # Rest
-        Data["BARO Press"] = TestData.P_INLET*10000 # bar --> Pa
-        Data["T_INLET"] = TestData.T_INLET + 273.15 # °C --> K
+        Data["BARO Press"] = TestData[MapDict["Air_Inlet_Pressure"]]*10000 # bar --> Pa
+        Data["T_INLET"] = TestData[MapDict["Air_Inlet_Temperature"]] + 273.15 # °C --> K
 
         # Clear Variables
-        TestData, Species = None, None
+        TestData = None
 
         return Data
 
 
-    def _prepare_iteration(self, Data, TestData, Ebench):    
+    def _prepare_iteration(self, Data, TestData, Ebench, MapDict):    
 
         # Intake
         Data["pH2O @ inlet"] = 10**(10.79574*(1-(273.16/(Data.T_INLET)))-5.028*np.log10((Data.T_INLET)/273.16)+0.000150475*(1-10**(-8.2969*(((Data.T_INLET)/273.16)-1)))+0.00042873*(10**(4.76955*(1-(273.16/(Data.T_INLET))))-1)-0.2138602)
-        Data["xH2O"] = TestData.M_RELHUM*Data.get("pH2O @ inlet")/(Data.get("BARO Press"))
+        Data["xH2O"] = TestData[MapDict["Relative_Humidity"]]*Data.get("pH2O @ inlet")/(Data.get("BARO Press"))
         Data["xH2Oint"] = Data.xH2O
         Data["Mmix"] = 28.96559*(1-Data.xH2O)+18.01528*Data.xH2O
         Data["nint (Intake Air Flow)"] = Data.get("Molar Flow Wet")/Data.Mmix
@@ -312,7 +319,9 @@ class Calculation:
         Data["xCO2dil"] = Ebench.xCO2dildry/(1+Data.xH2Odildry)
 
         # Rest
-        Data["xTHC[THC_FID]cor"] = Data.E_THCW2-Ebench.xTHC_THC_FID_init
+        Data["xTHC[THC_FID]cor"] = Data[MapDict["Total_Hydrocarbons_Wet"]]-Ebench.xTHC_THC_FID_init
+        Data[MapDict["Total_Hydrocarbons_Wet"]] = Data["xTHC[THC_FID]cor"]
+        Data["xTHCmeas"] = Data[MapDict["Total_Hydrocarbons_Wet"]]/1000000 # ppm --> mol/mol
         Data["xNO2meas"] = Data.xNOxmeas*0 # NO2 not measured
         Data["xNOmeas"] = Data.xNOxmeas*1
         Data["xTHCwet"] = Data.xTHCmeas
@@ -398,19 +407,18 @@ class Calculation:
             
             return [eq1,eq2,eq3,eq4,eq5,eq6,eq7,eq8,eq9,eq10,eq11,eq12,eq13,eq14,eq15,eq16,eq17,eq18]
 
-        i = 0
         Mode = 0
-        ResultList = np.zeros((len(Data),18))     
+        ResultList = np.zeros((len(Data),18))
+        g = 0.5 # First guess for iteration start
+        Solution = (g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g)    
 
-        while i < len(Data)-1:
-            i +=1  
-            g = 0.5 # First guess for iteration start
-
-            Solution = opt.fsolve(function_iteration,(g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g))
+        for i in range(0,len(Data)-1):
+             
+            Solution = opt.fsolve(function_iteration,Solution)
             
             if Solution[2]<Ebench.Factorchiller:
                 Mode = 1 # Different Calculation with mode 1 or 0
-                Solution = opt.fsolve(function_iteration,(g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g))
+                Solution = opt.fsolve(function_iteration,Solution)
                 Mode = 0
             ResultList[:][i] = Solution
 
@@ -439,7 +447,7 @@ class Calculation:
         Data["xNO2wet"] = Data.xNO2meas*((1-Data.xH2Oexh)/(1-Data.xH2ONO2meas))
         Data["xNOwet"] = Data.xNOmeas*((1-Data.xH2Oexh)/(1-Data.xH2ONOmeas))
         Data["xCO2wet"] = Data.xCO2meas*((1-Data.xH2Oexh)/(1-Data.xH2OCO2meas))
-        Data["xNOxcorrwet"] = Data.xNOxwet*(18.84 *Data.xH2O + 0.68094) ## Reference: CFR 1065.670 !!!!!@!@!@@!??? Change the value to take from json
+        Data["xNOxcorrwet"] = Data.xNOxwet*(float(Fuel.FactorMult) * Data.xH2O + float(Fuel.FactorAdd)) ## Reference: CFR 1065.670 !!!!!@!@!@@!??? Change the value to take from json
 
         # Masses of emissions
         Data["nexh"] = Data.get("nint (Intake Air Flow)")/(1+((Data.get("xint/exhdry")-Data.get("xraw/exhdry"))/(1+Data.xH2Oexhdry)))
@@ -453,22 +461,22 @@ class Calculation:
         ArraySum = {'CO2':Data.Mass_CO2.sum(),'CO':Data.Mass_CO.sum(),'NOx':Data.Mass_NOx.sum(),'THC':Data.Mass_THC.sum(),'NMHC':Data.Mass_NMHC.sum()}
 
         # Clear Variables
-        Fuel = None, None, None, None, None, None
+        Fuel = None
 
         return Data, ArraySum
 
 
-    def _drift_correction(self, DataUn, ZeroSpan, TestData, Species):
+    def _drift_correction(self, DataUn, ZeroSpan, TestData, MapDict):
 
         ## Correct Raw-Emissions ##
-        TestData['E_CO2D2'] = ZeroSpan.E_CO2D2['Chosen']*((2*DataUn.E_CO2D2)-(ZeroSpan.E_CO2D2['PreZero']+ZeroSpan.E_CO2D2['PostZero']))/((ZeroSpan.E_CO2D2['PreSpan']+ZeroSpan.E_CO2D2['PostSpan'])-(ZeroSpan.E_CO2D2['PreZero']+ZeroSpan.E_CO2D2['PostZero']))/10000 # in % because of later calculation
-        TestData[Species[1]] = ZeroSpan[Species[1]]['Chosen']*((2*DataUn.get(Species[1]))-(ZeroSpan[Species[1]]['PreZero']+ZeroSpan[Species[1]]['PostZero']))/((ZeroSpan[Species[1]]['PreSpan']+ZeroSpan[Species[1]]['PostSpan'])-(ZeroSpan[Species[1]]['PreZero']+ZeroSpan[Species[1]]['PostZero']))/10000 # in % because of later calculation
-        TestData['E_NOXD2'] = ZeroSpan.E_NOXD2['Chosen']*((2*TestData.E_NOXD2)-(ZeroSpan.E_NOXD2['PreZero']+ZeroSpan.E_NOXD2['PostZero']))/((ZeroSpan.E_NOXD2['PreSpan']+ZeroSpan.E_NOXD2['PostSpan'])-(ZeroSpan.E_NOXD2['PreZero']+ZeroSpan.E_NOXD2['PostZero']))
-        TestData['E_THCW2'] = ZeroSpan.E_THCW2['Chosen']*((2*DataUn.get('xTHC[THC_FID]cor'))-(ZeroSpan.E_THCW2['PreZero']+ZeroSpan.E_THCW2['PostZero']))/((ZeroSpan.E_THCW2['PreSpan']+ZeroSpan.E_THCW2['PostSpan'])-(ZeroSpan.E_THCW2['PreZero']+ZeroSpan.E_THCW2['PostZero']))
-        TestData['E_CH4W2'] = ZeroSpan.E_CH4W2['Chosen']*((2*TestData.E_CH4W2)-(ZeroSpan.E_CH4W2['PreZero']+ZeroSpan.E_CH4W2['PostZero']))/((ZeroSpan.E_CH4W2['PreSpan']+ZeroSpan.E_CH4W2['PostSpan'])-(ZeroSpan.E_CH4W2['PreZero']+ZeroSpan.E_CH4W2['PostZero']))
+        TestData[MapDict['Carbon_Dioxide_Dry']] = ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['Chosen']*((2*DataUn[MapDict['Carbon_Dioxide_Dry']])-(ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PreZero']+ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PostZero']))/((ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PreSpan']+ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PostSpan'])-(ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PreZero']+ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PostZero']))/10000 # in % because of later calculation
+        TestData[MapDict["Carbon_Monoxide_Dry"]] = ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['Chosen']*((2*DataUn.get(MapDict["Carbon_Monoxide_Dry"]))-(ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PreZero']+ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PostZero']))/((ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PreSpan']+ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PostSpan'])-(ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PreZero']+ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PostZero']))/10000 # in % because of later calculation
+        TestData[MapDict['Nitrogen_X_Dry']] = ZeroSpan[MapDict['Nitrogen_X_Dry']]['Chosen']*((2*TestData[MapDict['Nitrogen_X_Dry']])-(ZeroSpan[MapDict['Nitrogen_X_Dry']]['PreZero']+ZeroSpan[MapDict['Nitrogen_X_Dry']]['PostZero']))/((ZeroSpan[MapDict['Nitrogen_X_Dry']]['PreSpan']+ZeroSpan[MapDict['Nitrogen_X_Dry']]['PostSpan'])-(ZeroSpan[MapDict['Nitrogen_X_Dry']]['PreZero']+ZeroSpan[MapDict['Nitrogen_X_Dry']]['PostZero']))
+        TestData[MapDict['Total_Hydrocarbons_Wet']] = ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['Chosen']*((2*DataUn.get('xTHC[THC_FID]cor'))-(ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PreZero']+ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PostZero']))/((ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PreSpan']+ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PostSpan'])-(ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PreZero']+ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PostZero']))
+        TestData[MapDict['Methane_Wet']] = ZeroSpan[MapDict['Methane_Wet']]['Chosen']*((2*TestData[MapDict['Methane_Wet']])-(ZeroSpan[MapDict['Methane_Wet']]['PreZero']+ZeroSpan[MapDict['Methane_Wet']]['PostZero']))/((ZeroSpan[MapDict['Methane_Wet']]['PreSpan']+ZeroSpan[MapDict['Methane_Wet']]['PostSpan'])-(ZeroSpan[MapDict['Methane_Wet']]['PreZero']+ZeroSpan[MapDict['Methane_Wet']]['PostZero']))
 
         # Clear Variables
-        DataUn, ZeroSpan, Species = None, None, None
+        DataUn, ZeroSpan = None, None
 
         return TestData
 
@@ -525,7 +533,8 @@ class Report:
 
         ###### Load Variables #####
         self.output = output
-        #Test, Uncorrected, Corrected = Calculator.Data
+        Test, Uncorrected, Corrected = CalculatorLog['Data']
+        Test = DataHandler.testData.data
         ArraySumUn, ArraySumCor, ArraySumCorWon = CalculatorLog['Array']
         self.DriftUncorrected, self.DriftCorrected, self.Final = CalculatorLog['Results']
         Species = ['CO2','CO','NOx','THC','NMHC']  
@@ -538,9 +547,9 @@ class Report:
         self.sheet = self._write_first_page(self.sheet, DataHandler.resultsLog, CalculatorLog['ZeroSpan'], DelayArray)
         
         ##### Write Data according to choosen options #####
-        #self.sheet2 = self._write_dataframe(self.sheet2, Test)
-        #self.sheet3 = self._write_dataframe(self.sheet3, Uncorrected)
-        #self.sheet4 = self._write_dataframe(self.sheet4, Corrected)
+        self.sheet2 = self._write_dataframe(self.sheet2, Test)
+        self.sheet3 = self._write_dataframe(self.sheet3, Uncorrected)
+        self.sheet4 = self._write_dataframe(self.sheet4, Corrected)
 
         self.file.close()
 
@@ -549,9 +558,9 @@ class Report:
 
         file = xlsxwriter.Workbook(output, {'in_memory':True})
         self.sheet = file.add_worksheet('Emissions_Calculations')
-        #self.sheet2 = file.add_worksheet('Raw Data')
-        #self.sheet3 = file.add_worksheet('Drift-uncorrected Data')
-        #self.sheet4 = file.add_worksheet('Drift-corrected Data')
+        self.sheet2 = file.add_worksheet('Raw Data')
+        self.sheet3 = file.add_worksheet('Drift-uncorrected Data')
+        self.sheet4 = file.add_worksheet('Drift-corrected Data')
 
         return file
 
@@ -594,58 +603,63 @@ class Report:
 
     def _write_first_page(self, sheet, ResultsLog, ZeroSpan, DelayArray):
 
-        Regression = ResultsLog['Regression'][0]
-        OmitChoice = ResultsLog['Regression'][1]
-        Regression_bool = ResultsLog['Regression_bool']
-        Delay = ResultsLog['Data Alignment']
+        if (not ResultsLog['Regression']) == False:
 
-        TypeList = ['Power', 'Speed', 'Torque']
-        Letters = ['B','C','D']
-        ResultsList = ['Intercept', 'Rsquared', 'Slope', 'Standard Error']
-        sheet.write_row('B2',TypeList,self.dark_grey)
-        sheet.write('A2','Parameter',self.dark_grey)
-        sheet.merge_range('A7:B7','Omit Choice :',self.bright_grey)
-        if OmitChoice == 0:
-            text = 'W/o omit'
-        elif OmitChoice == 1:
-            text = 'Omit 1 (Power & Torque)'
-        elif OmitChoice == 2:
-            text = 'Omit 2 (Power & Speed)'
-        elif OmitChoice == 3:
-            text = 'Omit 3.1 (Power & Torque)'
-        elif OmitChoice == 4:
-            text = 'Omit 3.2 (Power & Speed)'
-        elif OmitChoice == 5:
-            text = 'OOmit 4.1 (Power & Torque)'  
-        elif OmitChoice == 6:
-            text = 'Omit 4.2 (Power & Speed)'
-        sheet.merge_range('C7:D7',text,self.border)                                            
+            Regression = ResultsLog['Regression'][0]
+            OmitChoice = ResultsLog['Regression'][1]
+            Regression_bool = ResultsLog['Regression_bool']            
+
+            TypeList = ['Power', 'Speed', 'Torque']
+            Letters = ['B','C','D']
+            ResultsList = ['Intercept', 'Rsquared', 'Slope', 'Standard Error']
+            sheet.write_row('B2',TypeList,self.dark_grey)
+            sheet.write('A2','Parameter',self.dark_grey)
+            sheet.merge_range('A7:B7','Omit Choice :',self.bright_grey)
+            if OmitChoice == 0:
+                text = 'W/o omit'
+            elif OmitChoice == 1:
+                text = 'Omit 1 (Power & Torque)'
+            elif OmitChoice == 2:
+                text = 'Omit 2 (Power & Speed)'
+            elif OmitChoice == 3:
+                text = 'Omit 3.1 (Power & Torque)'
+            elif OmitChoice == 4:
+                text = 'Omit 3.2 (Power & Speed)'
+            elif OmitChoice == 5:
+                text = 'OOmit 4.1 (Power & Torque)'  
+            elif OmitChoice == 6:
+                text = 'Omit 4.2 (Power & Speed)'
+            sheet.merge_range('C7:D7',text,self.border)                                            
 
 
-        sheet.merge_range('A1:D1','Regression', self.merge)
-        for Type, letter in zip(TypeList, Letters):
-            for result, index2 in zip(ResultsList, range(1,len(ResultsList)+1)):
-                if Regression_bool[Type][result] == True:
-                    sheet.write(letter+str(index2+2),Regression[Type][result],self.green)
-                    sheet.write('A'+str(index2+2),result,self.bright_grey)
-                else:
-                    sheet.write(letter+str(index2+2),Regression[Type][result],self.red)
-                    sheet.write('A'+str(index2+2),result,self.bright_grey)
+            sheet.merge_range('A1:D1','Regression', self.merge)
+            for Type, letter in zip(TypeList, Letters):
+                for result, index2 in zip(ResultsList, range(1,len(ResultsList)+1)):
+                    if Regression_bool[Type][result] == True:
+                        sheet.write(letter+str(index2+2),Regression[Type][result],self.green)
+                        sheet.write('A'+str(index2+2),result,self.bright_grey)
+                    else:
+                        sheet.write(letter+str(index2+2),Regression[Type][result],self.red)
+                        sheet.write('A'+str(index2+2),result,self.bright_grey)
 
-        sheet.merge_range('A10:C10','Data Alignment', self.merge)
-        Species = ['CO2','CO','NOx','THC','NMHC','O2','MFRAIR']
-        sheet.write_row('A11:C11',['Species','Units','Delay'],self.dark_grey)
-        sheet.write_column('A12',Species,self.bright_grey)
-        sheet.write_column('B12',['seconds','seconds','seconds','seconds','seconds','seconds','seconds'],self.bright_grey)
+        if (not ResultsLog['Data Alignment']) == False: 
 
-        # Write Delay
-        sheet.write('C12',DelayArray['CO2'],self.border)
-        sheet.write('C13',DelayArray['CO'],self.border)
-        sheet.write('C14',DelayArray['NOx'],self.border)
-        sheet.write('C15',DelayArray['THC'],self.border)
-        sheet.write('C16',DelayArray['CH4'],self.border)
-        sheet.write('C17',DelayArray['O2'],self.border)
-        sheet.write('C18',DelayArray['MFRAIR'],self.border)
+            Delay = ResultsLog['Data Alignment']                    
+
+            sheet.merge_range('A10:C10','Data Alignment', self.merge)
+            Species = ['CO2','CO','NOx','THC','NMHC','O2','MFRAIR']
+            sheet.write_row('A11:C11',['Species','Units','Delay'],self.dark_grey)
+            sheet.write_column('A12',Species,self.bright_grey)
+            sheet.write_column('B12',['seconds','seconds','seconds','seconds','seconds','seconds','seconds'],self.bright_grey)
+
+            # Write Delay
+            sheet.write('C12',DelayArray['CO2'],self.border)
+            sheet.write('C13',DelayArray['CO'],self.border)
+            sheet.write('C14',DelayArray['NOx'],self.border)
+            sheet.write('C15',DelayArray['THC'],self.border)
+            sheet.write('C16',DelayArray['CH4'],self.border)
+            sheet.write('C17',DelayArray['O2'],self.border)
+            sheet.write('C18',DelayArray['MFRAIR'],self.border)
 
 
         ZeroSpan = pd.read_json(ZeroSpan)

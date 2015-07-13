@@ -1,0 +1,178 @@
+<div ng-controller="ResultsController" data-ng-init="Calculation()">
+    <div class="row">    
+        <div class="col-xs-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Options for Report</h3>
+                </div>
+                <div style="max-height: 300px;">
+                    <ul class="list-group checked-list-box">
+                        <li value=0 class="list-group-item">All Options</li>
+                        <li value=1 class="list-group-item">Phasing Results</li>
+                        <li value=2 class="list-group-item">Regression Results</li>
+                        <li value=3 class="list-group-item">Regression Omissions</li>
+                        <li value=4 class="list-group-item" data-checked="true">Corrected Results</li>
+                        <li value=5 class="list-group-item">Uncorrected Results</li>
+                        <li value=6 class="list-group-item">Step-by-Step Equation Results</li>
+                    </ul>
+                </div>
+            </div>    
+        </div>
+        <div class="col-xs-6">
+            <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Calculation Results</h3>
+                    </div>
+                    <div cg-busy="{promise:promise,message:message,backdrop:backdrop,delay:delay,minDuration:minDuration}">
+                    <div class="panel-body" id="ResultTable">                    
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Species</th>
+                                    <th>Data</th>
+                                    <th>Units</th>
+                                    <th>Total Mass</th>
+                                </tr>
+                            </thead>
+                            <tbody>                                
+                                <tr>
+                                    <td>{{CO2_Name}}</td>
+                                    <td>{{CO2_Result}}</td>
+                                    <td>{{CO2_Unit}}</td>
+                                    <td>{{CO2_Total}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{CO_Name}}</td>
+                                    <td>{{CO_Result}}</td>
+                                    <td>{{CO_Unit}}</td>
+                                    <td>{{CO_Total}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{NOX_Name}}</td>
+                                    <td>{{NOX_Result}}</td>
+                                    <td>{{NOX_Unit}}</td>
+                                    <td>{{NOX_Total}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{THC_Name}}</td>
+                                    <td>{{THC_Result}}</td>
+                                    <td>{{THC_Unit}}</td>
+                                    <td>{{THC_Total}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{NMHC_Name}}</td>
+                                    <td>{{NMHC_Result}}</td>
+                                    <td>{{NMHC_Unit}}</td>
+                                    <td>{{NMHC_Total}}</td>
+                                </tr>
+                            </tbody>
+                        </table>                    
+                    </div>             
+                </div>
+            </div>
+            <button type="button" class="btn btn-success btn-s"  ng-click="Report()">
+                <span class="glyphicon glyphicon-arrow-down"></span> Download Results
+            </button>           
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(function() {
+        $('.list-group.checked-list-box .list-group-item').each(function() {
+
+        // Settings
+        var $widget = $(this),
+        $checkbox = $('<input type="checkbox" class="hidden" />'),
+        color = ($widget.data('color') ? $widget.data('color') : "primary"),
+        style = ($widget.data('style') == "button" ? "btn-" : "list-group-item-"),
+        settings = {
+            on: {
+                icon: 'glyphicon glyphicon-check'
+            },
+            off: {
+                icon: 'glyphicon glyphicon-unchecked'
+            }
+        };
+
+        $widget.css('cursor', 'pointer')
+        $widget.append($checkbox);
+
+        // Event Handlers
+        $widget.on('click', function() {
+            $checkbox.prop('checked', !$checkbox.is(':checked'));
+            $checkbox.triggerHandler('change');
+            updateDisplay();
+        });
+        $checkbox.on('change', function() {
+            updateDisplay();
+        });
+
+
+        // Actions
+        function updateDisplay() {
+            var isChecked = $checkbox.is(':checked');
+
+            // Set the button's state
+            $widget.data('state', (isChecked) ? "on" : "off");
+
+            // Set the button's icon
+            $widget.find('.state-icon')
+            .removeClass()
+            .addClass('state-icon ' + settings[$widget.data('state')].icon);
+
+            // Update the button's color
+            if (isChecked) {
+                $widget.addClass(style + color + ' active');
+            } else {
+                $widget.removeClass(style + color + ' active');
+            }
+        }
+
+        // Initialization
+        function init() {
+
+            if ($widget.data('checked') == true) {
+                $checkbox.prop('checked', !$checkbox.is(':checked'));
+            }
+
+            updateDisplay();
+
+            // Inject the icon if applicable
+            if ($widget.find('.state-icon').length == 0) {
+                $widget.prepend('<span class="state-icon ' + settings[$widget.data('state')].icon + '"></span>');
+            }
+        }
+        init();
+    });
+
+$('#get-checked-data').on('click', function(event) {
+    event.preventDefault();
+    var checkedItems = {},
+    counter = 0;
+    $("#check-list-box li.active").each(function(idx, li) {
+        checkedItems[counter] = $(li).text();
+        counter++;
+    });
+    $('#display-json').html(JSON.stringify(checkedItems, null, '\t'));
+});
+});
+
+</script>
+<style type="text/css">
+    /* CSS REQUIRED */
+
+    .state-icon {
+        left: -5px;
+    }
+
+    .list-group-item-primary {
+        color: rgb(255, 255, 255);
+        background-color: rgb(66, 139, 202);
+    }
+    /* DEMO ONLY - REMOVES UNWANTED MARGIN */
+
+    .well .list-group {
+        margin-bottom: 0px;
+    }
+</style>
