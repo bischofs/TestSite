@@ -20,11 +20,16 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = 'c+rlxx%mmvg38gc@^%pq09#q*5u=m7ofq892s$15s2ag!5cna-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '172.26.1.87',
+    'compute01.fev.com',
+    'localhost',
+    '127.0.0.1',
+]
 
 
 AUTH_USER_MODEL = 'Authentication.Account'
@@ -70,8 +75,10 @@ WSGI_APPLICATION = 'TestSite.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'mysql.connector.django',
+        'NAME': 'django_db',
+        'USER': 'root',
+        'PASSWORD':'mazdarx7'
     }
 }
 
@@ -93,17 +100,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATICFILES_FINDERS = (
-      'django.contrib.staticfiles.finders.FileSystemFinder',
-      'django.contrib.staticfiles.finders.AppDirectoriesFinder'
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder'
       #'djangular.finders.NamespacedAngularAppDirectoriesFinder'
 )
 
-STATIC_URL = '/static/'
+STATIC_URL = '/1065/static/'
 
-STATIC_ROOT = 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')
 
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'dist/static'),
     os.path.join(BASE_DIR, 'static'),
 )
 

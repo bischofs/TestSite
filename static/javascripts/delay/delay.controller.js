@@ -76,8 +76,9 @@
                 });
         }
 
-        $scope.read = function() {
-            $http.get('/api/v1/data/delay/')
+
+        var read = function() {
+            $http.get('/1065/api/v1/data/delay/')
                 .success(function(data) {
                     var spec = JSON.parse(data)
                     $scope.spec = spec

@@ -26,7 +26,7 @@ class FileUploadView(views.APIView):
     def post(self, request, format=None):
 
         
-        try:
+        #try:
             
             cache = caches['default']
 
@@ -45,12 +45,12 @@ class FileUploadView(views.APIView):
             jsonLog = json.dumps(jsonDict)
             return Response(jsonLog, status=200)
             
-        except Exception as e:
+        # except Exception as e:
          
-            return Response({
-                'status': 'Bad request',
-                'message': str(e)
-            }, status=status.HTTP_400_BAD_REQUEST)
+        #     return Response({
+        #         'status': 'Bad request',
+        #         'message': str(e)
+        #     }, status=status.HTTP_400_BAD_REQUEST)
 
 
     def get(self, request):
