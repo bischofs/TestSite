@@ -1,0 +1,18 @@
+<div >
+<!--  <a ui-sref=".import">Show List</a> -->
+
+<button id="reg" type="button" class="btn btn-success btn-s" ui-sref=".Import" style="display:none;">Regression</button>
+
+<div class="col-md-12"  ui-view></div>
+
+
+<div class="col-md-12">
+  <button type="button" class="btn btn-success btn-s" ui-sref=".Import">Data Upload</button>
+  <textarea class="span12" rows="3" placeholder="What's up?" required></textarea>
+</div>
+
+
+
+
+</div>
+b

@@ -1,0 +1,271 @@
+<style>
+  .btn-file {
+    position: relative;
+    overflow: hidden;
+    left:0px
+  }
+  .btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    background: red;
+    cursor: inherit;
+    display: block;
+
+  }
+  input[readonly] {
+    background-color: white !important;
+    cursor: text !important;
+  }
+  .regoutput {
+    width: 130px;
+  }
+  .progress{
+    margin-top: 10px;
+    margin-left: 15px;
+    width: 365px;
+    height: 20px;
+  }
+
+</style>
+<div style="row">
+  <div class="col-md-12">
+    <div class="col-md-7">                
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Input Data</h3>
+        </div>
+        <div class="panel-body">
+          <div ng-controller="ImportController">
+            <h4>Full Load</h4>
+            <table>
+              <td>
+                <span class="btn btn-primary btn-file">Browse <input ng-click = "filetype='full'" type="file" multiple="multiple" nv-file-select="" uploader="uploader" name="file" /></span>  
+              </td>
+              <td width="120px">
+                <div class="progress">
+                  <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" ng-style="{ 'width': uploader.progress + '%' }" style="width: 0%;"/>
+                </div>
+              </td>
+            </table>                
+            <table class="table">
+              <thead>
+                <tr>
+                  <th width="50%">Name</th>
+                  <th ng-show="uploader.isHTML5">Size</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="item in uploader.queue">
+                  <td><strong>{{ item.file.name }}</strong></td>
+                  <td ng-show="uploader.isHTML5" nowrap>{{ item.file.size/1024/1024|number:2 }} MB</td>
+                  <td class="text-center">
+                    <span ng-show="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
+                    <span ng-show="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
+                    <span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
+                  </td>
+                  <td nowrap>
+                    <button type="button" class="btn btn-success btn-xs" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
+                      <span class="glyphicon glyphicon-upload"></span> Upload
+                    </button>
+                    <button type="button" class="btn btn-success btn-xs" ng-click="item.remove()">
+                      <span class="glyphicon glyphicon-trash"></span> Remove
+                    </button>                                                                 
+                  </td>
+                </tr>
+              </tbody>                                                       
+            </table>
+          </div> 
+          <div  ng-controller="ImportController">
+            <h4>Pre-Zero/Span</h4>
+            <table>
+              <td>
+                <span class="btn btn-primary btn-file">Browse <input type="file" ng-click="filetype='pre'" multiple="multiple" nv-file-select="" uploader="uploader" name="file" /></span>  
+              </td>
+              <td width="120px">
+                <div class="progress">
+                  <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" ng-style="{ 'width': uploader.progress + '%' }" style="width: 0%;"/>
+                </div>
+              </td>
+            </table>  
+            <table class="table">
+              <thead>
+                <tr>
+                  <th width="50%">Name</th>
+                  <th ng-show="uploader.isHTML5">Size</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="item in uploader.queue">
+                  <td><strong>{{ item.file.name }}</strong></td>
+                  <td ng-show="uploader.isHTML5" nowrap>{{ item.file.size/1024/1024|number:2 }} MB</td>
+                  <td class="text-center">
+                    <span ng-show="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
+                    <span ng-show="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
+                    <span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
+                  </td>
+                  <td nowrap>
+                    <button type="button" class="btn btn-success btn-xs" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
+                      <span class="glyphicon glyphicon-upload"></span> Upload
+                    </button>
+                    <button type="button" class="btn btn-success btn-xs" ng-click="item.remove()">
+                      <span class="glyphicon glyphicon-trash"></span> Remove
+                    </button>                                                                 
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div ng-controller="ImportController">
+            <h4>Test</h4>
+            <table>
+              <td>
+                <span class="btn btn-primary btn-file">Browse <input type="file" multiple="multiple" ng-click="filetype='test'" nv-file-select="" uploader="uploader" name="file" /></span>  
+              </td>
+              <td width="120px">
+                <div class="progress">
+                  <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" ng-style="{ 'width': uploader.progress + '%' }" style="width: 0%;"/>
+                </div>
+              </td>
+            </table>  
+            <table class="table">
+              <thead>
+                <tr>
+                  <th width="50%">Name</th>
+                  <th ng-show="uploader.isHTML5">Size</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="item in uploader.queue">
+                  <td><strong>{{ item.file.name }}</strong></td>
+                  <td ng-show="uploader.isHTML5" nowrap>{{ item.file.size/1024/1024|number:2 }} MB</td>
+                  <td class="text-center">
+                    <span ng-show="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
+                    <span ng-show="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
+                    <span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
+                  </td>
+                  <td nowrap>
+                    <button type="button" class="btn btn-success btn-xs" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
+                      <span class="glyphicon glyphicon-upload"></span> Upload
+                    </button>
+                    <button type="button" class="btn btn-success btn-xs" ng-click="item.remove()">
+                      <span class="glyphicon glyphicon-trash"></span> Remove
+                    </button>                                                                 
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div ng-controller="ImportController">
+            <h4>Post-Zero/Span</h4>
+            <table>
+              <td>
+                <span class="btn btn-primary btn-file">Browse <input type="file" multiple="multiple" ng-click="filetype='post'" nv-file-select="" uploader="uploader" name="file" /></span>  
+              </td>
+              <td width="120px">
+                <div class="progress">
+                  <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" ng-style="{ 'width': uploader.progress + '%' }" style="width: 0%;"/>
+                </div>
+              </td>
+            </table> 
+            <table class="table">
+              <thead>
+                <tr>
+                  <th width="50%">Name</th>
+                  <th ng-show="uploader.isHTML5">Size</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="item in uploader.queue">
+                  <td><strong>{{ item.file.name }}</strong></td>
+                  <td ng-show="uploader.isHTML5" nowrap>{{ item.file.size/1024/1024|number:2 }} MB</td>
+                  <td class="text-center">
+                    <span ng-show="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
+                    <span ng-show="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
+                    <span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
+                  </td>
+                  <td nowrap>
+                    <button type="button" class="btn btn-success btn-xs" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
+                      <span class="glyphicon glyphicon-upload"></span> Upload
+                    </button>
+                    <button type="button" class="btn btn-success btn-xs" ng-click="item.remove()">
+                      <span class="glyphicon glyphicon-trash"></span> Remove
+                    </button>                                                                 
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <div ng-controller="ImportController">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h2 class="panel-title">Regression</h2>
+          </div>
+          <div class="panel-body">
+            <div class="col-xs-4 ">
+              <h4>Power</h4> Intercept
+              <h4><span class="label {{label_powerI}}">{{powerI}}</span></h4>
+              Rsquared
+              <h4><span class="label {{label_powerr}}">{{powerr}}</span></h4>
+              Slope
+              <h4><span class="label {{label_powers}}">{{powers}}</span></h4>
+              Standard Error
+              <h4><span class="label {{label_powerse}}">{{powerse}}</span></h4>
+            </div>
+            <div class="col-xs-4">
+              <h4>Speed</h4> Intercept
+              <h4><span class="label {{label_speedI}}">{{speedI}}</span></h4>
+              Rsquared
+              <h4><span class="label {{label_speedr}}">{{speedr}}</span></h4>
+              Slope
+              <h4><span class="label {{label_speeds}}">{{speeds}}</span></h4>
+              Standard Error
+              <h4><span class="label {{label_speedse}}">{{speedse}}</span></h4>
+            </div>
+            <div class="col-xs-4">
+              <h4>Torque</h4> Intercept
+              <h4><span class="label {{label_torqueI}}">{{torqueI}}</span></h4>
+              Rsquared
+              <h4><span class="label {{label_torquer}}">{{torquer}}</span></h4>
+              Slope
+              <h4><span class="label {{label_torques}}">{{torques}}</span></h4>
+              Standard Error
+              <h4><span class="label {{label_torquese}}">{{torquese}}</span></h4>
+            </div>            
+          </div>
+        </div>
+        <div class="form-group">
+          <select class="form-control" id="sel1">
+            <option value=0>W/o omit</option>
+            <option value=1>Omit 1 (Power & Torque)</option>
+            <option value=2>Omit 2 (Power & Speed)</option>
+            <option value=3>Omit 3.1 (Power & Torque)</option>
+            <option value=4>Omit 3.2 (Power & Speed)</option>
+            <option value=5>Omit 4.1 (Power & Torque)</option>                                    
+            <option value=6>Omit 4.2 (Power & Speed)</option>            
+          </select>
+        </div>      
+        <hr>
+        <button type="button" class="btn btn-default" ng-click="Regression()">Regression</button>
+      </div>
+    </div>
+  </div>
+</div>

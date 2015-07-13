@@ -9,13 +9,14 @@
     .module('TestSite.layout.controllers')
     .controller('NavbarController', NavbarController);
 
-  NavbarController.$inject = ['$scope', 'Authentication'];
+  NavbarController.$inject = ['$scope', 'Authentication', 'infoboxService'];
 
   /**
   * @namespace NavbarController
   */
-  function NavbarController($scope, Authentication) {
+  function NavbarController($scope, Authentication, infoboxService) {
     var vm = this;
+    $scope.DelayButton = 'None';
 
     vm.logout = logout;
 
@@ -24,6 +25,14 @@
     * @desc Log the user out
     * @memberOf thinkster.layout.controllers.NavbarController
     */
+    $scope.$on('TestUploaded',function(){
+
+      if (infoboxService.CycleType == 'Transient'){
+        $scope.DelayButton = 'inline'
+      } 
+      
+    })
+
     function logout() {
       Authentication.logout();
     }

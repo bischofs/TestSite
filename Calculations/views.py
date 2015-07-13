@@ -28,16 +28,16 @@ class CalculationView(views.APIView):
             cache = caches['default']
             dataHandler = cache.get(request.session._get_session_key())  
 
-            if not dataHandler.resultsLog['Calculation']:   
+            if not dataHandler.resultsLog['Calculation']:
                                    
                 ##### Initialize Calculation #####
                 calculator = Calculator(dataHandler, dataHandler.masterDict, request.QUERY_PARAMS)
 
                 ##### Save Results #####
                 dataHandler.resultsLog['Calculation'] = {'ZeroSpan' : calculator.preparation.ZeroSpan.to_json(), 'Fuel' : calculator.preparation.FuelData.to_json(),
-                                                        'Array' : calculator.calculation.ArraySum, 'Results' : calculator.calculation.result}
+                                                        'Array' : calculator.calculation.ArraySum, 'Results' : calculator.calculation.result, 'Data':calculator.calculation.Data}
 
-            jsonDict = {'Report':dataHandler.resultsLog['Calculation'],'errors': dataHandler.log}
+            jsonDict = {'Report':dataHandler.resultsLog['Calculation']['Results'][2],'errors': dataHandler.log}
             jsonLog = json.dumps(jsonDict)
 
             ##### Save Session #####
@@ -56,7 +56,7 @@ class CalculationView(views.APIView):
     def get(self, request, format=None):
 
         try:
-
+            
             ##### Load dataHandler from Cache #####
             cache = caches['default']
             dataHandler = cache.get(request.session._get_session_key())
