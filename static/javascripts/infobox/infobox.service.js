@@ -11,24 +11,16 @@
 
     function infoboxService($rootScope) {
 
-        var myList = ["some", "data"];
+        var ListInfo = ['meta','channels','units','ranges','amb']
         var service = {};
 
         service.updateFull = function() {
-            service.full_meta = 'True';
-            service.full_units = 'True';
-            service.full_ranges = 'True';
-            service.full_amb = 'True';
-            service.full_channels = 'True';            
+            updateFile('full');         
             $rootScope.$broadcast("FullUploaded");
         }
 
         service.updatePre = function() {
-            service.pre_meta = 'True';
-            service.pre_units = 'True';
-            service.pre_ranges = 'True';
-            service.pre_amb = 'True';
-            service.pre_channels = 'True';
+            updateFile('pre');  
             $rootScope.$broadcast("PreUploaded");
         }        
 
@@ -36,38 +28,34 @@
 
             service.cycle  = CycleAttr['Cycle'];
             service.CycleType = CycleAttr['CycleType'];
-
-            service.test_meta = 'True';
-            service.test_units = 'True';
-            service.test_ranges = 'True';
-            service.test_amb = 'True';
-            service.test_channels = 'True';
+            updateFile('test');
 
             $rootScope.$broadcast("TestUploaded");
         }
 
         service.updatePost = function() {
-            service.post_meta = 'True';
-            service.post_units = 'True';
-            service.post_ranges = 'True';
-            service.post_amb = 'True';
-            service.post_channels = 'True';            
+            updateFile('post');          
             $rootScope.$broadcast("PostUploaded");
         }
 
-
-        service.getList= function() {
-            return myList;
+        service.updateRanges = function() {
+            service.full_ranges = 'OK';
+            service.pre_ranges = 'OK';
+            service.test_ranges = 'OK';
+            service.post_ranges = 'OK';            
+            $rootScope.$broadcast("RangesUpdated");
         }
 
-        service.addItem = function(newObj) {
-            myList.push(newObj);
+        service.resetAll =function(){
+            $rootScope.$broadcast("ResetAll");
         }
 
         return service
 
-
-
+        function updateFile (File) {                
+            for (var i = 0; i < ListInfo.length; i++) {
+                service[File+'_'+ListInfo[i]] = 'OK';
+            };
+        }        
     }
-
 })();

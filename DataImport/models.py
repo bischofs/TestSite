@@ -184,7 +184,7 @@ class Data:
 
   def _load_metadata(self, data, FileName, masterMetaData, masterFileName, ChannelData):
 
-    metaData = data[:1]     
+    metaData = data[:1].dropna(how="all",axis=(1)) # Drop Zero-Columns
 
     ##### Loop through all entries of ChannelData in the header page #####
     for channel in ChannelData.items():
@@ -222,11 +222,12 @@ class Data:
     SkipList = ['N_TR','no_run','Comment1','Comment2','Proj#', 'N_TQ', 'CycleCondition1065','CycleState1065', 'N_FLAG2'] # Remove CycleCondition later e.g COS = Coldstart
 
     ##### Compare Metadata with Master-MetaData #####
-    for MasterChannel, FileChannel, ChannelName in zip(masterMetaData.values[0],MetaData.values[0],MetaData):
-      if (not MasterChannel == FileChannel) and (ChannelName not in SkipList):
-        raise Exception("%s in file %s is not the same as in file %s" % (ChannelName, FileName, masterFileName))
+    for ChannelName in zip(MetaData):
+      if ChannelName[0] not in SkipList:
+          if (not masterMetaData[ChannelName[0]][0] == MetaData[ChannelName[0]][0]):
+              raise Exception("%s in file %s is not the same as in file %s" % (ChannelName, FileName, masterFileName))
 
-    MasterChannel, FileChannel, ChannelName, SkipList = None, None, None, None
+    ChannelName, SkipList = None, None
 
 
   def _check_channels(self, ChannelData):

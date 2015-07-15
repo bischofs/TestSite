@@ -16,6 +16,7 @@ from rest_framework.renderers import JSONRenderer
 from DataImport.models import DataHandler
 from Calculations.models import Calculator
 from Calculations.models import Report
+import copy
 
 class CalculationView(views.APIView):        
 
@@ -28,7 +29,7 @@ class CalculationView(views.APIView):
             cache = caches['default']
             dataHandler = cache.get(request.session._get_session_key())  
 
-            if not dataHandler.resultsLog['Calculation']:
+            if dataHandler.resultsLog['Data Alignment']['Array'] != dataHandler.resultsLog['Data Alignment']['ArrayCalc']:
                                    
                 ##### Initialize Calculation #####
                 calculator = Calculator(dataHandler, dataHandler.masterDict, request.QUERY_PARAMS)
@@ -36,7 +37,7 @@ class CalculationView(views.APIView):
                 ##### Save Results #####
                 dataHandler.resultsLog['Calculation'] = {'ZeroSpan' : calculator.preparation.ZeroSpan.to_json(), 'Fuel' : calculator.preparation.FuelData.to_json(),
                                                         'Array' : calculator.calculation.ArraySum, 'Results' : calculator.calculation.result, 'Data':calculator.calculation.Data}
-
+                dataHandler.resultsLog['Data Alignment']['ArrayCalc'] = copy.deepcopy(dataHandler.resultsLog['Data Alignment']['Array']) # Save Delay-Array used for Calculation
             jsonDict = {'Report':dataHandler.resultsLog['Calculation']['Results'][2],'errors': dataHandler.log}
             jsonLog = json.dumps(jsonDict)
 

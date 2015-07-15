@@ -26,7 +26,7 @@ class FileUploadView(views.APIView):
     def post(self, request, format=None):
 
         
-        #try:
+        try:
             
             cache = caches['default']
 
@@ -45,12 +45,12 @@ class FileUploadView(views.APIView):
             jsonLog = json.dumps(jsonDict)
             return Response(jsonLog, status=200)
             
-        # except Exception as e:
+        except Exception as e:
          
-        #     return Response({
-        #         'status': 'Bad request',
-        #         'message': str(e)
-        #     }, status=status.HTTP_400_BAD_REQUEST)
+             return Response({
+                 'status': 'Bad request',
+                 'message': str(e)
+             }, status=status.HTTP_400_BAD_REQUEST)
 
 
     def get(self, request):
@@ -90,6 +90,17 @@ class FileUploadView(views.APIView):
 class MetaDataView(views.APIView):
 
     
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
 
-        return HttpResponse('Hello, World!')
+        cache = caches['default']
+
+        request.session.set_test_cookie()
+
+        if(not cache.get(request.session.session_key)):
+            return Response({'message':'No Data available!'}, status=200) 
+        else:
+            dataHandler = cache.get(request.session.session_key)
+            dataHandler = None
+            cache.set(request.session.session_key, dataHandler)
+            return Response({'message':'Data cleared!'}, status=200)
+        
