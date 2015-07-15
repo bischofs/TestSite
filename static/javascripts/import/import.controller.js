@@ -141,7 +141,7 @@ function ImportController($scope, FileUploader, toastr, infoboxService) {
             infoboxService.updatePost();
         }
         if (jsonObj['FilesLoaded'] == true){
-            infoboxService.updateRanges();
+            infoboxService.finishUpload();
         }
     }
 

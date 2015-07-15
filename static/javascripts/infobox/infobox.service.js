@@ -38,12 +38,11 @@
             $rootScope.$broadcast("PostUploaded");
         }
 
-        service.updateRanges = function() {
-            service.full_ranges = 'OK';
-            service.pre_ranges = 'OK';
-            service.test_ranges = 'OK';
-            service.post_ranges = 'OK';            
-            $rootScope.$broadcast("RangesUpdated");
+        service.finishUpload = function() {
+            service.amb = 'OK';    
+            service.ranges = 'OK';   
+            service.timestamp = 'OK';    
+            $rootScope.$broadcast("FinishedUpload");
         }
 
         service.resetAll =function(){

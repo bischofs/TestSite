@@ -98,9 +98,12 @@ class DataHandler:
     else:
       self.allFilesLoaded = True
 
+      ##### Check Timestamps of Files
+      self._check_time_stamp(self.preZeroSpan.TimeStamp, self.testData.TimeStamp, self.postZeroSpan.TimeStamp, len(self.testData.data))
+
       ##### Create MaterDict, Set Co-Channel, Load E-Bench-Data #####
       [self.masterDict, CoHigh] = self._create_master_dict(attrs)
-      self.ebenchData = self._load_ebench(self.ebenches[int(self.CycleAttr['EbenchNum'])-1].history, self.testData.TimeStamp, CoHigh)   
+      self.ebenchData = self._load_ebench(self.ebenches[int(self.CycleAttr['EbenchNum'])-1].history, self.testData.TimeStamp, CoHigh)
 
 
   def _create_master_dict(self, attrs):
@@ -149,7 +152,24 @@ class DataHandler:
 
     self.ebenches = None
 
-    return ebenchData    
+    return ebenchData   
+
+
+  def _check_time_stamp(self,TsPre,TsTest,TsPost,TestLength):
+
+    String = 'Timestamp-Check Failed ! : '
+
+    if (TsTest - TsPre) < 0:
+      String = String + 'Timestamp of Pre-ZeroSpan is after the Test. '    
+    if (TsPost - TsTest) < 0:
+      String = String + 'Timestamp of Post-ZeroSpan is before the Test. '
+    if (TsPost - TsTest) > 2*TestLength: 
+      String = String + 'Timestamp of Post-ZeroSpan is too late. '
+    if (TsTest - TsPre) > TestLength:
+      String = String + 'Timestamp of Pre-ZeroSpan is too early. '
+
+    if String != 'Timestamp-Check Failed ! : ':
+      raise Exception (String)
 
 
 
@@ -172,7 +192,7 @@ class Data:
     self.data = RawData
     [self.metaData, masterMetaData, masterFileName] = self._load_metadata(self.data, self.fileName, masterMetaData, masterFileName, ChannelData)
     [self.data, self.units] = self._load_data_units(self.data)
-    self.TimeStamp = time.mktime(datetime.datetime.strptime(self.data['Date'][0] + ' ' + self.data['Time'][0], "%m/%d/%Y %H:%M:%S.%f").timetuple())
+    self.TimeStamp = self._load_timestamp(self.data)
 
     ##### Perform Checks on Data #####
     self._check_metadata(self.metaData, self.fileName, masterMetaData, masterFileName) 
@@ -215,6 +235,10 @@ class Data:
       self.data.index = range(0,len(self.data))
 
       return self.data, units
+
+
+  def _load_timestamp(self, Data):
+    return time.mktime(datetime.datetime.strptime(Data['Date'][0] + ' ' + Data['Time'][0], "%m/%d/%Y %H:%M:%S.%f").timetuple())
 
 
   def _check_metadata(self, MetaData, FileName, masterMetaData, masterFileName):

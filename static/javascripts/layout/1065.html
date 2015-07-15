@@ -59,14 +59,6 @@
                                 <td>Units</td>
                                 <td><span class="label {{l_test_units}}">{{test_units}}</span></td>
                             </tr>
-                            <tr>
-                                <td>Ambient Cond.</td>
-                                <td><span class="label {{l_test_amb}}">{{test_amb}}</span></td>
-                            </tr>
-                            <tr>
-                                <td>Data Ranges</td>
-                                <td><span class="label {{l_test_ranges}}">{{test_ranges}}</span></td>
-                            </tr>
                         </table>            
                     </li>
                     <li>
@@ -86,7 +78,23 @@
                             </tr>
                         </table>                   
                     </li>
-
+                    <li>
+                        <p>General Checks</p>
+                        <table>
+                            <tr>
+                                <td>Ambient Cond.</td>
+                                <td><span class="label {{l_amb}}">{{amb}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>Data Ranges</td>
+                                <td><span class="label {{l_ranges}}">{{ranges}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>Timestamp</td>
+                                <td><span class="label {{l_timestamp}}">{{timestamp}}</span></td>
+                            </tr>                            
+                        </table>   
+                    </li>
                 </ol> 
                 <button ng-click='Reset()' type="button" class="btn btn-default">Reset Cycle</button>           
             </div>

@@ -12,7 +12,7 @@
      */
     function InfoboxController($scope, FileUploader, toastr, infoboxService, $http) {
 
-        var ListInfo = ['meta','channels','units','ranges','amb']
+        var ListInfo = ['meta','channels','units']
         var ListFile = ['full','pre','test','post']
 
         FirstLoad();
@@ -48,17 +48,17 @@
             load_file('post')
         })
 
-        $scope.$on('RangesUpdated',function(){
+        $scope.$on('FinishedUpload',function(){
 
-            $scope.full_ranges = infoboxService.full_ranges;
-            $scope.pre_ranges = infoboxService.pre_ranges;
-            $scope.test_ranges = infoboxService.test_ranges;
-            $scope.post_ranges = infoboxService.post_ranges;
+            // Text for General Tests
+            $scope.ranges = infoboxService.ranges;
+            $scope.amb = infoboxService.amb;
+            $scope.timestamp = infoboxService.timestamp;
 
-            $scope.l_full_ranges = "label-success";
-            $scope.l_pre_ranges = "label-success";
-            $scope.l_test_ranges = "label-success";        
-            $scope.l_post_ranges = "label-success";                
+            // Success Labels for General Tests
+            $scope.l_ranges = "label-success";
+            $scope.l_amb = "label-success";
+            $scope.l_timestamp = "label-success";        
 
         })
 
@@ -71,10 +71,23 @@
         }   
 
         function FirstLoad() {
+
             $scope.cycle = 'Unknown';
+
+            // Text for General Tests
+            $scope.ranges = 'NA';
+            $scope.amb = 'NA';
+            $scope.timestamp = 'NA';
+
+            // Default Labels for General Tests
+            $scope.l_amb = 'label-default';
+            $scope.l_ranges = 'label-default';
+            $scope.l_timestamp = 'label-default';
+
+            // Text and Labels for File-Checks            
             for (var i = 0; i < ListFile.length; i++) {
                 for (var j = 0; j < ListInfo.length; j++) {
-                    $scope[ListFile[i] + '_' + ListInfo[j]] = 'No Data';
+                    $scope[ListFile[i] + '_' + ListInfo[j]] = 'NA';
                     $scope['l_' + ListFile[i] + '_' + ListInfo[j]] = 'label-default';
                 };            
             };                  
