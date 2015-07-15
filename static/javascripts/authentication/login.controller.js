@@ -40,7 +40,14 @@
     * @memberOf TestSite.authentication.controllers.LoginController
     */
     function login() {
-      Authentication.login(vm.email, vm.password);
+
+      $scope.delay = 0;
+      $scope.minDuration = 0;
+      $scope.message = 'Logging in...';
+      $scope.backdrop = true;
+      $scope.promise = null;      
+
+      $scope.promise = Authentication.login(vm.email, vm.password);
     }
   }
 })();

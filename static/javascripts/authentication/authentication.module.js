@@ -11,5 +11,5 @@
     .module('TestSite.authentication.controllers', []);
 
   angular
-    .module('TestSite.authentication.services', ['ngCookies']);
+    .module('TestSite.authentication.services', ['ngCookies','cgBusy']);
 })();
