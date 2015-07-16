@@ -191,6 +191,48 @@
                 "E_NOXD"
             ]
         },
+	"Nitrous_Oxide": {
+            "unit": "ppm",
+            "maximum_value": "20000",
+            "minimum_value": "-10",
+            "multiple_benches": false,
+            "header_data": false,
+	    "files": [
+                "TestData",
+                "ZeroSpan"
+            ],
+	    "channel_names": [
+                "M_N2OW"
+            ]
+        },
+	"Ammonia": {
+            "unit": "ppm",
+            "maximum_value": "20000",
+            "minimum_value": "-10",
+            "multiple_benches": false,
+            "header_data": false,
+	    "files": [
+                "TestData",
+                "ZeroSpan"
+            ],
+	    "channel_names": [
+                "M_NH3W"
+            ]
+        },
+	"Formaldehyde": {
+            "unit": "ppm",
+            "maximum_value": "20000",
+            "minimum_value": "-10",
+            "multiple_benches": false,
+            "header_data": false,
+	    "files": [
+                "TestData",
+                "ZeroSpan"
+            ],
+	    "channel_names": [
+                "M_CH20W"
+            ]
+        },
         "Air_Inlet_Pressure": {
             "unit": "Bar A",
             "maximum_value": "1.0325",
@@ -279,7 +321,7 @@
                 "TestData"
             ],
 	    "channel_names": [
-                "C_FRAIRW"
+                "M_FRAIRW"
             ]
         },
         "Engine_Power": {
@@ -294,20 +336,6 @@
             ],
 	    "channel_names": [
                 "U_BPOW"
-            ]
-        },
-        "Engine_Horsepower": {
-            "unit": "bhp",
-            "maximum_value": "10000",
-            "minimum_value": "-10000",
-            "multiple_benches": false,
-            "header_data": false,
-	    "files": [
-
-		"FullLoad"
-            ],
-	    "channel_names": [
-                "C_BHP"
             ]
         },
         "Engine_Torque": {
