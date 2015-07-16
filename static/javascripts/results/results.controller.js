@@ -11,6 +11,8 @@
 
     function ResultsController($scope, $http, toastr, cgBusy, infoboxService) {
 
+        //var ListSpecies = ['CO2','CO','NOX','THC','NMHC','NO2','CH2O','NH3'];
+
         var ListSpecies = ['CO2','CO','NOX','THC','NMHC'];
         var ListFields = ['Name','Result','Units','Total'];
         var ListAdds = ['','','',' mg']

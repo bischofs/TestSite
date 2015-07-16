@@ -64,6 +64,10 @@ class Preparation:
     FuelData.M_CO = 28.0101 # Molar mass of CO
     FuelData.M_CO2 = 44.0095 # Molar mass of CO2
 
+    #FuelData.M_N2O = 44.0128 # Molar mass of N20
+    #FuelData.M_CH2O = 30.02598 # Molar mass of Formaldehyde
+    #FuelData.M_NH3 = 17.03052 # Molar mass of Ammonia  
+
     ## Mass fractions ##   
     FuelData.W_c = float(HeaderData[MapDict['Mass_Fraction_Carbon']])/100 # Carbon mass fraction of fuel
     FuelData.W_h = float(HeaderData[MapDict['Mass_Fraction_Hydrogen']])/100 # Hydrogen mass fraction of fuel
@@ -171,10 +175,7 @@ class Preparation:
 
   def _prepare_type(self, ZeroSpan, MapDict, TimeWindow, Data, name):
 
-    Species = [MapDict['Carbon_Dioxide_Dry'], MapDict['Carbon_Monoxide_Dry'], MapDict['Nitrogen_X_Dry'],
-               MapDict['Total_Hydrocarbons_Wet'], MapDict['Methane_Wet']]
-
-    for spec in Species:
+    for spec in self.Species:
       ColumnZero = Data.loc[TimeWindow[spec][0]:TimeWindow[spec][1], spec]
       ColumnZero.index = range(0,len(ColumnZero))
       ColumnSpan = Data.loc[TimeWindow[spec][2]:TimeWindow[spec][3], spec]
@@ -198,7 +199,7 @@ class Preparation:
         raise Exception('Not enough data points for average Zero/Span! Minimum : 30')
 
     # Clear Variables
-    ColumnZero, ColumnSpan, spec, Species, TimeWindow, Data, name, i = None, None, None, None, None, None, None, None
+    ColumnZero, ColumnSpan, spec, TimeWindow, Data, name, i = None, None, None, None, None, None, None
 
     return ZeroSpan        
 
@@ -286,6 +287,10 @@ class Calculation:
         Data["xCOmeas"] = Data.get(MapDict["Carbon_Monoxide_Dry"])/1000000 # ppm --> mol/mol
         Data["xNOxmeas"] = Data[MapDict["Nitrogen_X_Dry"]]/1000000 # ppm --> mol/mol
 
+        #Data["xN2Omeas"] = Data[MapDict["Nitrous_Oxide_Wet"]]/1000000
+        #Data["xCH2Omeas"] = Data[MapDict["Formaldehyde_Wet"]]/1000000
+        #Data["xNH3meas"] = Data[MapDict["Ammonia_Wet"]]/1000000
+
         # Flows
         Data["mfuel"] = TestData[MapDict["Fuel_Flow_Rate"]]*1000/3600 # kg/h --> g/s
         Data["Molar Flow Wet"] = TestData.C_FRAIRWS*1000/3600 # kg/h --> g/s
@@ -324,8 +329,12 @@ class Calculation:
         Data["xTHCmeas"] = Data[MapDict["Total_Hydrocarbons_Wet"]]/1000000 # ppm --> mol/mol
         Data["xNO2meas"] = Data.xNOxmeas*0 # NO2 not measured
         Data["xNOmeas"] = Data.xNOxmeas*1
-        Data["xTHCwet"] = Data.xTHCmeas
-        Data["xNMHCwet"] = (Data.xTHCwet-Data.xCH4wet*Ebench.CH4_RF)/(1-Ebench.RFPF*Ebench.CH4_RF)        
+        Data["xTHCwet"] = Data.xTHCmeas   
+        Data["xNMHCwet"] = (Data.xTHCwet-Data.xCH4wet*Ebench.CH4_RF)/(1-Ebench.RFPF*Ebench.CH4_RF)
+
+        #Data["xN2Owet"] = Data["xN2Omeas"]
+        #Data["xCH2Owet"] =  Data["xCH2Omeas"]
+        #Data["xNH3wet"] = Data["xNH3meas"]       
 
         # Clear Variables
         TestData, Ebench = None, None
@@ -457,6 +466,13 @@ class Calculation:
         Data["Mass_CO2"] = Data.xCO2wet*Data.nexh*Fuel.M_CO2
         Data["Mass_NMHC"] = Data.xNMHCwet*Data.nexh*Fuel.M_NMHC
 
+        #Data["Mass_N2O"] = Data.xNO2wet*Data.nexh*Fuel.M_N2O
+        #Data["Mass_CH2O"] = Data.xCH2Owet*Data.nexh*Fuel.M_CH2O
+        #Data["Mass_NH3"] = Data.xNH3wet*Data.nexh*Fuel.M_NH3        
+
+        # Emissions in total
+        #ArraySum = {'CO2':Data.Mass_CO2.sum(),'CO':Data.Mass_CO.sum(),'NOx':Data.Mass_NOx.sum(),'THC':Data.Mass_THC.sum(),'NMHC':Data.Mass_NMHC.sum(),'N2O':Data.Mass_N2O.sum(),'CH2O':Data.Mass_CH2O.sum(),'NH3':Data.Mass_NH3.sum()}
+
         # Emissions in total
         ArraySum = {'CO2':Data.Mass_CO2.sum(),'CO':Data.Mass_CO.sum(),'NOx':Data.Mass_NOx.sum(),'THC':Data.Mass_THC.sum(),'NMHC':Data.Mass_NMHC.sum()}
 
@@ -482,7 +498,16 @@ class Calculation:
         Data.Mass_NOx[np.where(Data.Mass_NOx<0)[0]] = 0      
         Data.Mass_THC[np.where(Data.Mass_THC<0)[0]] = 0
         Data.Mass_NMHC[np.where(Data.Mass_NMHC<0)[0]] = 0
+
+        #Data.Mass_N2O[np.where(Data.Mass_N2O<0)[0]] = 0
+        #Data.Mass_CH2O[np.where(Data.Mass_CH2O<0)[0]] = 0
+        #ata.Mass_NH3[np.where(Data.Mass_NH3<0)[0]] = 0
+
         U_BPOW_Factor = DataRaw[MapDict['Engine_Power']].drop(np.where(DataRaw[MapDict['Engine_Power']]<0)[0]).sum(skipna=True)/(3600*0.746)
+
+        #ArraySumCorWon = {'CO2':Data.Mass_CO2.sum(),'CO':Data.Mass_CO.sum(),'NOx':Data.Mass_NOx.sum(),
+        #                 'THC':Data.Mass_THC.sum(),'NMHC':Data.Mass_NMHC.sum(),'N2O':Data.Mass_N2O.sum(),
+        #                 'CH2O':Data.Mass_CH2O.sum(),'NH3':Data.Mass_NH3.sum()}
 
         ArraySumCorWon = {'CO2':Data.Mass_CO2.sum(),'CO':Data.Mass_CO.sum(),'NOx':Data.Mass_NOx.sum(),
                          'THC':Data.Mass_THC.sum(),'NMHC':Data.Mass_NMHC.sum()}
@@ -493,14 +518,21 @@ class Calculation:
     def _result(self):
 
         ##### Load Data #####
+        #Species = ['CO2','CO','NOx','THC','NMHC','N2O','CH2O','NH3']
+
+        ##### Load Data #####
         Species = ['CO2','CO','NOx','THC','NMHC'] 
 
         ##### Create DataFrames #####
         DF = pd.DataFrame()
         DF['Name'] = Species
-        DF['Units'] = ['g/ghphr','g/ghphr','g/ghphr','g/ghphr','g/ghphr']
+        #DF['Units'] = ['g/bhphr','g/bhphr','g/bhphr','g/bhphr','g/bhphr','g/bhphr','g/bhphr']
+        #DF['Result'] = np.zeros([7,1])
+        #DF['Total'] =  np.zeros([7,1])
+
+        DF['Units'] = ['g/bhphr','g/bhphr','g/bhphr','g/bhphr','g/bhphr']
         DF['Result'] = np.zeros([5,1])
-        DF['Total'] =  np.zeros([5,1])
+        DF['Total'] =  np.zeros([5,1])        
         self.DriftUncorrected, self.DriftCorrected, self.Final = DF.copy(), DF.copy(), DF.copy()
         DF = None
 
@@ -528,6 +560,8 @@ class Report:
         Test = DataHandler.testData.data
         ArraySumUn, ArraySumCor, ArraySumCorWon = CalculatorLog['Array']
         self.DriftUncorrected, self.DriftCorrected, self.Final = CalculatorLog['Results']
+        #Species = ['CO2','CO','NOx','THC','NMHC','N2O','CH2O','NH3']
+
         Species = ['CO2','CO','NOx','THC','NMHC']  
 
         ###### Preparation of Excel-File #####        
