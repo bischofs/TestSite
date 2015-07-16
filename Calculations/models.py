@@ -98,7 +98,7 @@ class Preparation:
     EbenchData.RFPF = ebenchData['RFPF']
     EbenchData.CH4_RF = ebenchData['CH4_RF']
     EbenchData.Tchiller = ebenchData['Tchiller'] + 273.15 # in K      
-    EbenchData.Pamb = 99.16  #np.mean(TestData[MapDict['Air_Ambient_Pressure']])*100 # bar --> kPa
+    EbenchData.Pamb = np.mean(TestData[MapDict['Air_Ambient_Pressure']])*100 # bar --> kPa
     EbenchData.Pchiller = ebenchData['Pchiller'] + EbenchData.Pamb
     EbenchData.xCO2intdry = 0.000375 ## CFR 1065.655
     EbenchData.xCO2dildry = 0.000375 ## CFR 1065.655
@@ -182,7 +182,7 @@ class Preparation:
       
       for i in range(0,len(ColumnZero)):
 
-          if ColumnZero[i]> ZeroSpan[spec]['Chosen']*0.01: # Accetable Range of noise 1%
+          if ColumnZero[i]> ZeroSpan[spec]['Chosen']*0.01: # Acceptable Range of noise 1%
               ColumnZero = ColumnZero.drop(i)
 
           if (ColumnSpan[i]< ZeroSpan[spec]['Chosen']*0.98) | (ColumnSpan[i] > ZeroSpan[spec]['Chosen']*1.02): # Acceptable Range of noise +-2%
@@ -210,16 +210,16 @@ class Calculation:
 
         if Preparation.TransientBool == True:
 
-            self._transient_calculation(Preparation, MapDict)
+            self._calculation(Preparation, MapDict)
             self.result = self._result()  
 
         else:
             Preparation.test = self._prepare_steady_state(Preparation.test, MapDict)
-            self._transient_calculation(Preparation, MapDict)
+            self._calculation(Preparation, MapDict)
             self.result = self._result()
 
 
-    def _transient_calculation(self, Preparation, MapDict):
+    def _calculation(self, Preparation, MapDict):
 
         ZeroSpan = Preparation.ZeroSpan
         DataUn = pd.DataFrame()
@@ -243,7 +243,7 @@ class Calculation:
 
     def _prepare_steady_state(self, data, MapDict):
 
-        ## Calculate steady state Cycle
+        ##### Prepare Testdata for Steady State Cycle #####
         TestData = data
         ModeArray = pd.Series(TestData['N_CERTMODE']).unique()
         MeanFrame = pd.DataFrame(columns=TestData.columns.values)
@@ -460,9 +460,6 @@ class Calculation:
         # Emissions in total
         ArraySum = {'CO2':Data.Mass_CO2.sum(),'CO':Data.Mass_CO.sum(),'NOx':Data.Mass_NOx.sum(),'THC':Data.Mass_THC.sum(),'NMHC':Data.Mass_NMHC.sum()}
 
-        # Clear Variables
-        Fuel = None
-
         return Data, ArraySum
 
 
@@ -474,9 +471,6 @@ class Calculation:
         TestData[MapDict['Nitrogen_X_Dry']] = ZeroSpan[MapDict['Nitrogen_X_Dry']]['Chosen']*((2*TestData[MapDict['Nitrogen_X_Dry']])-(ZeroSpan[MapDict['Nitrogen_X_Dry']]['PreZero']+ZeroSpan[MapDict['Nitrogen_X_Dry']]['PostZero']))/((ZeroSpan[MapDict['Nitrogen_X_Dry']]['PreSpan']+ZeroSpan[MapDict['Nitrogen_X_Dry']]['PostSpan'])-(ZeroSpan[MapDict['Nitrogen_X_Dry']]['PreZero']+ZeroSpan[MapDict['Nitrogen_X_Dry']]['PostZero']))
         TestData[MapDict['Total_Hydrocarbons_Wet']] = ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['Chosen']*((2*DataUn.get('xTHC[THC_FID]cor'))-(ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PreZero']+ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PostZero']))/((ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PreSpan']+ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PostSpan'])-(ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PreZero']+ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PostZero']))
         TestData[MapDict['Methane_Wet']] = ZeroSpan[MapDict['Methane_Wet']]['Chosen']*((2*TestData[MapDict['Methane_Wet']])-(ZeroSpan[MapDict['Methane_Wet']]['PreZero']+ZeroSpan[MapDict['Methane_Wet']]['PostZero']))/((ZeroSpan[MapDict['Methane_Wet']]['PreSpan']+ZeroSpan[MapDict['Methane_Wet']]['PostSpan'])-(ZeroSpan[MapDict['Methane_Wet']]['PreZero']+ZeroSpan[MapDict['Methane_Wet']]['PostZero']))
-
-        # Clear Variables
-        DataUn, ZeroSpan = None, None
 
         return TestData
 
@@ -493,9 +487,6 @@ class Calculation:
         ArraySumCorWon = {'CO2':Data.Mass_CO2.sum(),'CO':Data.Mass_CO.sum(),'NOx':Data.Mass_NOx.sum(),
                          'THC':Data.Mass_THC.sum(),'NMHC':Data.Mass_NMHC.sum()}
 
-        # Clear Variables
-        MapDict, DataRaw, i = None, None, None
-
         return ArraySumCorWon, U_BPOW_Factor
 
 
@@ -506,20 +497,20 @@ class Calculation:
 
         ##### Create DataFrames #####
         DF = pd.DataFrame()
-        DF['Species'] = Species
+        DF['Name'] = Species
         DF['Units'] = ['g/ghphr','g/ghphr','g/ghphr','g/ghphr','g/ghphr']
-        DF['Test'] = np.zeros([5,1])
+        DF['Result'] = np.zeros([5,1])
         DF['Total'] =  np.zeros([5,1])
         self.DriftUncorrected, self.DriftCorrected, self.Final = DF.copy(), DF.copy(), DF.copy()
         DF = None
 
         for i in range(0,len(Species)):
-            self.DriftUncorrected['Test'][i] = self.ArraySumUn[Species[i]]/self.U_BPOW_Factor
-            self.DriftUncorrected['Total'][i] = self.ArraySumUn[Species[i]]
-            self.DriftCorrected['Test'][i] = self.ArraySumCor[Species[i]]/self.U_BPOW_Factor
-            self.DriftCorrected['Total'][i] = self.ArraySumCor[Species[i]]
-            self.Final['Test'][i] = self.ArraySumCorWon[Species[i]]/self.U_BPOW_Factor
-            self.Final['Total'][i] = self.ArraySumCorWon[Species[i]]
+            self.DriftUncorrected['Result'][i] = np.round(self.ArraySumUn[Species[i]]/self.U_BPOW_Factor,2)
+            self.DriftUncorrected['Total'][i] = np.round(self.ArraySumUn[Species[i]],2)
+            self.DriftCorrected['Result'][i] = np.round(self.ArraySumCor[Species[i]]/self.U_BPOW_Factor,2)
+            self.DriftCorrected['Total'][i] = np.round(self.ArraySumCor[Species[i]],2)
+            self.Final['Result'][i] = np.round(self.ArraySumCorWon[Species[i]]/self.U_BPOW_Factor,2)
+            self.Final['Total'][i] = np.round(self.ArraySumCorWon[Species[i]],2)
 
         self.result = [self.DriftUncorrected.to_json(), self.DriftCorrected.to_json(), self.Final.to_json()]
 

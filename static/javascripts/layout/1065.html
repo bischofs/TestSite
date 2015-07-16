@@ -1,16 +1,14 @@
 <div class="row">
     <div ng-controller="InfoboxController">
-        <div class="panel panel-default  col-md-2">
-            <div class="panel-body">
-                <table style="width:100%">
-                    <tr>
-                        <td>Cycle : </td>
-                        <td><b> {{cycle}}</b></td>
-                    </tr>
-                </table>
-                <br>
-                <ol class="treeview">
-                    <li>
+        <div class="col-md-2 info-box">
+            <div class="panel panel-default ">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Cycle : {{cycle}}</h3>
+                </div>
+                <div cg-busy="{promise:promise,message:'Resetting Cycle...'}">        
+                    <div class="panel-body list-box">
+                        <ol class="treeview">
+                            <li>
                         <p>Full Load</p>
                         <table>
                             <tr>
@@ -96,7 +94,9 @@
                         </table>   
                     </li>
                 </ol> 
-                <button ng-click='Reset()' type="button" class="btn btn-default">Reset Cycle</button>           
+			<button ng-click='Reset()' type="button" class="btn btn-default">Reset Cycle</button>           
+		    </div>
+		</div>
             </div>
         </div>
     </div>
@@ -125,32 +125,32 @@
     </div>
 </div>
 <style type="text/css">
-    .data-checked {
-        float: right;
-    }
-  
-    .panel-heading {
-        padding: 6px 9px;
-    }
+.data-checked {
+    float: right;
+}
+.info-box {
+    padding: 3px;
+}  
+.panel-heading {
+    padding: 6px 9px;
+}
+.panel-title {
+    font-size: 13px;
+}
+.treeview {
+    padding-left: 23px;
+    padding-top: 3px; 
+}
+.treeview td {
+    padding-left: 5px;
+}
 
-    .panel-title {
-        font-size: 13px;
-    }
-
-    .treeview {
-        padding-left: 2px;
-    }
-
-    .treeview td {
-        padding-left: 5px;
-    }
-
-    .treeview p {
-        margin: 0px;
-        font-style: italic;
-        font-size: 13px;
-    }
-    table{
-        width: 135px;
-    }
+.treeview p {
+    margin: 0px;
+    font-style: italic;
+    font-size: 13px;
+}
+table{
+    width: 135px;
+}
 </style>

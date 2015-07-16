@@ -23,7 +23,7 @@
                     <div class="panel-heading">
                         <h3 class="panel-title">Calculation Results</h3>
                     </div>
-                    <div cg-busy="{promise:promise,message:message,backdrop:backdrop,delay:delay,minDuration:minDuration}">
+                    <div cg-busy="{promise:promise,message:'Calculation Running...'}">
                     <div class="panel-body" id="ResultTable">                    
                         <table class="table">
                             <thead>
@@ -38,31 +38,31 @@
                                 <tr>
                                     <td>{{CO2_Name}}</td>
                                     <td>{{CO2_Result}}</td>
-                                    <td>{{CO2_Unit}}</td>
+                                    <td>{{CO2_Units}}</td>
                                     <td>{{CO2_Total}}</td>
                                 </tr>
                                 <tr>
                                     <td>{{CO_Name}}</td>
                                     <td>{{CO_Result}}</td>
-                                    <td>{{CO_Unit}}</td>
+                                    <td>{{CO_Units}}</td>
                                     <td>{{CO_Total}}</td>
                                 </tr>
                                 <tr>
                                     <td>{{NOX_Name}}</td>
                                     <td>{{NOX_Result}}</td>
-                                    <td>{{NOX_Unit}}</td>
+                                    <td>{{NOX_Units}}</td>
                                     <td>{{NOX_Total}}</td>
                                 </tr>
                                 <tr>
                                     <td>{{THC_Name}}</td>
                                     <td>{{THC_Result}}</td>
-                                    <td>{{THC_Unit}}</td>
+                                    <td>{{THC_Units}}</td>
                                     <td>{{THC_Total}}</td>
                                 </tr>
                                 <tr>
                                     <td>{{NMHC_Name}}</td>
                                     <td>{{NMHC_Result}}</td>
-                                    <td>{{NMHC_Unit}}</td>
+                                    <td>{{NMHC_Units}}</td>
                                     <td>{{NMHC_Total}}</td>
                                 </tr>
                             </tbody>

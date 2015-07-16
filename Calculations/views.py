@@ -29,7 +29,7 @@ class CalculationView(views.APIView):
             cache = caches['default']
             dataHandler = cache.get(request.session._get_session_key())  
 
-            if dataHandler.resultsLog['Data Alignment']['Array'] != dataHandler.resultsLog['Data Alignment']['ArrayCalc']:
+            if dataHandler.DoCalculation == True:
                                    
                 ##### Initialize Calculation #####
                 calculator = Calculator(dataHandler, dataHandler.masterDict, request.QUERY_PARAMS)
@@ -37,7 +37,7 @@ class CalculationView(views.APIView):
                 ##### Save Results #####
                 dataHandler.resultsLog['Calculation'] = {'ZeroSpan' : calculator.preparation.ZeroSpan.to_json(), 'Fuel' : calculator.preparation.FuelData.to_json(),
                                                         'Array' : calculator.calculation.ArraySum, 'Results' : calculator.calculation.result, 'Data':calculator.calculation.Data}
-                dataHandler.resultsLog['Data Alignment']['ArrayCalc'] = copy.deepcopy(dataHandler.resultsLog['Data Alignment']['Array']) # Save Delay-Array used for Calculation
+                dataHandler.DoCalculation = False
             jsonDict = {'Report':dataHandler.resultsLog['Calculation']['Results'][2],'errors': dataHandler.log}
             jsonLog = json.dumps(jsonDict)
 
@@ -77,9 +77,7 @@ class CalculationView(views.APIView):
             Response['Cache-Control'] = 'must-revalidate, post-check=0, pre-check=0'
             Response['Cache-Control'] = 'private:false'
             Response['Content-Disposition'] = 'attachment; filename="Final.xlsx"'
-            #Response['Content-Transfer-Encoding'] = 'binary'
             Response['Content-length'] = report.output.tell()
-            #Response['Connection'] = 'close'
 
             return Response
 

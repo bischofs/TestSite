@@ -19,12 +19,11 @@
 
         $scope.Reset = function() {
 
-            $.get("/1065/api/v1/data/meta/")
+            $scope.promise = $.get("/1065/api/v1/data/meta/")
             .done(function(response){
                 infoboxService.resetAll();               
                 toastr.success(response.message);                   
             })            
-            
         } 
 
         $scope.$on('ResetAll',function(){
@@ -59,7 +58,6 @@
             $scope.l_ranges = "label-success";
             $scope.l_amb = "label-success";
             $scope.l_timestamp = "label-success";        
-
         })
 
         function load_file(File) {
