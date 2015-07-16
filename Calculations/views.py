@@ -77,9 +77,7 @@ class CalculationView(views.APIView):
             Response['Cache-Control'] = 'must-revalidate, post-check=0, pre-check=0'
             Response['Cache-Control'] = 'private:false'
             Response['Content-Disposition'] = 'attachment; filename="Final.xlsx"'
-            #Response['Content-Transfer-Encoding'] = 'binary'
             Response['Content-length'] = report.output.tell()
-            #Response['Connection'] = 'close'
 
             return Response
 

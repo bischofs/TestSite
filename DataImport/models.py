@@ -102,30 +102,54 @@ class DataHandler:
       self._check_time_stamp(self.preZeroSpan.TimeStamp, self.testData.TimeStamp, self.postZeroSpan.TimeStamp, len(self.testData.data))
 
       ##### Create MaterDict, Set Co-Channel, Load E-Bench-Data #####
-      [self.masterDict, CoHigh] = self._create_master_dict(attrs)
-      self.ebenchData = self._load_ebench(self.ebenches[int(self.CycleAttr['EbenchNum'])-1].history, self.testData.TimeStamp, CoHigh)
+      self.masterDict = self._create_master_dict(attrs)
+      self.ebenchData = self._load_ebench(self.ebenches[int(self.CycleAttr['EbenchNum'])-1].history, self.testData.TimeStamp)
 
 
   def _create_master_dict(self, attrs):
 
-      masterDict = self.testData.mapDict
-      masterDict.update(self.preZeroSpan.mapDict) # testData.mapDict is changed as well
+    masterDict = self.testData.mapDict
+    masterDict.update(self.preZeroSpan.mapDict) # testData.mapDict is changed as well
 
-      ##### Check Channel-Ranges of all files and create MasterDict #####
-      for File in attrs:
-        CoHigh = vars(self)[File].check_ranges(self.ChannelData)
-        if File == 'testData':
-          if CoHigh == True:
-            masterDict['Carbon_Monoxide_Dry'] = masterDict['Carbon_Monoxide_High_Dry']
-          else:
-            masterDict['Carbon_Monoxide_Dry'] = masterDict['Carbon_Monoxide_Low_Dry']
-          del masterDict['Carbon_Monoxide_Low_Dry']
-          del masterDict['Carbon_Monoxide_High_Dry']
+    ##### Check Channel-Ranges of all files and create MasterDict #####
+    for File in attrs:
+      vars(self)[File].check_ranges(self.ChannelData)
 
-      return masterDict, CoHigh
+    masterDict = self._set_CO(self.testData.data, masterDict)
 
 
-  def _load_ebench(self, Ebenches, TimeStamp, CoHigh):
+    return masterDict
+
+
+  def _set_CO(self, data, masterDict):
+
+    ##### CO-Strings for masterDict #####
+    COL = 'Carbon_Monoxide_Low_Dry'
+    COH = 'Carbon_Monoxide_High_Dry'
+    CO = 'Carbon_Monoxide_Dry'
+
+    ##### Load Min- Compare/Value for COL #####
+    minValue = self.ChannelData[COL]['minimum_value']
+    minCompare = np.nanmin(data[masterDict[COL]])[0]
+
+    ##### Check whether minimum out of Range #####
+    if (minCompare < float(minValue)) == True:
+      masterDict[CO] = masterDict[COH]
+    else:
+      masterDict[CO] = masterDict[COL]
+  
+    del masterDict[COL]
+    del masterDict[COH]
+
+    import ipdb; ipdb.set_trace()
+
+    # Clear Variables
+    COl, COH, CO, minValue, minCompare = None, None, None, None, None
+
+    return masterDict
+
+
+  def _load_ebench(self, Ebenches, TimeStamp):
 
     ############### HARD CODED TIMESTAMP #######################
     TimeStamp = time.time()
@@ -141,7 +165,7 @@ class DataHandler:
         ebenchData['Pchiller'] = EbenchSet['Thermal_Absolute_Pressure']
         ebenchData['xTHC[THC_FID]init'] = EbenchSet['THC_Initial_Contamination']
         ebenchData['Bottle_Concentration_CO2'] = EbenchSet['Bottle_Concentration_CO2']/10000 # ppm --> %
-        if CoHigh:
+        if 'COH' in self.masterDict['Carbon_Monoxide_Dry']:
           ebenchData['Bottle_Concentration_CO'] = EbenchSet['Bottle_Concentration_COH']/10000 # ppm --> %
         else:
           ebenchData['Bottle_Concentration_CO'] = EbenchSet['Bottle_Concentration_COL']
@@ -193,10 +217,10 @@ class Data:
     [self.metaData, masterMetaData, masterFileName] = self._load_metadata(self.data, self.fileName, masterMetaData, masterFileName, ChannelData)
     [self.data, self.units] = self._load_data_units(self.data)
     self.TimeStamp = self._load_timestamp(self.data)
+    self.mapDict = self._create_mapDict(ChannelData)
 
     ##### Perform Checks on Data #####
     self._check_metadata(self.metaData, self.fileName, masterMetaData, masterFileName) 
-    self._check_channels(ChannelData)
     self._check_units(ChannelData)
 
     return masterMetaData, masterFileName
@@ -254,28 +278,32 @@ class Data:
     ChannelName, SkipList = None, None
 
 
-  def _check_channels(self, ChannelData):
+  def _create_mapDict(self, ChannelData):
+
+    mapDict = {}
       
     for channel in ChannelData.items():
       if channel[1]['files'].__contains__(self.fileType) and channel[1]['header_data'] == False:
         if (channel[1]['multiple_benches'] == True):
-          self._check_channels_util(channel[0], channel[1]['channel_names'], True, self.data, self.fileName)
+          self._create_mapDict_util(channel[0], channel[1]['channel_names'], True, self.data, self.fileName, mapDict)
         else:
-          self._check_channels_util(channel[0], channel[1]['channel_names'], False, self.data, self.fileName)                   
+          self._create_mapDict_util(channel[0], channel[1]['channel_names'], False, self.data, self.fileName, mapDict)                   
       elif channel[1]['header_data'] == True:
-          self._check_channels_util(channel[0], channel[1]['channel_names'], False, self.metaData, self.fileName)
+          self._create_mapDict_util(channel[0], channel[1]['channel_names'], False, self.metaData, self.fileName, mapDict)
 
     # Clear Variables
     channel = None
 
+    return mapDict
 
-  def _check_channels_util(self, channel, channelNames, multipleBenches, data, fileName):   
+
+  def _create_mapDict_util(self, channel, channelNames, multipleBenches, data, fileName, mapDict):   
 
     ##### For Loop through all entries of of mapDict        
     for name in channelNames:
       if name in data.columns:
-        self.mapDict[channel] = name
-        break
+        mapDict[channel] = name
+        return mapDict
     else:
         raise Exception("Cannot find %s channel %s in file %s" % (channel.replace("_"," "), channelNames, fileName))   
 
@@ -297,39 +325,33 @@ class Data:
 
   def check_ranges(self, ChannelData):
 
-    CoHigh = False
-        
     for channel in self.mapDict:       
+      if channel != 'Carbon_Monoxide_Low_Dry':
 
-      ##### Read Max/Min-Vaues from json-file #####
-      maxValue = ChannelData[channel]['maximum_value']
-      minValue = ChannelData[channel]['minimum_value']
+        ##### Read Max/Min-Vaues from json-file #####
+        maxValue = ChannelData[channel]['maximum_value']
+        minValue = ChannelData[channel]['minimum_value']
 
-      ##### Load Values from Data #####
-      if ChannelData[channel]['header_data'] == False:
-        maxCompare = np.nanmax(self.data[self.mapDict[channel]])[0]
-        minCompare = np.nanmin(self.data[self.mapDict[channel]])[0]
+        ##### Load Values from Data #####
+        if ChannelData[channel]['header_data'] == False:
+          maxCompare = np.nanmax(self.data[self.mapDict[channel]])[0]
+          minCompare = np.nanmin(self.data[self.mapDict[channel]])[0]
 
-      ##### Load Values from Metadata #####
-      else:
-        maxCompare = float(self.metaData[self.mapDict[channel]][0])
-        minCompare = float(self.metaData[self.mapDict[channel]][0])
-
-      ##### Check whether maximum out of Range #####
-      if (maxCompare > float(maxValue)) == True:
-        self._output_oor(channel, maxValue, 'above required maximum', ChannelData)       
-
-      ##### Check whether minimum out of Range #####
-      if (minCompare < float(minValue)) == True:
-        if channel == 'Carbon_Monoxide_Low_Dry':
-          CoHigh = True
+        ##### Load Values from Metadata #####
         else:
+          maxCompare = float(self.metaData[self.mapDict[channel]][0])
+          minCompare = float(self.metaData[self.mapDict[channel]][0])
+
+        ##### Check whether maximum out of Range #####
+        if (maxCompare > float(maxValue)) == True:
+          self._output_oor(channel, maxValue, 'above required maximum', ChannelData)       
+
+        ##### Check whether minimum out of Range #####
+        if (minCompare < float(minValue)) == True:
           self._output_oor(channel, minValue, 'below required minimum', ChannelData)
 
     # Clear Variables
     channel, maxValue, minValue, maxCompare, minCompare = None, None, None, None, None
-
-    return CoHigh
 
   # oor = Out of Range
   def _output_oor(self, channel, Value, ErrorString, ChannelData):   
@@ -351,22 +373,22 @@ class ZeroSpan(Data):
     super().__init__(dataFile)
 
 
-  def _check_channels(self, ChannelData):
+  def _create_mapDict(self, ChannelData):
 
     self.Channel = self._bench_channel(ChannelData)
-    super()._check_channels(ChannelData)
+    return super()._create_mapDict(ChannelData)
 
 
-  def _check_channels_util(self, channel, channelNames, multipleBenches, data, fileName):
+  def _create_mapDict_util(self, channel, channelNames, multipleBenches, data, fileName, mapDict):
 
     ##### Write used Ebench-Channel #####
     for name in channelNames:
       if name in data.columns:
         if multipleBenches == True:
-          self.mapDict[channel] =  name + self.Channel
+          mapDict[channel] =  name + self.Channel
         else:
-          self.mapDict[channel] =  name
-        break
+          mapDict[channel] =  name
+        return mapDict
     else:
         raise Exception("Cannot find %s channel %s in file %s" % (channel.replace("_"," "), channelNames, fileName))   
 

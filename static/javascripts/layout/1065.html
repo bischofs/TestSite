@@ -1,102 +1,102 @@
 <div class="row">
     <div ng-controller="InfoboxController">
-        <div class="panel panel-default  col-md-2">
-            <div class="panel-body">
-                <table style="width:100%">
-                    <tr>
-                        <td>Cycle : </td>
-                        <td><b> {{cycle}}</b></td>
-                    </tr>
-                </table>
-                <br>
-                <ol class="treeview">
-                    <li>
-                        <p>Full Load</p>
-                        <table>
-                            <tr>
-                                <td>Meta Data</td>
-                                <td><span class="label {{l_full_meta}}">{{full_meta}}</span></td>
-                            </tr>
-                            <tr>
-                                <td>Channels</td>
-                                <td><span class="label {{l_full_channels}}">{{full_channels}}</span></td>
-                            </tr>
-                            <tr>
-                                <td>Units</td>
-                                <td><span class="label {{l_full_units}}">{{full_units}}</span></td>
-                            </tr>
-                        </table>
-                    </li>
-                    <li>
-                        <p>Pre-Zero/Span</p>
-                        <table>
-                            <tr>
-                                <td>Meta Data</td>
-                                <td><span class="label {{l_pre_meta}}">{{pre_meta}}</span></td>
-                            </tr>
-                            <tr>
-                                <td>Channels</td>
-                                <td><span class="label {{l_pre_channels}}">{{pre_channels}}</span></td>
-                            </tr>
-                            <tr>
-                                <td>Units</td>
-                                <td><span class="label {{l_pre_units}}">{{pre_units}}</span></td>
-                            </tr>
-                        </table>
-                    </li>
-                    <li>
-                       <p>Test Data</p>
-                        <table>
-                            <tr>
-                                <td>Meta Data</td>
-                                <td><span class="label {{l_test_meta}}">{{test_meta}}</span></td>
-                            </tr>
-                            <tr>
-                                <td>Channels</td>
-                                <td><span class="label {{l_test_channels}}">{{test_channels}}</span></td>
-                            </tr>
-                            <tr>
-                                <td>Units</td>
-                                <td><span class="label {{l_test_units}}">{{test_units}}</span></td>
-                            </tr>
-                        </table>            
-                    </li>
-                    <li>
-                        <p>Post Zero/Span</p>
-                        <table>
-                            <tr>
-                                <td>Meta Data</td>
-                                <td><span class="label {{l_post_meta}}">{{post_meta}}</td>
-                            </tr>
-                            <tr>
-                                <td>Channels</td>
-                                <td><span class="label {{l_post_channels}}">{{post_channels}}</td>
-                            </tr>
-                            <tr>
-                                <td>Units</td>
-                                <td><span class="label {{l_post_units}}">{{post_units}}</td>
-                            </tr>
-                        </table>                   
-                    </li>
-                    <li>
-                        <p>General Checks</p>
-                        <table>
-                            <tr>
-                                <td>Ambient Cond.</td>
-                                <td><span class="label {{l_amb}}">{{amb}}</span></td>
-                            </tr>
-                            <tr>
-                                <td>Data Ranges</td>
-                                <td><span class="label {{l_ranges}}">{{ranges}}</span></td>
-                            </tr>
-                            <tr>
-                                <td>Timestamp</td>
-                                <td><span class="label {{l_timestamp}}">{{timestamp}}</span></td>
-                            </tr>                            
-                        </table>   
-                    </li>
-                </ol> 
-                <button ng-click='Reset()' type="button" class="btn btn-default">Reset Cycle</button>           
+        <div class="col-md-2">
+            <div class="panel panel-default ">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Cycle : {{cycle}}</h3>
+                </div>
+                <div cg-busy="{promise:promise,message:'Resetting Cycle...'}">        
+                    <div class="panel-body">
+                        <ol class="treeview">
+                            <li>
+                                <p>Full Load</p>
+                                <table>
+                                    <tr>
+                                        <td>Meta Data</td>
+                                        <td><span class="label {{l_full_meta}}">{{full_meta}}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Channels</td>
+                                        <td><span class="label {{l_full_channels}}">{{full_channels}}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Units</td>
+                                        <td><span class="label {{l_full_units}}">{{full_units}}</span></td>
+                                    </tr>
+                                </table>
+                            </li>
+                            <li>
+                                <p>Pre-Zero/Span</p>
+                                <table>
+                                    <tr>
+                                        <td>Meta Data</td>
+                                        <td><span class="label {{l_pre_meta}}">{{pre_meta}}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Channels</td>
+                                        <td><span class="label {{l_pre_channels}}">{{pre_channels}}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Units</td>
+                                        <td><span class="label {{l_pre_units}}">{{pre_units}}</span></td>
+                                    </tr>
+                                </table>
+                            </li>
+                            <li>
+                               <p>Test Data</p>
+                                <table>
+                                    <tr>
+                                        <td>Meta Data</td>
+                                        <td><span class="label {{l_test_meta}}">{{test_meta}}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Channels</td>
+                                        <td><span class="label {{l_test_channels}}">{{test_channels}}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Units</td>
+                                        <td><span class="label {{l_test_units}}">{{test_units}}</span></td>
+                                    </tr>
+                                </table>            
+                            </li>
+                            <li>
+                                <p>Post Zero/Span</p>
+                                <table>
+                                    <tr>
+                                        <td>Meta Data</td>
+                                        <td><span class="label {{l_post_meta}}">{{post_meta}}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Channels</td>
+                                        <td><span class="label {{l_post_channels}}">{{post_channels}}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Units</td>
+                                        <td><span class="label {{l_post_units}}">{{post_units}}</span></td>
+                                    </tr>
+                                </table>                   
+                            </li>
+                            <li>
+                                <p>General Checks</p>
+                                <table>
+                                    <tr>
+                                        <td>Ambient Cond.</td>
+                                        <td><span class="label {{l_amb}}">{{amb}}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Data Ranges</td>
+                                        <td><span class="label {{l_ranges}}">{{ranges}}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Timestamp</td>
+                                        <td><span class="label {{l_timestamp}}">{{timestamp}}</span></td>
+                                    </tr>                            
+                                </table>   
+                            </li>
+                        </ol>
+                        <button ng-click='Reset()' type="button" class="btn btn-default">Reset Cycle</button>           
+                    </div>
+                </div>
             </div>
         </div>
     </div>
