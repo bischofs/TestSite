@@ -11,7 +11,7 @@ class DelayPrep:
 
     def __init__(self, Results, Data, mapDict):
 
-        if not Results:    
+        if Results['Data'].empty:    
             self.DelayArray = {'NOx':0,'CH4':0,'THC':0,'CO':0,'CO2':0,'O2':0,'NO':0,'MFRAIR':0}
             self.Copy = copy.deepcopy(Data)
             self.data = Data

@@ -33,6 +33,10 @@
       
     })
 
+    $scope.$on('ResetAll',function(){
+        $scope.DelayButton = 'None';
+    }); 
+
     function logout() {
       Authentication.logout();
     }

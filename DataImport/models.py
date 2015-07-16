@@ -14,7 +14,7 @@ class DataHandler:
 
   def __init__(self):
 
-    self.resultsLog = {'Regression': {},'Regression_bool': {}, 'Data Alignment': {}, 'Calculation': {}, 'Report':{}}
+    self.resultsLog = {'Regression': {},'Regression_bool': {}, 'Data Alignment': {'Array':{'NOx':0,'CH4':0,'THC':0,'CO':0,'CO2':0,'O2':0,'NO':0,'MFRAIR':0},'Data':pd.DataFrame()}, 'Calculation': {}, 'Report':{}}
     self.fileDict = {'FULL': 'fullLoad', 'PRE':'preZeroSpan','MAIN':'testData','POST':'postZeroSpan'}
     self.CyclesData = pd.read_json("cycles.json").Cycles
     self.ChannelData = pd.read_json("spec.json").Species
@@ -24,6 +24,7 @@ class DataHandler:
     self.File = None
     self.masterFileName = None
     self.allFilesLoaded = False
+    self.DoCalculation = True
     self.CycleAttr = {}
     self.log = {}
 
@@ -141,8 +142,6 @@ class DataHandler:
     del masterDict[COL]
     del masterDict[COH]
 
-    import ipdb; ipdb.set_trace()
-
     # Clear Variables
     COl, COH, CO, minValue, minCompare = None, None, None, None, None
 
@@ -182,7 +181,6 @@ class DataHandler:
   def _check_time_stamp(self,TsPre,TsTest,TsPost,TestLength):
 
     String = 'Timestamp-Check Failed ! : '
-
     if (TsTest - TsPre) < 0:
       String = String + 'Timestamp of Pre-ZeroSpan is after the Test. '    
     if (TsPost - TsTest) < 0:
@@ -435,19 +433,21 @@ class TestData(Data):
   def _load_steady_state(self, Data): 
 
     Torque71_6 = max(Data['N_CERTTRQ']) # Torque channel will be changed
-    Data = Data[Data['N_CERTMODE'].isin(pd.Series(Data['N_CERTMODE'].astype(int)).unique())] # Choose Data where Channel N_CERTMODE is int
-    Data = Data[Data['N_CERTMODE']>0]
+    DataSteady = Data[Data['N_CERTMODE'].isin(pd.Series(Data['N_CERTMODE'].astype(int)).unique())] # Choose Data where Channel N_CERTMODE is int
+    DataSteady = DataSteady[DataSteady['N_CERTMODE']>0]
 
     ##### Write Torque in original TorqueChannel (same for Speed)
-    Data['UDPi_TorqueDemand'] = Data['N_CERTTRQ']
-    Data['UDPi_TorqueDemand'][Data['N_CERTMODE'] == 1] = Torque71_6/0.716
-    Data['UDPi_SpeedDemand'] = Data['N_CERTSPD']
-    Data.index = range(0,len(Data))
+    DataSteady['UDPi_TorqueDemand'] = DataSteady['N_CERTTRQ']
+    DataSteady['UDPi_TorqueDemand'][DataSteady['N_CERTMODE'] == 1] = Torque71_6/0.716
+    DataSteady['UDPi_SpeedDemand'] = DataSteady['N_CERTSPD']
+    DataSteady.index = range(0,len(DataSteady))
+    DataSteady.Date[0] = Data.Date[0]
+    DataSteady.Time[0] = Data.Time[0]
 
     # Clear Variables
-    Torque71_6r = None
+    Torque71_6r, Date, Time = None, None, None
 
-    return Data
+    return DataSteady
 
 
 

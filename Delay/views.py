@@ -20,9 +20,8 @@ class DelayView(views.APIView):
             dataHandler = cache.get(request.session.session_key)
 
             delayPrep = DelayPrep(dataHandler.resultsLog['Data Alignment'], dataHandler.testData.data, dataHandler.masterDict)
-            if not dataHandler.resultsLog['Data Alignment']:
+            if dataHandler.resultsLog['Data Alignment']['Data'].empty:
                 dataHandler.resultsLog['Data Alignment']['Data'] = delayPrep.Copy
-                dataHandler.resultsLog['Data Alignment']['ArrayCalc'] = {}
             js = delayPrep.create_windows()
 
             cache.set(request.session.session_key, dataHandler)
@@ -44,9 +43,11 @@ class DelayView(views.APIView):
             cache = caches['default']
             dataHandler = cache.get(request.session.session_key)
 
-            Submit = DelaySubmit(dataHandler.testData.data, dataHandler.masterDict, request.DATA['delay'])
-            dataHandler.testData.data = Submit.Data
-            dataHandler.resultsLog['Data Alignment']['Array'] = request.DATA['delay']
+            if request.DATA['delay'] != dataHandler.resultsLog['Data Alignment']['Array']:
+                Submit = DelaySubmit(dataHandler.testData.data, dataHandler.masterDict, request.DATA['delay'])
+                dataHandler.testData.data = Submit.Data
+                dataHandler.resultsLog['Data Alignment']['Array'] = request.DATA['delay']
+                dataHandler.DoCalculation = True
 
             cache.set(request.session.session_key, dataHandler)
                 
