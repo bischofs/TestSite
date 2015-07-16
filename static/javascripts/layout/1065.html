@@ -15,15 +15,15 @@
                         <table>
                             <tr>
                                 <td>Meta Data</td>
-                                <td><span class="label {{l_full_meta}}">{{full_meta}}</span></td>
+                                <td class="data-checked"><span class="label {{l_full_meta}}">{{full_meta}}</span></td>
                             </tr>
                             <tr>
                                 <td>Channels</td>
-                                <td><span class="label {{l_full_channels}}">{{full_channels}}</span></td>
+                                <td class="data-checked"><span class="label {{l_full_channels}}">{{full_channels}}</span></td>
                             </tr>
                             <tr>
                                 <td>Units</td>
-                                <td><span class="label {{l_full_units}}">{{full_units}}</span></td>
+                                <td class="data-checked"><span class="label {{l_full_units}}">{{full_units}}</span></td>
                             </tr>
                         </table>
                     </li>
@@ -32,15 +32,15 @@
                         <table>
                             <tr>
                                 <td>Meta Data</td>
-                                <td><span class="label {{l_pre_meta}}">{{pre_meta}}</span></td>
+                                <td class="data-checked"><span class="label {{l_pre_meta}}">{{pre_meta}}</span></td>
                             </tr>
                             <tr>
                                 <td>Channels</td>
-                                <td><span class="label {{l_pre_channels}}">{{pre_channels}}</span></td>
+                                <td class="data-checked"><span class="label {{l_pre_channels}}">{{pre_channels}}</span></td>
                             </tr>
                             <tr>
                                 <td>Units</td>
-                                <td><span class="label {{l_pre_units}}">{{pre_units}}</span></td>
+                                <td class="data-checked"><span class="label {{l_pre_units}}">{{pre_units}}</span></td>
                             </tr>
                         </table>
                     </li>
@@ -49,15 +49,15 @@
                         <table>
                             <tr>
                                 <td>Meta Data</td>
-                                <td><span class="label {{l_test_meta}}">{{test_meta}}</span></td>
+                                <td class="data-checked"><span class="label {{l_test_meta}}">{{test_meta}}</span></td>
                             </tr>
                             <tr>
                                 <td>Channels</td>
-                                <td><span class="label {{l_test_channels}}">{{test_channels}}</span></td>
+                                <td class="data-checked"><span class="label {{l_test_channels}}">{{test_channels}}</span></td>
                             </tr>
                             <tr>
                                 <td>Units</td>
-                                <td><span class="label {{l_test_units}}">{{test_units}}</span></td>
+                                <td class="data-checked"><span class="label {{l_test_units}}">{{test_units}}</span></td>
                             </tr>
                         </table>            
                     </li>
@@ -66,15 +66,15 @@
                         <table>
                             <tr>
                                 <td>Meta Data</td>
-                                <td><span class="label {{l_post_meta}}">{{post_meta}}</td>
+                                <td class="data-checked"><span class="label {{l_post_meta}}">{{post_meta}}</td>
                             </tr>
                             <tr>
                                 <td>Channels</td>
-                                <td><span class="label {{l_post_channels}}">{{post_channels}}</td>
+                                <td class="data-checked"><span class="label {{l_post_channels}}">{{post_channels}}</td>
                             </tr>
                             <tr>
                                 <td>Units</td>
-                                <td><span class="label {{l_post_units}}">{{post_units}}</td>
+                                <td class="data-checked"><span class="label {{l_post_units}}">{{post_units}}</td>
                             </tr>
                         </table>                   
                     </li>
@@ -83,15 +83,15 @@
                         <table>
                             <tr>
                                 <td>Ambient Cond.</td>
-                                <td><span class="label {{l_amb}}">{{amb}}</span></td>
+                                <td class="data-checked"><span class="label {{l_amb}}">{{amb}}</span></td>
                             </tr>
                             <tr>
                                 <td>Data Ranges</td>
-                                <td><span class="label {{l_ranges}}">{{ranges}}</span></td>
+                                <td class="data-checked"><span class="label {{l_ranges}}">{{ranges}}</span></td>
                             </tr>
                             <tr>
                                 <td>Timestamp</td>
-                                <td><span class="label {{l_timestamp}}">{{timestamp}}</span></td>
+                                <td class="data-checked"><span class="label {{l_timestamp}}">{{timestamp}}</span></td>
                             </tr>                            
                         </table>   
                     </li>
@@ -125,6 +125,10 @@
     </div>
 </div>
 <style type="text/css">
+    .data-checked {
+        float: right;
+    }
+  
     .panel-heading {
         padding: 6px 9px;
     }
