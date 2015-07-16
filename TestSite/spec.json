@@ -191,7 +191,7 @@
                 "E_NOXD"
             ]
         },
-	"Nitrous_Oxide": {
+	"Nitrous_Oxide_Wet": {
             "unit": "ppm",
             "maximum_value": "20000",
             "minimum_value": "-10",
@@ -205,7 +205,7 @@
                 "M_N2OW"
             ]
         },
-	"Ammonia": {
+	"Ammonia_Wet": {
             "unit": "ppm",
             "maximum_value": "20000",
             "minimum_value": "-10",
@@ -219,7 +219,7 @@
                 "M_NH3W"
             ]
         },
-	"Formaldehyde": {
+	"Formaldehyde_Wet": {
             "unit": "ppm",
             "maximum_value": "20000",
             "minimum_value": "-10",
