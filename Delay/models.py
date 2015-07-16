@@ -12,6 +12,8 @@ class DelayPrep:
     def __init__(self, Results, Data, mapDict):
 
         if Results['Data'].empty:    
+            #self.DelayArray = {'NOx':0,'CH4':0,'THC':0,'CO':0,'CO2':0,'O2':0,'NO':0,'N2O':0,'CH2O':0,'NH3':0,'MFRAIR':0}
+
             self.DelayArray = {'NOx':0,'CH4':0,'THC':0,'CO':0,'CO2':0,'O2':0,'NO':0,'MFRAIR':0}
             self.Copy = copy.deepcopy(Data)
             self.data = Data
@@ -31,8 +33,8 @@ class DelayPrep:
                                                      ('Carbon_Dioxide_Dry',self.data[self.mapDict['Carbon_Dioxide_Dry']]),
                                                      ('Engine_Torque',self.data[self.mapDict['Engine_Torque']]),
                                                      ('Carbon_Monoxide_Dry',self.data[self.mapDict['Carbon_Monoxide_Dry']])])
-        
-        
+
+        #('Nitrous_Oxide_Wet', self.data[self.mapDict['Nitrous_Oxide_Wet']]),('Formaldehyde_Wet', self.data[self.mapDict['Formaldehyde_Wet']]),('Ammonia_Wet', self.data[self.mapDict['Ammonia_Wet']])
 
     def create_windows(self):
             
@@ -58,6 +60,10 @@ class DelaySubmit:
     def __init__(self, Data, MasterDict, DelayArray):
 
         self.Data = Data
+
+        #ChannelList = ['Air_Flow_Rate','Nitrogen_X_Dry','Total_Hydrocarbons_Wet','Methane_Wet','Oxygen_Dry','Nitrogen_Monoxide_Dry','Carbon_Dioxide_Dry','Carbon_Monoxide_Dry','Nitrous_Oxide_Wet','Formaldehyde_Wet','Ammonia_Wet']
+        #AbbrList = ['MFRAIR','NOx','THC','CH4','O2','NO','CO2','CO','N2O','CH2O','NH3']
+
 
         ChannelList = ['Air_Flow_Rate','Nitrogen_X_Dry','Total_Hydrocarbons_Wet','Methane_Wet','Oxygen_Dry','Nitrogen_Monoxide_Dry','Carbon_Dioxide_Dry','Carbon_Monoxide_Dry']
         AbbrList = ['MFRAIR','NOx','THC','CH4','O2','NO','CO2','CO']
