@@ -279,7 +279,7 @@
                 "TestData"
             ],
 	    "channel_names": [
-                "C_FRAIRWS"
+                "C_FRAIRW"
             ]
         },
         "Engine_Power": {
@@ -321,7 +321,7 @@
 		"FullLoad"
             ],
 	    "channel_names": [
-                "C_TRQENG"
+                "UDPi_FltTorque"
             ]
         },
         "Commanded_Torque": {
