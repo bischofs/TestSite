@@ -8,7 +8,10 @@ from simple_history.models import HistoricalRecords
 class Ebench(models.Model):
     
     Name = models.CharField(max_length=50)
-    Model = models.CharField(max_length=50)
+    EbenchID = models.BigIntegerField(max_length=10)
+    Ebench_Serial_Number = models.BigIntegerField(max_length=50)
+    Ebench_Model = models.CharField(max_length=50)
+    Ebench_Channel = models.BigIntegerField(max_length=10)
     CH4_Response_Factor = models.FloatField()
     CH4_Penetration_Factor = models.FloatField()
     Thermal_Chiller_Dewpoint = models.FloatField()
