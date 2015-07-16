@@ -77,22 +77,20 @@
         function read() {
             $http.get('/1065/api/v1/data/delay/')
                 .success(function(data) {
-                    var spec = JSON.parse(data.DelaySpecies)
-                    $scope.spec = spec
+                    
+                    $scope.spec = JSON.parse(data.DelaySpecies)
                     $scope.save = data.Array
                     $scope.options = {
                         pointDot: false,
                         showTooltips: false
                     };
-                    $scope.ChosenSpecies = 'NOx'
-                    $scope.series = [$scope.ChosenSpecies, 'Torque'];
-                    $scope.currentDelay = $scope.save[$scope.series[0]];
-                    $scope.labels = _.keys($scope.spec[$scope.Array[$scope.ChosenSpecies]]).splice(50+data.Array['NOx'], 100);
-                    $scope.data = [_.values($scope.spec[$scope.Array[$scope.ChosenSpecies]]).splice(50+data.Array['NOx'], 100), _.values($scope.spec.Engine_Torque).splice(50, 100)];
-                    $scope.currentSpec = $scope.spec[$scope.Array[$scope.ChosenSpecies]];            
-                    $scope.apply;        
-                    toastr.success('Prepartion for Delay finished!');            
 
+                    $scope.series = ['NOx', 'Torque'];
+                    $scope.currentDelay = $scope.save[$scope.series[0]];
+                    $scope.labels = _.keys($scope.spec[$scope.Array['NOx']]).splice(50+data.Array['NOx'], 100);
+                    $scope.data = [_.values($scope.spec[$scope.Array['NOx']]).splice(50+data.Array['NOx'], 100), _.values($scope.spec.Engine_Torque).splice(50, 100)];
+                    $scope.currentSpec = $scope.spec[$scope.Array['NOx']];            
+                    toastr.success('Prepartion for Delay finished!');            
                 })
                 .error(function(response) {
                     toastr.error(response.message, 'Prepartion for Delay failed!');

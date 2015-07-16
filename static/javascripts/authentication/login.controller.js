@@ -39,13 +39,7 @@
     * @desc Log the user in
     * @memberOf TestSite.authentication.controllers.LoginController
     */
-    function login() {
-
-      $scope.delay = 0;
-      $scope.minDuration = 0;
-      $scope.message = 'Logging in...';
-      $scope.backdrop = true;
-      $scope.promise = null;      
+    function login() { 
 
       $scope.promise = Authentication.login(vm.email, vm.password);
     }
