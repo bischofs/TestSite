@@ -16,7 +16,7 @@
         //               'NO':'Nitrogen_Monoxide_Dry','MFRAIR':'Air_Flow_Rate','NO2':'Nitrous_Oxide_Wet',
         //                'CH2O':'Formaldehyde_Wet','NH3':'Ammonia_Wet'}
 
-        $scope.Array = {'NOx':'Nitrogen_X_Dry','CH4':'Methane_Wet','THC':'Total_Hydrocarbons_Wet','CO':'Carbon_Monoxide_Dry','CO2':'Carbon_Dioxide_Dry','O2':'Oxygen_Dry','NO':'Nitrogen_Monoxide_Dry','MFRAIR':'Air_Flow_Rate'}
+        $scope.Array = {'NOx':'Nitrogen_X_Dry','CH4':'Methane_Wet','THC':'Total_Hydrocarbons_Wet','CO':'Carbon_Monoxide_Dry','CO2':'Carbon_Dioxide_Dry','NO':'Nitrogen_Monoxide_Dry','MFRAIR':'Air_Flow_Rate'}
         read();
 
         $scope.species = function() {
@@ -87,7 +87,8 @@
                     $scope.save = data.Array
                     $scope.options = {
                         pointDot: false,
-                        showTooltips: false
+                        showTooltips: false,
+			responsive: false,
                     };
 
                     $scope.series = ['NOx', 'Torque'];
