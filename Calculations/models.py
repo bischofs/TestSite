@@ -64,9 +64,9 @@ class Preparation:
     FuelData.M_CO = 28.0101 # Molar mass of CO
     FuelData.M_CO2 = 44.0095 # Molar mass of CO2
 
-    #FuelData.M_N2O = 44.0128 # Molar mass of N20
-    #FuelData.M_CH2O = 30.02598 # Molar mass of Formaldehyde
-    #FuelData.M_NH3 = 17.03052 # Molar mass of Ammonia  
+    FuelData.M_N2O = 44.0128 # Molar mass of N20
+    FuelData.M_CH2O = 30.02598 # Molar mass of Formaldehyde
+    FuelData.M_NH3 = 17.03052 # Molar mass of Ammonia  
 
     ## Mass fractions ##   
     FuelData.W_c = float(HeaderData[MapDict['Mass_Fraction_Carbon']])/100 # Carbon mass fraction of fuel
@@ -212,12 +212,12 @@ class Calculation:
         if Preparation.TransientBool == True:
 
             self._calculation(Preparation, MapDict)
-            self.result = self._result()  
+            self.result = self._result(MapDict)  
 
         else:
             Preparation.test = self._prepare_steady_state(Preparation.test, MapDict)
             self._calculation(Preparation, MapDict)
-            self.result = self._result()
+            self.result = self._result(MapDict)
 
 
     def _calculation(self, Preparation, MapDict):
@@ -266,7 +266,7 @@ class Calculation:
         Data = self._unit_conversion(Data, TestData, MapDict)
         Data = self._prepare_iteration(Data, TestData, Ebench, MapDict)
         Data = self._iteration(Data, Fuel, Ebench)
-        [Data, ArraySum] = self._rest_calculation(Data, Fuel)
+        [Data, ArraySum] = self._rest_calculation(Data, Fuel, MapDict)
 
         # Clear Variables
         Preparation, TestData, Ebench, Fuel = None, None, None, None
@@ -287,9 +287,12 @@ class Calculation:
         Data["xCOmeas"] = Data.get(MapDict["Carbon_Monoxide_Dry"])/1000000 # ppm --> mol/mol
         Data["xNOxmeas"] = Data[MapDict["Nitrogen_X_Dry"]]/1000000 # ppm --> mol/mol
 
-        #Data["xN2Omeas"] = Data[MapDict["Nitrous_Oxide_Wet"]]/1000000
-        #Data["xCH2Omeas"] = Data[MapDict["Formaldehyde_Wet"]]/1000000
-        #Data["xNH3meas"] = Data[MapDict["Ammonia_Wet"]]/1000000
+        if "Nitrous_Oxide_Wet" in MapDict:
+            Data["xN2Omeas"] = TestData[MapDict["Nitrous_Oxide_Wet"]]/1000000
+        if "Formaldehyde_Wet" in MapDict:
+            Data["xCH2Omeas"] = TestData[MapDict["Formaldehyde_Wet"]]/1000000
+        if "Ammonia_Wet" in MapDict:
+            Data["xNH3meas"] = TestData[MapDict["Ammonia_Wet"]]/1000000
 
         # Flows
         Data["mfuel"] = TestData[MapDict["Fuel_Flow_Rate"]]*1000/3600 # kg/h --> g/s
@@ -332,9 +335,12 @@ class Calculation:
         Data["xTHCwet"] = Data.xTHCmeas   
         Data["xNMHCwet"] = (Data.xTHCwet-Data.xCH4wet*Ebench.CH4_RF)/(1-Ebench.RFPF*Ebench.CH4_RF)
 
-        #Data["xN2Owet"] = Data["xN2Omeas"]
-        #Data["xCH2Owet"] =  Data["xCH2Omeas"]
-        #Data["xNH3wet"] = Data["xNH3meas"]       
+        if "Nitrous_Oxide_Wet" in MapDict:
+            Data["xN2Owet"] = Data["xN2Omeas"]
+        if "Formaldehyde_Wet" in MapDict:
+            Data["xCH2Owet"] =  Data["xCH2Omeas"]
+        if "Ammonia_Wet" in MapDict:
+            Data["xNH3wet"] = Data["xNH3meas"]     
 
         # Clear Variables
         TestData, Ebench = None, None
@@ -442,7 +448,7 @@ class Calculation:
         return Data
 
 
-    def _rest_calculation(self, Data, Fuel):   
+    def _rest_calculation(self, Data, Fuel, MapDict):   
 
         # Dry Emissions
         Data["xH2ONOmeas"] = Data.xH2ONO2meas
@@ -466,15 +472,18 @@ class Calculation:
         Data["Mass_CO2"] = Data.xCO2wet*Data.nexh*Fuel.M_CO2
         Data["Mass_NMHC"] = Data.xNMHCwet*Data.nexh*Fuel.M_NMHC
 
-        #Data["Mass_N2O"] = Data.xNO2wet*Data.nexh*Fuel.M_N2O
-        #Data["Mass_CH2O"] = Data.xCH2Owet*Data.nexh*Fuel.M_CH2O
-        #Data["Mass_NH3"] = Data.xNH3wet*Data.nexh*Fuel.M_NH3        
-
-        # Emissions in total
-        #ArraySum = {'CO2':Data.Mass_CO2.sum(),'CO':Data.Mass_CO.sum(),'NOx':Data.Mass_NOx.sum(),'THC':Data.Mass_THC.sum(),'NMHC':Data.Mass_NMHC.sum(),'N2O':Data.Mass_N2O.sum(),'CH2O':Data.Mass_CH2O.sum(),'NH3':Data.Mass_NH3.sum()}
-
         # Emissions in total
         ArraySum = {'CO2':Data.Mass_CO2.sum(),'CO':Data.Mass_CO.sum(),'NOx':Data.Mass_NOx.sum(),'THC':Data.Mass_THC.sum(),'NMHC':Data.Mass_NMHC.sum()}
+
+        if "Nitrous_Oxide_Wet" in MapDict:
+            Data["Mass_N2O"] = Data.xNO2wet*Data.nexh*Fuel.M_N2O
+            ArraySum.update({'N2O':Data.Mass_N2O.sum()})
+        if "Formaldehyde_Wet" in MapDict:
+            Data["Mass_CH2O"] = Data.xCH2Owet*Data.nexh*Fuel.M_CH2O
+            ArraySum.update({'CH2O':Data.Mass_CH2O.sum()})
+        if "Ammonia_Wet" in MapDict:
+            Data["Mass_NH3"] = Data.xNH3wet*Data.nexh*Fuel.M_NH3
+            ArraySum.update({'NH3':Data.Mass_NH3.sum()})            
 
         return Data, ArraySum
 
@@ -499,40 +508,50 @@ class Calculation:
         Data.Mass_THC[np.where(Data.Mass_THC<0)[0]] = 0
         Data.Mass_NMHC[np.where(Data.Mass_NMHC<0)[0]] = 0
 
-        #Data.Mass_N2O[np.where(Data.Mass_N2O<0)[0]] = 0
-        #Data.Mass_CH2O[np.where(Data.Mass_CH2O<0)[0]] = 0
-        #ata.Mass_NH3[np.where(Data.Mass_NH3<0)[0]] = 0
-
         U_BPOW_Factor = DataRaw[MapDict['Engine_Power']].drop(np.where(DataRaw[MapDict['Engine_Power']]<0)[0]).sum(skipna=True)/(3600*0.746)
 
-        #ArraySumCorWon = {'CO2':Data.Mass_CO2.sum(),'CO':Data.Mass_CO.sum(),'NOx':Data.Mass_NOx.sum(),
-        #                 'THC':Data.Mass_THC.sum(),'NMHC':Data.Mass_NMHC.sum(),'N2O':Data.Mass_N2O.sum(),
-        #                 'CH2O':Data.Mass_CH2O.sum(),'NH3':Data.Mass_NH3.sum()}
-
         ArraySumCorWon = {'CO2':Data.Mass_CO2.sum(),'CO':Data.Mass_CO.sum(),'NOx':Data.Mass_NOx.sum(),
-                         'THC':Data.Mass_THC.sum(),'NMHC':Data.Mass_NMHC.sum()}
+                         'THC':Data.Mass_THC.sum(),'NMHC':Data.Mass_NMHC.sum()}        
+
+        if "Nitrous_Oxide_Wet" in MapDict:
+            Data.Mass_N2O[np.where(Data.Mass_N2O<0)[0]] = 0
+            ArraySumCorWon.update({'N2O':Data.Mass_N2O.sum()})
+        if "Formaldehyde_Wet" in MapDict:
+            Data.Mass_CH2O[np.where(Data.Mass_CH2O<0)[0]] = 0
+            ArraySumCorWon.update({'CH2O':Data.Mass_CH2O.sum()})
+        if "Ammonia_Wet" in MapDict:
+            Data.Mass_NH3[np.where(Data.Mass_NH3<0)[0]] = 0
+            ArraySumCorWon.update({'NH3':Data.Mass_NH3.sum()})
 
         return ArraySumCorWon, U_BPOW_Factor
 
 
-    def _result(self):
+    def _result(self, MapDict):
 
         ##### Load Data #####
-        #Species = ['CO2','CO','NOx','THC','NMHC','N2O','CH2O','NH3']
+        Species = ['CO2','CO','NOx','THC','NMHC']
+        SpeciesNum = 5
+        Units = ['g/bhphr','g/bhphr','g/bhphr','g/bhphr','g/bhphr']
 
-        ##### Load Data #####
-        Species = ['CO2','CO','NOx','THC','NMHC'] 
+        if "Nitrous_Oxide_Wet" in MapDict:
+            SpeciesNum = SpeciesNum+1
+            Species.append('N2O')
+            Units.append('g/bhphr')
+        if "Formaldehyde_Wet" in MapDict:
+            SpeciesNum = SpeciesNum+1
+            Species.append('CH2O')
+            Units.append('g/bhphr')
+        if "Ammonia_Wet" in MapDict:
+            SpeciesNum = SpeciesNum+1
+            Species.append('NH3')
+            Units.append('g/bhphr')      
 
         ##### Create DataFrames #####
         DF = pd.DataFrame()
         DF['Name'] = Species
-        #DF['Units'] = ['g/bhphr','g/bhphr','g/bhphr','g/bhphr','g/bhphr','g/bhphr','g/bhphr']
-        #DF['Result'] = np.zeros([7,1])
-        #DF['Total'] =  np.zeros([7,1])
-
-        DF['Units'] = ['g/bhphr','g/bhphr','g/bhphr','g/bhphr','g/bhphr']
-        DF['Result'] = np.zeros([5,1])
-        DF['Total'] =  np.zeros([5,1])        
+        DF['Units'] = Units
+        DF['Result'] = np.zeros([SpeciesNum,1])
+        DF['Total'] =  np.zeros([SpeciesNum,1])        
         self.DriftUncorrected, self.DriftCorrected, self.Final = DF.copy(), DF.copy(), DF.copy()
         DF = None
 
@@ -560,16 +579,22 @@ class Report:
         Test = DataHandler.testData.data
         ArraySumUn, ArraySumCor, ArraySumCorWon = CalculatorLog['Array']
         self.DriftUncorrected, self.DriftCorrected, self.Final = CalculatorLog['Results']
-        #Species = ['CO2','CO','NOx','THC','NMHC','N2O','CH2O','NH3']
 
-        Species = ['CO2','CO','NOx','THC','NMHC']  
+        Species = ['CO2','CO','NOx','THC','CH4'] 
+
+        if "Nitrous_Oxide_Wet" in MapDict:
+            Species.append('N2O')
+        if "Formaldehyde_Wet" in MapDict:
+            Species.append('CH2O')
+        if "Ammonia_Wet" in MapDict:
+            Species.append('NH3')
 
         ###### Preparation of Excel-File #####        
         self.file = self._preparation_excel_file(self.output)
 
         ##### Write Emissions in Report ######
         self.sheet = self._write_emissions(self.sheet, self.DriftUncorrected, self.DriftCorrected, self.Final, ArraySumUn, ArraySumCor, ArraySumCorWon, Species)
-        self.sheet = self._write_first_page(self.sheet, DataHandler.resultsLog, CalculatorLog['ZeroSpan'], DelayArray)
+        self.sheet = self._write_first_page(self.sheet, DataHandler.resultsLog, CalculatorLog['ZeroSpan'], DelayArray, Species)
         
         ##### Write Data according to choosen options #####
         self.sheet2 = self._write_dataframe(self.sheet2, Test)
@@ -592,7 +617,7 @@ class Report:
     def _write_emissions(self, sheet, DriftUncorrected, DriftCorrected, Final, ArraySumUn, ArraySumCor, ArraySumCorWon, Species):
 
         Type = ['Drift-uncorrected', 'Drift-corrected', 'Final']
-        TypeNum = [21, 11 , 1]
+        TypeNum = [25, 13 , 1]
         DataList = [DriftUncorrected, DriftCorrected, Final]
         ArrayList = [ArraySumUn, ArraySumCor, ArraySumCorWon]     
 
@@ -605,18 +630,18 @@ class Report:
         self.merge = self.file.add_format({'bold': 1,'border': 1,'align': 'center','valign': 'vcenter','fg_color': '#C71585','font_color':'white'})
         
         for [text, index, Data, Array] in zip(Type, TypeNum, DataList, ArrayList):
-            
+
             ##### Write Data to File #####
             Data = pd.read_json(Data)
             sheet.merge_range('J'+str(index) + ':L'+str(index), text +' Emissions', self.merge)
             sheet.write('J'+str(index+1),'Species',self.dark_grey)
             sheet.write('K'+str(index+1),'Units',self.dark_grey)
-            sheet.write('L'+str(index+1),'Test',self.dark_grey)
-            sheet.write_column('J'+str(index+2),Data.Species,self.bright_grey)
+            sheet.write('L'+str(index+1),'Result',self.dark_grey)
+            sheet.write_column('J'+str(index+2),Data.Name,self.bright_grey)
             sheet.write_column('K'+str(index+2),Data.Units,self.bright_grey)
-            where_are_NaNs = np.isnan(Data.Test)
-            Data.Test[where_are_NaNs] = 99999
-            sheet.write_column('L'+str(index+2),np.round(Data.get('Test'),3),self.border)
+            where_are_NaNs = np.isnan(Data.Result)
+            Data.Result[where_are_NaNs] = 99999
+            sheet.write_column('L'+str(index+2),np.round(Data.get('Result'),3),self.border)
 
             ##### Emissions Total Mass #####
             sheet.write('N'+str(index), 'Emissions Mass', self.bright_grey)
@@ -626,7 +651,7 @@ class Report:
         return sheet
 
 
-    def _write_first_page(self, sheet, ResultsLog, ZeroSpan, DelayArray):
+    def _write_first_page(self, sheet, ResultsLog, ZeroSpan, DelayArray, Species):
 
         if (not ResultsLog['Regression']) == False:
 
@@ -670,39 +695,32 @@ class Report:
         if (not ResultsLog['Data Alignment']) == False: 
 
             Delay = ResultsLog['Data Alignment']                    
-
+            Species.append('MFRAIR')
             sheet.merge_range('A10:C10','Data Alignment', self.merge)
-            Species = ['CO2','CO','NOx','THC','NMHC','O2','MFRAIR']
             sheet.write_row('A11:C11',['Species','Units','Delay'],self.dark_grey)
             sheet.write_column('A12',Species,self.bright_grey)
-            sheet.write_column('B12',['seconds','seconds','seconds','seconds','seconds','seconds','seconds'],self.bright_grey)
 
             # Write Delay
-            sheet.write('C12',DelayArray['CO2'],self.border)
-            sheet.write('C13',DelayArray['CO'],self.border)
-            sheet.write('C14',DelayArray['NOx'],self.border)
-            sheet.write('C15',DelayArray['THC'],self.border)
-            sheet.write('C16',DelayArray['CH4'],self.border)
-            sheet.write('C17',DelayArray['O2'],self.border)
-            sheet.write('C18',DelayArray['MFRAIR'],self.border)
-
+            for i, spec in zip(range(0,len(Species)),Species):
+                sheet.write('C'+str(12+i),DelayArray[spec],self.border)
+                sheet.write('B'+str(12+i),'seconds',self.bright_grey)
 
         ZeroSpan = pd.read_json(ZeroSpan)
         Species = ZeroSpan.columns.values
         Letters = ['C','D','E','F','G']
         TypeList = ['Chosen','PreZero','PostZero','PreSpan','PostSpan']
-        sheet.merge_range('A21:G21','Zero/Span - Table', self.merge)
-        sheet.write('A22','Species',self.dark_grey)
-        sheet.write('B22','Units',self.dark_grey)
-        sheet.write_row('C22:G22',TypeList,self.dark_grey)
+        sheet.merge_range('A23:G23','Zero/Span - Table', self.merge)
+        sheet.write('A24','Species',self.dark_grey)
+        sheet.write('B24','Units',self.dark_grey)
+        sheet.write_row('C24:G24',TypeList,self.dark_grey)
         for Type, letter in zip(TypeList, Letters):
             for spec, index in zip(Species,range(1,len(Species)+1)):
                 if ZeroSpan[spec][Type] > 100:
-                    sheet.write('B'+str(index+22),'ppm',self.bright_grey)
+                    sheet.write('B'+str(index+24),'ppm',self.bright_grey)
                 else:
-                    sheet.write('B'+str(index+22),'%',self.bright_grey)
-                sheet.write(letter+str(index+22), np.round(ZeroSpan[spec][Type],2),self.border)
-                sheet.write('A'+str(index+22), spec,self.bright_grey)
+                    sheet.write('B'+str(index+24),'%',self.bright_grey)
+                sheet.write(letter+str(index+24), np.round(ZeroSpan[spec][Type],2),self.border)
+                sheet.write('A'+str(index+24), spec,self.bright_grey)
 
     def _write_dataframe(self, Sheet, Data):
 

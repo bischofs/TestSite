@@ -14,13 +14,16 @@ class DataHandler:
 
   def __init__(self):
 
-    self.resultsLog = {'Regression': {},'Regression_bool': {}, 'Data Alignment': {'Array':{'NOx':0,'CH4':0,'THC':0,'CO':0,'CO2':0,'O2':0,'NO':0,'MFRAIR':0},'Data':pd.DataFrame()}, 'Calculation': {}, 'Report':{}}
+    self.resultsLog = {'Regression': {},'Regression_bool': {},
+                        'Data Alignment': {'Array':{'NOx':0,'CH4':0,'THC':0,'CO':0,'CO2':0,'O2':0,'NO':0,'MFRAIR':0,'N2O':0,'CH2O':0,'NH3':0},
+                        'Data':pd.DataFrame()}, 'Calculation': {}, 'Report':{}}
     self.fileDict = {'FULL': 'fullLoad', 'PRE':'preZeroSpan','MAIN':'testData','POST':'postZeroSpan'}
     self.CyclesData = pd.read_json("cycles.json").Cycles
     self.ChannelData = pd.read_json("spec.json").Species
     self.ebenches = Ebench.objects.all()
     self.masterDict = {}
     self.masterMetaData = pd.DataFrame()
+    self.Species = {}
     self.File = None
     self.masterFileName = None
     self.allFilesLoaded = False
@@ -78,10 +81,10 @@ class DataHandler:
     CycleAttr['Name'] = CyclesData[Cycle]['Name']    
     CycleAttr['Engine'] = CyclesData[Cycle]['Engine']
     CycleAttr['CycleType'] = CyclesData[Cycle]['CycleType']
+    CycleAttr['CycleLength'] = CyclesData[Cycle]['CycleLength']
     CycleAttr['Fuel'] = CyclesData[Cycle]['Fuel']
     CycleAttr['FactorMult'] = CyclesData[Cycle]['NOxFactorMult']
     CycleAttr['FactorAdd'] = CyclesData[Cycle]['NOxFactorAdd']
-
     return CycleAttr
 
 
@@ -98,13 +101,15 @@ class DataHandler:
 
     else:
       self.allFilesLoaded = True
-
       ##### Check Timestamps of Files
       self._check_time_stamp(self.preZeroSpan.TimeStamp, self.testData.TimeStamp, self.postZeroSpan.TimeStamp, len(self.testData.data))
 
       ##### Create MaterDict, Set Co-Channel, Load E-Bench-Data #####
       self.masterDict = self._create_master_dict(attrs)
       self.ebenchData = self._load_ebench(self.ebenches[int(self.CycleAttr['EbenchNum'])-1].history, self.testData.TimeStamp)
+
+      ##### Set used Species #####
+      self.Species = self.testData.Species
 
 
   def _create_master_dict(self, attrs):
@@ -283,11 +288,11 @@ class Data:
     for channel in ChannelData.items():
       if channel[1]['files'].__contains__(self.fileType) and channel[1]['header_data'] == False:
         if (channel[1]['multiple_benches'] == True):
-          self._create_mapDict_util(channel[0], channel[1]['channel_names'], True, self.data, self.fileName, mapDict)
+          self._create_mapDict_util(channel[0], channel[1]['channel_names'], True, channel[1]['Species'], self.data, self.fileName, mapDict)
         else:
-          self._create_mapDict_util(channel[0], channel[1]['channel_names'], False, self.data, self.fileName, mapDict)                   
+          self._create_mapDict_util(channel[0], channel[1]['channel_names'], False, channel[1]['Species'], self.data, self.fileName, mapDict)                   
       elif channel[1]['header_data'] == True:
-          self._create_mapDict_util(channel[0], channel[1]['channel_names'], False, self.metaData, self.fileName, mapDict)
+          self._create_mapDict_util(channel[0], channel[1]['channel_names'], False, channel[1]['Species'], self.metaData, self.fileName, mapDict)
 
     # Clear Variables
     channel = None
@@ -295,7 +300,7 @@ class Data:
     return mapDict
 
 
-  def _create_mapDict_util(self, channel, channelNames, multipleBenches, data, fileName, mapDict):   
+  def _create_mapDict_util(self, channel, channelNames, multipleBenches, Species, data, fileName, mapDict):   
 
     ##### For Loop through all entries of of mapDict        
     for name in channelNames:
@@ -303,6 +308,7 @@ class Data:
         mapDict[channel] = name
         return mapDict
     else:
+      if Species == False:
         raise Exception("Cannot find %s channel %s in file %s" % (channel.replace("_"," "), channelNames, fileName))   
 
     # Clear Variables
@@ -377,7 +383,7 @@ class ZeroSpan(Data):
     return super()._create_mapDict(ChannelData)
 
 
-  def _create_mapDict_util(self, channel, channelNames, multipleBenches, data, fileName, mapDict):
+  def _create_mapDict_util(self, channel, channelNames, multipleBenches, Species, data, fileName, mapDict):
 
     ##### Write used Ebench-Channel #####
     for name in channelNames:
@@ -388,6 +394,7 @@ class ZeroSpan(Data):
           mapDict[channel] =  name
         return mapDict
     else:
+      if Species == False:
         raise Exception("Cannot find %s channel %s in file %s" % (channel.replace("_"," "), channelNames, fileName))   
 
     # Clear Variables
@@ -418,6 +425,7 @@ class TestData(Data):
   def __init__(self, dataFile, CycleType):
     super().__init__(dataFile)
     self.CycleType = CycleType
+    self.Species = {}
 
 
   def _load_data_units(self, RawData):
@@ -450,13 +458,28 @@ class TestData(Data):
     return DataSteady
 
 
+  def _create_mapDict_util(self, channel, channelNames, multipleBenches, Species, data, fileName, mapDict):   
+
+      ##### For Loop through all entries of of mapDict        
+      for name in channelNames:
+        if name in data.columns:
+          mapDict[channel] = name
+          if Species == True:
+            self.Species[channel] = name
+          return mapDict
+      else:
+        if Species == False:
+          raise Exception("Cannot find %s channel %s in file %s" % (channel.replace("_"," "), channelNames, fileName))   
+
+      # Clear Variables
+      name = None         
+
+
 
 class CycleValidator:
     
 
     def __init__(self, Testdata, Mapdict, Fullload, Warmidle, filterChoice):
-
-
 
         ##### Load Data #####
         self.FilterChoice = filterChoice     

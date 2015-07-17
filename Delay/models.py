@@ -9,12 +9,19 @@ import copy
 class DelayPrep:    
 
 
-    def __init__(self, Results, Data, mapDict):
+    def __init__(self, Results, Data, MapDict):
 
         if Results['Data'].empty:    
-            #self.DelayArray = {'NOx':0,'CH4':0,'THC':0,'CO':0,'CO2':0,'O2':0,'NO':0,'N2O':0,'CH2O':0,'NH3':0,'MFRAIR':0}
 
             self.DelayArray = {'NOx':0,'CH4':0,'THC':0,'CO':0,'CO2':0,'O2':0,'NO':0,'MFRAIR':0}
+
+            if "Nitrous_Oxide_Wet" in MapDict:
+                self.DelayArray.update({'N2O':0})
+            if "Formaldehyde_Wet" in MapDict:
+                self.DelayArray.update({'CH2O':0})
+            if "Ammonia_Wet" in MapDict:
+                self.DelayArray.update({'NH3':0})        
+                  
             self.Copy = copy.deepcopy(Data)
             self.data = Data
             
@@ -22,23 +29,29 @@ class DelayPrep:
             self.DelayArray = Results['Array']
             self.data = copy.deepcopy(Results['Data'])   
 
-        self.mapDict = mapDict
+        self.MapDict = MapDict
 
-        self.delaySpecies = pd.DataFrame.from_items([('Air_Flow_Rate', self.data[self.mapDict['Air_Flow_Rate']]),
-                                                     ('Nitrogen_X_Dry',self.data[self.mapDict['Nitrogen_X_Dry']]),
-                                                     ('Total_Hydrocarbons_Wet',self.data[self.mapDict['Total_Hydrocarbons_Wet']]), 
-                                                     ('Methane_Wet',self.data[self.mapDict['Methane_Wet']]),
-                                                     ('Oxygen_Dry',self.data[self.mapDict['Oxygen_Dry']]),
-                                                     ('Nitrogen_Monoxide_Dry',self.data[self.mapDict['Nitrogen_Monoxide_Dry']]),
-                                                     ('Carbon_Dioxide_Dry',self.data[self.mapDict['Carbon_Dioxide_Dry']]),
-                                                     ('Engine_Torque',self.data[self.mapDict['Engine_Torque']]),
-                                                     ('Carbon_Monoxide_Dry',self.data[self.mapDict['Carbon_Monoxide_Dry']])])
+        self.delaySpecies = pd.DataFrame.from_items([('Air_Flow_Rate', self.data[self.MapDict['Air_Flow_Rate']]),
+                                                     ('Nitrogen_X_Dry',self.data[self.MapDict['Nitrogen_X_Dry']]),
+                                                     ('Total_Hydrocarbons_Wet',self.data[self.MapDict['Total_Hydrocarbons_Wet']]), 
+                                                     ('Methane_Wet',self.data[self.MapDict['Methane_Wet']]),
+                                                     ('Oxygen_Dry',self.data[self.MapDict['Oxygen_Dry']]),
+                                                     ('Nitrogen_Monoxide_Dry',self.data[self.MapDict['Nitrogen_Monoxide_Dry']]),
+                                                     ('Carbon_Dioxide_Dry',self.data[self.MapDict['Carbon_Dioxide_Dry']]),
+                                                     ('Engine_Torque',self.data[self.MapDict['Engine_Torque']]),
+                                                     ('Carbon_Monoxide_Dry',self.data[self.MapDict['Carbon_Monoxide_Dry']])])
 
-        #('Nitrous_Oxide_Wet', self.data[self.mapDict['Nitrous_Oxide_Wet']]),('Formaldehyde_Wet', self.data[self.mapDict['Formaldehyde_Wet']]),('Ammonia_Wet', self.data[self.mapDict['Ammonia_Wet']])
+        if "Nitrous_Oxide_Wet" in MapDict:
+            self.delaySpecies['Nitrous_Oxide_Wet'] = self.data[self.MapDict['Nitrous_Oxide_Wet']]
+        if "Formaldehyde_Wet" in MapDict:
+            self.delaySpecies['Formaldehyde_Wet'] = self.data[self.MapDict['Formaldehyde_Wet']]
+        if "Ammonia_Wet" in MapDict:
+            self.delaySpecies['Ammonia_Wet'] = self.data[self.MapDict['Ammonia_Wet']]
+
 
     def create_windows(self):
             
-        pctChange = self.data[self.mapDict['Engine_Torque']].diff()
+        pctChange = self.data[self.MapDict['Engine_Torque']].diff()
         largest = pctChange.nlargest(3)
         
         low = largest.index[1] - 100
@@ -57,20 +70,22 @@ class DelayPrep:
 
 class DelaySubmit:
 
-    def __init__(self, Data, MasterDict, DelayArray):
+    def __init__(self, Data, MapDict, DelayArray, CycleLength):
 
         self.Data = Data
 
-        #ChannelList = ['Air_Flow_Rate','Nitrogen_X_Dry','Total_Hydrocarbons_Wet','Methane_Wet','Oxygen_Dry','Nitrogen_Monoxide_Dry','Carbon_Dioxide_Dry','Carbon_Monoxide_Dry','Nitrous_Oxide_Wet','Formaldehyde_Wet','Ammonia_Wet']
-        #AbbrList = ['MFRAIR','NOx','THC','CH4','O2','NO','CO2','CO','N2O','CH2O','NH3']
+        ChannelList = ['Nitrogen_X_Dry','Methane_Wet','Total_Hydrocarbons_Wet','Carbon_Monoxide_Dry','Carbon_Dioxide_Dry','Oxygen_Dry','Nitrogen_Monoxide_Dry','Air_Flow_Rate']
 
+        if "Nitrous_Oxide_Wet" in MapDict:
+            ChannelList.append("Nitrous_Oxide_Wet")
+        if "Formaldehyde_Wet" in MapDict:
+            ChannelList.append("Formaldehyde_Wet")
+        if "Ammonia_Wet" in MapDict:
+            ChannelList.append("Ammonia_Wet")         
 
-        ChannelList = ['Air_Flow_Rate','Nitrogen_X_Dry','Total_Hydrocarbons_Wet','Methane_Wet','Oxygen_Dry','Nitrogen_Monoxide_Dry','Carbon_Dioxide_Dry','Carbon_Monoxide_Dry']
-        AbbrList = ['MFRAIR','NOx','THC','CH4','O2','NO','CO2','CO']
+        for Channel, Abbr in zip(ChannelList,DelayArray):
+            self.Data[[MapDict[Channel]]] = self.Data[[MapDict[Channel]]].shift(-1*DelayArray[Abbr])
+            self.Data[[MapDict[Channel]]] = self.Data[[MapDict[Channel]]].fillna(self.Data[[MapDict[Channel]]].irow(-1))
+        self.Data = self.Data.ix[:CycleLength-1]
 
-        for Channel, Abbr in zip(ChannelList,AbbrList):
-            self.Data[[MasterDict[Channel]]] = self.Data[[MasterDict[Channel]]].shift(-1*DelayArray[Abbr])
-            self.Data[[MasterDict[Channel]]] = self.Data[[MasterDict[Channel]]].fillna(self.Data[[MasterDict[Channel]]].irow(-1))
-
-        self.Data = self.Data.ix[:len(self.Data)-29]
 
