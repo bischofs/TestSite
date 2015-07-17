@@ -11,9 +11,7 @@
 
     function ResultsController($scope, $http, toastr, cgBusy, infoboxService) {
 
-        //var ListSpecies = ['CO2','CO','NOX','THC','NMHC','NO2','CH2O','NH3'];
-
-        var ListSpecies = ['CO2','CO','NOX','THC','NMHC'];
+        var ListSpecies = ['CO2','CO','NOx','THC','NMHC','N2O','CH2O','NH3'];
         var ListFields = ['Name','Result','Units','Total'];
         var ListAdds = ['','','',' mg']
         FirstLoad();
@@ -29,9 +27,9 @@
                     var report = JSON.parse(jsonLog.Report)
 
                     // Write Results in Table
-                    for (var i = 0; i < ListSpecies.length; i++) {
+                    for (var i = 0; i < Object.keys(report.Name).length; i++) {
                         for (var j = 0; j < ListFields.length; j++) {
-                            $scope[ListSpecies[i]+'_'+ListFields[j]] = report[ListFields[j]][i] + ListAdds[j];
+                            $scope[report.Name[i]+'_'+ListFields[j]] = report[ListFields[j]][i] + ListAdds[j];
                         };
                     };
                 })
