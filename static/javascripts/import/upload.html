@@ -220,6 +220,17 @@
             <h2 class="panel-title">Regression</h2>
           </div>
           <div class="panel-body">
+	    <div class="form-group">
+              <select class="form-control" id="sel1">
+		<option value=0>No Omissions</option>
+		<option value=1>Omit 1 (Power & Torque)</option>
+		<option value=2>Omit 2 (Power & Speed)</option>
+		<option value=3>Omit 3.1 (Power & Torque)</option>
+		<option value=4>Omit 3.2 (Power & Speed)</option>
+		<option value=5>Omit 4.1 (Power & Torque)</option>                                    
+		<option value=6>Omit 4.2 (Power & Speed)</option>            
+              </select>
+            </div>      
             <div class="col-xs-4 ">
               <h4>Power</h4> Intercept
               <h4><span class="label {{label_powerI}}">{{powerI}}</span></h4>
@@ -227,7 +238,7 @@
               <h4><span class="label {{label_powerr}}">{{powerr}}</span></h4>
               Slope
               <h4><span class="label {{label_powers}}">{{powers}}</span></h4>
-              Standard Error
+              Std. Error
               <h4><span class="label {{label_powerse}}">{{powerse}}</span></h4>
             </div>
             <div class="col-xs-4">
@@ -237,7 +248,7 @@
               <h4><span class="label {{label_speedr}}">{{speedr}}</span></h4>
               Slope
               <h4><span class="label {{label_speeds}}">{{speeds}}</span></h4>
-              Standard Error
+              Std. Error
               <h4><span class="label {{label_speedse}}">{{speedse}}</span></h4>
             </div>
             <div class="col-xs-4">
@@ -247,24 +258,13 @@
               <h4><span class="label {{label_torquer}}">{{torquer}}</span></h4>
               Slope
               <h4><span class="label {{label_torques}}">{{torques}}</span></h4>
-              Standard Error
+              Std. Error
               <h4><span class="label {{label_torquese}}">{{torquese}}</span></h4>
             </div>            
           </div>
+          <button type="button" class="btn btn-default" style="margin-bottom:10px;margin-left:10px" ng-click="Regression()">Update</button>
         </div>
-        <div class="form-group">
-          <select class="form-control" id="sel1">
-            <option value=0>W/o omit</option>
-            <option value=1>Omit 1 (Power & Torque)</option>
-            <option value=2>Omit 2 (Power & Speed)</option>
-            <option value=3>Omit 3.1 (Power & Torque)</option>
-            <option value=4>Omit 3.2 (Power & Speed)</option>
-            <option value=5>Omit 4.1 (Power & Torque)</option>                                    
-            <option value=6>Omit 4.2 (Power & Speed)</option>            
-          </select>
-        </div>      
         <hr>
-        <button type="button" class="btn btn-default" ng-click="Regression()">Regression</button>
       </div>
     </div>
   </div>
