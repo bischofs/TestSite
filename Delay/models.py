@@ -74,18 +74,25 @@ class DelaySubmit:
 
         self.Data = Data
 
-        ChannelList = ['Nitrogen_X_Dry','Methane_Wet','Total_Hydrocarbons_Wet','Carbon_Monoxide_Dry','Carbon_Dioxide_Dry','Oxygen_Dry','Nitrogen_Monoxide_Dry','Air_Flow_Rate']
+        ChannelList = {'NOx':'Nitrogen_X_Dry','CH4':'Methane_Wet','THC':'Total_Hydrocarbons_Wet','CO':'Carbon_Monoxide_Dry',
+                       'CO2':'Carbon_Dioxide_Dry','O2':'Oxygen_Dry','NO':'Nitrogen_Monoxide_Dry','MFRAIR':'Air_Flow_Rate'}
 
         if "Nitrous_Oxide_Wet" in MapDict:
-            ChannelList.append("Nitrous_Oxide_Wet")
+            ChannelList['N2O'] = "Nitrous_Oxide_Wet"
+        else:
+            del DelayArray['N2O']
         if "Formaldehyde_Wet" in MapDict:
-            ChannelList.append("Formaldehyde_Wet")
+            ChannelList['CH2O'] = "Formaldehyde_Wet"
+        else:
+            del DelayArray['CH2O']
         if "Ammonia_Wet" in MapDict:
-            ChannelList.append("Ammonia_Wet")         
+            ChannelList['NH3'] = "Ammonia_Wet" 
+        else:
+            del DelayArray['NH3']        
 
-        for Channel, Abbr in zip(ChannelList,DelayArray):
-            self.Data[[MapDict[Channel]]] = self.Data[[MapDict[Channel]]].shift(-1*DelayArray[Abbr])
-            self.Data[[MapDict[Channel]]] = self.Data[[MapDict[Channel]]].fillna(self.Data[[MapDict[Channel]]].irow(-1))
+        for Channel in DelayArray:
+            self.Data[[MapDict[ChannelList[Channel]]]] = self.Data[[MapDict[ChannelList[Channel]]]].shift(-1*DelayArray[Channel])
+            self.Data[[MapDict[ChannelList[Channel]]]] = self.Data[[MapDict[ChannelList[Channel]]]].fillna(self.Data[[MapDict[ChannelList[Channel]]]].irow(-1))
         self.Data = self.Data.ix[:CycleLength-1]
 
 

@@ -26,21 +26,26 @@
                     toastr.success('Calculations finished!');
                     var jsonLog = JSON.parse(response)
                     var report = JSON.parse(jsonLog.Report)
+                    var SpeciesList = []
 
-                    if (5 in report.Name){
-                        ListSpecies.push(report.Name[5])
-                    } else{
-                        $scope[report.Name[5] + '_display'] = 'None';
+                    for (var key in report.Name) {
+                        SpeciesList.push(report.Name[key]);
                     }
-                    if (6 in report.Name){
-                        ListSpecies.push(report.Name[6])
+
+                    if (SpeciesList.indexOf("N2O")>-1){
+                        ListSpecies.push("N2O");
                     } else{
-                        $scope[report.Name[6] + '_display'] = 'None';
+                        $scope.N2O_display = 'None';
                     }
-                    if (7 in report.Name){
-                        ListSpecies.push(report.Name[7])
+                    if (SpeciesList.indexOf("CH2O")>-1){
+                        ListSpecies.push('CH2O');
                     } else{
-                        $scope[report.Name[7] + '_display'] = 'None';
+                        $scope.CH2O_display = 'None';
+                    }
+                    if (SpeciesList.indexOf("NH3")>-1){
+                        ListSpecies.push('NH3');
+                    } else{
+                        $scope.NH3_display = 'None';
                     }                                      
 
                     // Write Results in Table
