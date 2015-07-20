@@ -81,7 +81,8 @@ class DataHandler:
     CycleAttr['Name'] = CyclesData[Cycle]['Name']    
     CycleAttr['Engine'] = CyclesData[Cycle]['Engine']
     CycleAttr['CycleType'] = CyclesData[Cycle]['CycleType']
-    CycleAttr['CycleLength'] = CyclesData[Cycle]['CycleLength']
+    if CycleAttr['CycleType'] == 'Transient':
+      CycleAttr['CycleLength'] = CyclesData[Cycle]['CycleLength']
     CycleAttr['Fuel'] = CyclesData[Cycle]['Fuel']
     CycleAttr['FactorMult'] = CyclesData[Cycle]['NOxFactorMult']
     CycleAttr['FactorAdd'] = CyclesData[Cycle]['NOxFactorAdd']
@@ -273,9 +274,9 @@ class Data:
     SkipList = ['N_TR','no_run','Comment1','Comment2','Proj#', 'N_TQ', 'CycleCondition1065','CycleState1065', 'N_FLAG2'] # Remove CycleCondition later e.g COS = Coldstart
 
     ##### Compare Metadata with Master-MetaData #####
-    for ChannelName in zip(MetaData):
-      if ChannelName[0] not in SkipList:
-          if (not masterMetaData[ChannelName[0]][0] == MetaData[ChannelName[0]][0]):
+    for ChannelName in MetaData:
+      if ChannelName not in SkipList:
+          if (not str(masterMetaData[ChannelName][0]) == str(MetaData[ChannelName][0])):
               raise Exception("%s in file %s is not the same as in file %s" % (ChannelName, FileName, masterFileName))
 
     ChannelName, SkipList = None, None
@@ -288,11 +289,11 @@ class Data:
     for channel in ChannelData.items():
       if channel[1]['files'].__contains__(self.fileType) and channel[1]['header_data'] == False:
         if (channel[1]['multiple_benches'] == True):
-          self._create_mapDict_util(channel[0], channel[1]['channel_names'], True, channel[1]['Species'], self.data, self.fileName, mapDict)
+          self._create_mapDict_util(channel[0], channel[1]['channel_names'], True, channel[1]['Optional'], self.data, self.fileName, mapDict)
         else:
-          self._create_mapDict_util(channel[0], channel[1]['channel_names'], False, channel[1]['Species'], self.data, self.fileName, mapDict)                   
+          self._create_mapDict_util(channel[0], channel[1]['channel_names'], False, channel[1]['Optional'], self.data, self.fileName, mapDict)                   
       elif channel[1]['header_data'] == True:
-          self._create_mapDict_util(channel[0], channel[1]['channel_names'], False, channel[1]['Species'], self.metaData, self.fileName, mapDict)
+          self._create_mapDict_util(channel[0], channel[1]['channel_names'], False, channel[1]['Optional'], self.metaData, self.fileName, mapDict)
 
     # Clear Variables
     channel = None
