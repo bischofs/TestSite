@@ -438,13 +438,13 @@ class TestData(Data):
 
     [data, units] = super()._load_data_units(RawData)
 
-    if self.CycleType == 'Steady':
+    if self.CycleType == 'Steady State':
       data = self._load_steady_state(data)
 
     return data, units
 
 
-  def _load_steady_state(self, Data): 
+  def _load_steady_state(self, Data):
 
     Torque71_6 = max(Data['N_CERTTRQ']) # Torque channel will be changed
     DataSteady = Data[Data['N_CERTMODE'].isin(pd.Series(Data['N_CERTMODE'].astype(int)).unique())] # Choose Data where Channel N_CERTMODE is int
