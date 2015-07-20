@@ -65,7 +65,7 @@
 
             $http.get('/1065/api/v1/data/calculations/')
                 .success(function(response){
-                    toastr.success(response.message, 'Report finished!');
+                    toastr.success('Report finished!');
 		            location.href =('/1065/api/v1/data/calculations/');                    
                 })
                 .error(function(response){

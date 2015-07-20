@@ -71,7 +71,7 @@ class CalculationView(views.APIView):
 
             ##### Prepare the Response #####
             report.output.seek(0)
-            Response = HttpResponse(report.output.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            Response = HttpResponse(report.output.read(), content_type='application/force-download')
             Response['Pragma'] = 'public'
             Response['Expires'] = 0
             Response['Cache-Control'] = 'must-revalidate, post-check=0, pre-check=0'

@@ -451,9 +451,7 @@ class TestData(Data):
     DataSteady = DataSteady[DataSteady['N_CERTMODE']>0]
 
     ##### Write Torque in original TorqueChannel (same for Speed)
-    DataSteady['UDPi_TorqueDemand'] = DataSteady['N_CERTTRQ']
     DataSteady['UDPi_TorqueDemand'][DataSteady['N_CERTMODE'] == 1] = Torque71_6/0.716
-    DataSteady['UDPi_SpeedDemand'] = DataSteady['N_CERTSPD']
     DataSteady.index = range(0,len(DataSteady))
     DataSteady.Date[0] = Data.Date[0]
     DataSteady.Time[0] = Data.Time[0]

@@ -236,7 +236,7 @@ class Calculation:
         [self.ArraySumCorWon, self.U_BPOW_Factor] = self._remove_negatives(DataCor, Preparation.test, MapDict)
 
         self.ArraySum = [self.ArraySumUn, self.ArraySumCor, self.ArraySumCorWon]
-        self.Data = [Preparation.test, DataUn, DataCor]
+        self.Data = [DataUn, DataCor]
 
         # Clear Variables
         ZeroSpan, DataUn, DataCor = None, None, None
@@ -575,8 +575,7 @@ class Report:
 
         ###### Load Variables #####
         self.output = output
-        Test, Uncorrected, Corrected = CalculatorLog['Data']
-        Test = DataHandler.testData.data
+        Uncorrected, Corrected = CalculatorLog['Data']
         ArraySumUn, ArraySumCor, ArraySumCorWon = CalculatorLog['Array']
         self.DriftUncorrected, self.DriftCorrected, self.Final = CalculatorLog['Results']
 
@@ -597,7 +596,7 @@ class Report:
         self.sheet = self._write_first_page(self.sheet, DataHandler.resultsLog, CalculatorLog['ZeroSpan'], DelayArray, Species)
         
         ##### Write Data according to choosen options #####
-        self.sheet2 = self._write_dataframe(self.sheet2, Test)
+        self.sheet2 = self._write_dataframe(self.sheet2, DataHandler.testData.data)
         self.sheet3 = self._write_dataframe(self.sheet3, Uncorrected)
         self.sheet4 = self._write_dataframe(self.sheet4, Corrected)
 
@@ -676,7 +675,7 @@ class Report:
             elif OmitChoice == 4:
                 text = 'Omit 3.2 (Power & Speed)'
             elif OmitChoice == 5:
-                text = 'OOmit 4.1 (Power & Torque)'  
+                text = 'Omit 4.1 (Power & Torque)'  
             elif OmitChoice == 6:
                 text = 'Omit 4.2 (Power & Speed)'
             sheet.merge_range('C7:D7',text,self.border)                                            
