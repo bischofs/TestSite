@@ -96,10 +96,10 @@
                     $scope.labels = _.keys($scope.spec[$scope.Array['NOx']]).splice(50+data.Array['NOx'], 100);
                     $scope.data = [_.values($scope.spec[$scope.Array['NOx']]).splice(50+data.Array['NOx'], 100), _.values($scope.spec.Engine_Torque).splice(50, 100)];
                     $scope.currentSpec = $scope.spec[$scope.Array['NOx']];            
-                    toastr.success('Prepartion for Delay finished!');            
+                    toastr.success('Preparation for Delay finished!');            
                 })
                 .error(function(response) {
-                    toastr.error(response.message, 'Prepartion for Delay failed!');
+                    toastr.error(response.message, 'Preparation for Delay failed!');
                 });
         };
 

@@ -44,7 +44,7 @@ class DelayView(views.APIView):
             dataHandler = cache.get(request.session.session_key)
 
             if request.DATA['delay'] != dataHandler.resultsLog['Data Alignment']['Array']:
-                Submit = DelaySubmit(dataHandler.testData.data, dataHandler.masterDict, request.DATA['delay'])
+                Submit = DelaySubmit(dataHandler.testData.data, dataHandler.masterDict, request.DATA['delay'], dataHandler.CycleAttr['CycleLength'])
                 dataHandler.testData.data = Submit.Data
                 dataHandler.resultsLog['Data Alignment']['Array'] = request.DATA['delay']
                 dataHandler.DoCalculation = True

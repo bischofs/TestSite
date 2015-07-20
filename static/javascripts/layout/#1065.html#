@@ -1,0 +1,152 @@
+c<div class="row">
+    <div ng-controller="InfoboxController">
+        <div class="panel panel-default  col-md-2">
+            <div class="panel-body">
+                <table style="width:100%">
+                    <tr>
+                        <td>Cycle : </td>
+                        <td><b> {{cycle}}</b></td>
+                    </tr>
+                </table>
+                <br>
+                <ol class="treeview">
+                    <li>
+                        <p>Full Load</p>
+                        <table>
+                            <tr>
+                                <td>Meta Data</td>
+                                <td><span class="label {{l_full_meta}}">{{full_meta}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>Channels</td>
+                                <td><span class="label {{l_full_channels}}">{{full_channels}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>Units</td>
+                                <td><span class="label {{l_full_units}}">{{full_units}}</span></td>
+                            </tr>
+                        </table>
+                    </li>
+                    <li>
+                        <p>Pre-Zero/Span</p>
+                        <table>
+                            <tr>
+                                <td>Meta Data</td>
+                                <td><span class="label {{l_pre_meta}}">{{pre_meta}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>Channels</td>
+                                <td><span class="label {{l_pre_channels}}">{{pre_channels}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>Units</td>
+                                <td><span class="label {{l_pre_units}}">{{pre_units}}</span></td>
+                            </tr>
+                        </table>
+                    </li>
+                    <li>
+                       <p>Test Data</p>
+                        <table>
+                            <tr>
+                                <td>Meta Data</td>
+                                <td><span class="label {{l_test_meta}}">{{test_meta}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>Channels</td>
+                                <td><span class="label {{l_test_channels}}">{{test_channels}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>Units</td>
+                                <td><span class="label {{l_test_units}}">{{test_units}}</span></td>
+                            </tr>
+                        </table>            
+                    </li>
+                    <li>
+                        <p>Post Zero/Span</p>
+                        <table>
+                            <tr>
+                                <td>Meta Data</td>
+                                <td><span class="label {{l_post_meta}}">{{post_meta}}</td>
+                            </tr>
+                            <tr>
+                                <td>Channels</td>
+                                <td><span class="label {{l_post_channels}}">{{post_channels}}</td>
+                            </tr>
+                            <tr>
+                                <td>Units</td>
+                                <td><span class="label {{l_post_units}}">{{post_units}}</td>
+                            </tr>
+                        </table>                   
+                    </li>
+                    <li>
+                        <p>General Checks</p>
+                        <table>
+                            <tr>
+                                <td>Ambient Cond.</td>
+                                <td><span class="label {{l_amb}}">{{amb}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>Data Ranges</td>
+                                <td><span class="label {{l_ranges}}">{{ranges}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>Timestamp</td>
+                                <td><span class="label {{l_timestamp}}">{{timestamp}}</span></td>
+                            </tr>                            
+                        </table>   
+                    </li>
+                </ol> 
+                <button ng-click='Reset()' type="button" class="btn btn-default">Reset Cycle</button>           
+            </div>
+        </div>
+    </div>
+    <div class="col-md-10">
+        <div ng-controller='NavbarController'>
+            <div class="row">
+            </div>
+            <!--  <a ui-sref=".import">Show List</a> -->
+            <div style="padding: 15px; padding-left: 0px; padding-top: 0px">
+                <button type="button" class="btn btn-default" ui-sref=".Import">Data Upload</button>
+                <span style="font-size: 1.0em; padding: 10px" class="glyphicon glyphicon-arrow-right"></span>
+                <button style="display:{{DelayButton}}" type="button" class="btn btn-default " ui-sref=".Delay">Data Alignment</button>
+                <span style="font-size: 1.0em; padding: 10px; display:{{DelayButton}}" class="glyphicon glyphicon-arrow-right"></span>
+                <button type="button" class="btn btn-default " ui-sref=".Results">Results and Download</button>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Test Data</h3>
+                </div>
+                <div ui-view class="panel-body">
+                    <div class="col-md-12">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style type="text/css">
+    .panel-heading {
+        padding: 6px 9px;
+    }
+
+    .panel-title {
+        font-size: 13px;
+    }
+
+    .treeview {
+        padding-left: 2px;
+    }
+
+    .treeview td {
+        padding-left: 5px;
+    }
+
+    .treeview p {
+        margin: 0px;
+        font-style: italic;
+        font-size: 13px;
+    }
+    table{
+        width: 135px;
+    }
+</style>
