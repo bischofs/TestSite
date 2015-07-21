@@ -11,12 +11,9 @@
      */
     function DelayController($scope, $http, toastr, $location) {
 
-        //$scope.Array = {'NOx':'Nitrogen_X_Dry','CH4':'Methane_Wet','THC':'Total_Hydrocarbons_Wet',
-        //                'CO':'Carbon_Monoxide_Dry','CO2':'Carbon_Dioxide_Dry','O2':'Oxygen_Dry',
-        //               'NO':'Nitrogen_Monoxide_Dry','MFRAIR':'Air_Flow_Rate','NO2':'Nitrous_Oxide_Wet',
-        //                'CH2O':'Formaldehyde_Wet','NH3':'Ammonia_Wet'}
-
-        $scope.Array = {'NOx':'Nitrogen_X_Dry','CH4':'Methane_Wet','THC':'Total_Hydrocarbons_Wet','CO':'Carbon_Monoxide_Dry','CO2':'Carbon_Dioxide_Dry','O2':'Oxygen_Dry','NO':'Nitrogen_Monoxide_Dry','MFRAIR':'Air_Flow_Rate'}
+        $scope.Array = {'NOx':'Nitrogen_X_Dry','CH4':'Methane_Wet','THC':'Total_Hydrocarbons_Wet',
+                        'CO':'Carbon_Monoxide_Dry','CO2':'Carbon_Dioxide_Dry','NO':'Nitrogen_Monoxide_Dry',
+                        'MFRAIR':'Air_Flow_Rate','N2O':'Nitrous_Oxide_Wet','CH2O':'Formaldehyde_Wet','NH3':'Ammonia_Wet'}
         read();
 
         $scope.species = function() {
@@ -87,8 +84,30 @@
                     $scope.save = data.Array
                     $scope.options = {
                         pointDot: false,
-                        showTooltips: false
+                        showTooltips: false,
+                        responsive: false,
                     };
+
+                    if ($scope.Array['N2O'] in $scope.spec){
+                         $scope.N2O_Button = 'inline';
+                    } else{
+                         $scope.N2O_Button = 'None';
+                         $scope.save.N2O = '-'
+                    }
+                    if ($scope.Array['CH2O'] in $scope.spec){
+                        $scope.CH2O_Button = 'inline';
+                    } else{
+                        $scope.CH2O_Button = 'None';
+                        $scope.save.CH2O = '-'
+                    }
+                    if ($scope.Array['NH3'] in $scope.spec){
+                        $scope.NH3_Button = 'inline';
+                    } else{
+                        $scope.NH3_Button = 'None';
+                        $scope.save.NH3 = '-'
+                    }
+                    $scope.apply                                   
+
 
                     $scope.series = ['NOx', 'Torque'];
                     $scope.currentDelay = $scope.save[$scope.series[0]];
