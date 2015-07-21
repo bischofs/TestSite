@@ -6,7 +6,7 @@
             "minimum_value": "-1",
             "multiple_benches": false,
             "header_data": true,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -20,7 +20,7 @@
             "minimum_value": "-10",
             "multiple_benches": false,
             "header_data": true,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -34,7 +34,7 @@
             "minimum_value": "-1",
             "multiple_benches": false,
             "header_data": true,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -48,7 +48,7 @@
             "minimum_value": "-1",
             "multiple_benches": false,
             "header_data": true,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -62,7 +62,7 @@
             "minimum_value": "-1",
             "multiple_benches": false,
             "header_data": true,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -76,7 +76,7 @@
             "minimum_value": "-1",
             "multiple_benches": false,
             "header_data": true,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -90,7 +90,7 @@
             "minimum_value": "-1",
             "multiple_benches": true,
             "header_data": false,
-            "Optional": true,
+            "optional": true,
             "files": [
                 "TestData",
                 "ZeroSpan"
@@ -105,7 +105,7 @@
             "minimum_value": "-50",
             "multiple_benches": true,
             "header_data": false,
-            "Optional": true,
+            "optional": true,
             "files": [
                 "TestData",
                 "ZeroSpan"
@@ -120,7 +120,7 @@
             "minimum_value": "-1",
             "multiple_benches": true,
             "header_data": false,
-            "Optional": true,
+            "optional": true,
             "files": [
                 "TestData",
                 "ZeroSpan"
@@ -135,7 +135,7 @@
             "minimum_value": "-10",
             "multiple_benches": true,
             "header_data": false,
-            "Optional": true,
+            "optional": true,
             "files": [
                 "TestData",
                 "ZeroSpan"
@@ -150,7 +150,7 @@
             "minimum_value": "-10",
             "multiple_benches": true,
             "header_data": false,
-            "Optional": true,
+            "optional": true,
             "files": [
                 "TestData",
                 "ZeroSpan"
@@ -165,7 +165,7 @@
             "minimum_value": "-10",
             "multiple_benches": true,
             "header_data": false,
-            "Optional": true,
+            "optional": true,
             "files": [
                 "TestData",
                 "ZeroSpan"
@@ -180,7 +180,7 @@
             "minimum_value": "-10",
             "multiple_benches": true,
             "header_data": false,
-            "Optional": true,
+            "optional": true,
             "files": [
                 "TestData",
                 "ZeroSpan"
@@ -195,7 +195,7 @@
             "minimum_value": "-10",
             "multiple_benches": false,
             "header_data": false,
-            "Optional": true,
+            "optional": true,
             "files": [
                 "TestData"
             ],
@@ -209,7 +209,7 @@
             "minimum_value": "-10",
             "multiple_benches": false,
             "header_data": false,
-            "Optional": true,
+            "optional": true,
             "files": [
                 "TestData"
             ],
@@ -223,7 +223,7 @@
             "minimum_value": "-10",
             "multiple_benches": false,
             "header_data": false,
-            "Optional": true,
+            "optional": true,
             "files": [
                 "TestData"
             ],
@@ -237,7 +237,7 @@
             "minimum_value": "0.80",
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -251,7 +251,7 @@
             "minimum_value": "20",
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -265,7 +265,7 @@
             "minimum_value": "0.80",
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -279,7 +279,7 @@
             "minimum_value": "20",
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -293,7 +293,7 @@
             "minimum_value": "10",
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -307,7 +307,7 @@
             "minimum_value": "-1",
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -321,7 +321,7 @@
             "minimum_value": "-100",
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -335,7 +335,7 @@
             "minimum_value": "-10000",
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData",
                 "FullLoad"
@@ -350,7 +350,7 @@
             "minimum_value": "-10000",
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData",
                 "FullLoad"
@@ -365,7 +365,7 @@
             "minimum_value": "-10000",
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData",
                 "FullLoad"
@@ -380,7 +380,7 @@
             "minimum_value": "-8000",
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData",
                 "FullLoad"
@@ -395,7 +395,7 @@
             "minimum_value": "-8000",
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData",
                 "FullLoad"
@@ -410,7 +410,7 @@
             "minimum_value": "-1",
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData",
                 "FullLoad"
