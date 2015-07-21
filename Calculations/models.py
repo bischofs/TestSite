@@ -593,7 +593,7 @@ class Report:
 
         ##### Write Emissions in Report ######
         self.sheet = self._write_emissions(self.sheet, self.DriftUncorrected, self.DriftCorrected, self.Final, ArraySumUn, ArraySumCor, ArraySumCorWon, Species)
-        self.sheet = self._write_first_page(self.sheet, DataHandler.resultsLog, CalculatorLog['ZeroSpan'], DelayArray, Species)
+        self.sheet = self._write_first_page(self.sheet, DataHandler.resultsLog, CalculatorLog['ZeroSpan'], DelayArray, Species, DataHandler.CycleAttr, DataHandler.ebenchData)
         
         ##### Write Data according to choosen options #####
         self.sheet2 = self._write_dataframe(self.sheet2, DataHandler.testData.data)
@@ -650,59 +650,44 @@ class Report:
         return sheet
 
 
-    def _write_first_page(self, sheet, ResultsLog, ZeroSpan, DelayArray, Species):
+    def _write_first_page(self, sheet, ResultsLog, ZeroSpan, DelayArray, Species, CycleAttr, Ebench):
 
         if (not ResultsLog['Regression']) == False:
+            sheet = self._write_regression(ResultsLog, sheet)
 
-            Regression = ResultsLog['Regression'][0]
-            OmitChoice = ResultsLog['Regression'][1]
-            Regression_bool = ResultsLog['Regression_bool']            
+        if (not ResultsLog['Data Alignment']) == False:
+            sheet = self._write_delay(ResultsLog, Species, sheet, DelayArray)
 
-            TypeList = ['Power', 'Speed', 'Torque']
-            Letters = ['B','C','D']
-            ResultsList = ['Intercept', 'Rsquared', 'Slope', 'Standard Error']
-            sheet.write_row('B2',TypeList,self.dark_grey)
-            sheet.write('A2','Parameter',self.dark_grey)
-            sheet.merge_range('A7:B7','Omit Choice :',self.bright_grey)
-            if OmitChoice == 0:
-                text = 'W/o omit'
-            elif OmitChoice == 1:
-                text = 'Omit 1 (Power & Torque)'
-            elif OmitChoice == 2:
-                text = 'Omit 2 (Power & Speed)'
-            elif OmitChoice == 3:
-                text = 'Omit 3.1 (Power & Torque)'
-            elif OmitChoice == 4:
-                text = 'Omit 3.2 (Power & Speed)'
-            elif OmitChoice == 5:
-                text = 'Omit 4.1 (Power & Torque)'  
-            elif OmitChoice == 6:
-                text = 'Omit 4.2 (Power & Speed)'
-            sheet.merge_range('C7:D7',text,self.border)                                            
+        sheet = self._write_zerospan(ZeroSpan, sheet)
+        sheet = self._write_cycle_data(CycleAttr, sheet)
+        sheet = self._write_ebench(Ebench, sheet)
 
+        return sheet
 
-            sheet.merge_range('A1:D1','Regression', self.merge)
-            for Type, letter in zip(TypeList, Letters):
-                for result, index2 in zip(ResultsList, range(1,len(ResultsList)+1)):
-                    if Regression_bool[Type][result] == True:
-                        sheet.write(letter+str(index2+2),Regression[Type][result],self.green)
-                        sheet.write('A'+str(index2+2),result,self.bright_grey)
-                    else:
-                        sheet.write(letter+str(index2+2),Regression[Type][result],self.red)
-                        sheet.write('A'+str(index2+2),result,self.bright_grey)
+    def _write_dataframe(self, Sheet, Data):
 
-        if (not ResultsLog['Data Alignment']) == False: 
+        for i in range(0,len(Data.columns)):
+            Sheet.write(0,i,Data.columns[i])
+            Sheet.write_column(1,i,Data[Data.columns[i]])
 
-            Delay = ResultsLog['Data Alignment']                    
-            Species.append('MFRAIR')
-            sheet.merge_range('A10:C10','Data Alignment', self.merge)
-            sheet.write_row('A11:C11',['Species','Units','Delay'],self.dark_grey)
-            sheet.write_column('A12',Species,self.bright_grey)
+        return Sheet
 
-            # Write Delay
-            for i, spec in zip(range(0,len(Species)),Species):
-                sheet.write('C'+str(12+i),DelayArray[spec],self.border)
-                sheet.write('B'+str(12+i),'seconds',self.bright_grey)
+    def _write_delay(self, ResultsLog, Species, sheet, DelayArray):
+
+        Delay = ResultsLog['Data Alignment']                    
+        Species.append('MFRAIR')
+        sheet.merge_range('A10:C10','Data Alignment', self.merge)
+        sheet.write_row('A11:C11',['Species','Units','Delay'],self.dark_grey)
+        sheet.write_column('A12',Species,self.bright_grey)
+
+        # Write Delay
+        for i, spec in zip(range(0,len(Species)),Species):
+            sheet.write('C'+str(12+i),DelayArray[spec],self.border)
+            sheet.write('B'+str(12+i),'seconds',self.bright_grey)  
+
+        return sheet      
+
+    def _write_zerospan(self, ZeroSpan, sheet):
 
         ZeroSpan = pd.read_json(ZeroSpan)
         Species = ZeroSpan.columns.values
@@ -721,11 +706,88 @@ class Report:
                 sheet.write(letter+str(index+24), np.round(ZeroSpan[spec][Type],2),self.border)
                 sheet.write('A'+str(index+24), spec,self.bright_grey)
 
-    def _write_dataframe(self, Sheet, Data):
+        return sheet
 
-        for i in range(0,len(Data.columns)):
-            Sheet.write(0,i,Data.columns[i])
-            Sheet.write_column(1,i,Data[Data.columns[i]])
+    def _write_ebench(self, Ebench, sheet):
+        
+        if Ebench['Bottle_Concentration_CO'] < 100:
+            CO_unit = '%'
+        else:
+            CO_unit = 'ppm'
+        Units = ['-','-','K','kPa','-','%',CO_unit,'ppm','ppm','ppm']
+        Names = ['RFPF', 'CH4_RF', 'Tchiller', 'Pchiller', 'xTHC[THC_FID]init', 'Bottle_Concentration_CO2',
+                 'Bottle_Concentration_CO', 'Bottle_Concentration_NOX', 'Bottle_Concentration_THC', 'Bottle_Concentration_NMHC']
 
-        return Sheet
 
+        sheet.merge_range('A32:C32','Ebench Data', self.merge)
+        sheet.write('A33','Name',self.dark_grey)
+        sheet.write('B33','Units',self.dark_grey)
+        sheet.write('C33','Value',self.dark_grey)
+
+        # Write Names
+        sheet.write_column('A34', Names, self.bright_grey)
+        sheet.write_column('B34', Units, self.bright_grey)
+
+        for name, i in zip(Names, range(0,len(Names))):
+            sheet.write('C'+str(34+i), Ebench[name], self.border)
+
+        return sheet        
+
+    def _write_cycle_data(self, CycleAttr, sheet):
+
+        Names = ['Cycle Abbr', 'Cycle Name', 'Cycle Type', 'Cycle Length', ' Ebench ID']
+        if 'CycleLength' in CycleAttr:
+            Length = CycleAttr['CycleLength']
+        else:
+            Length = '-'
+        Values = [CycleAttr['Cycle'], CycleAttr['Name'], CycleAttr['CycleType'], Length, CycleAttr['EbenchNum']]
+
+        sheet.merge_range('A1:B1','Cycle Data', self.merge)
+        sheet.write('A2','Name',self.dark_grey)
+        sheet.write('B2','Value',self.dark_grey)
+        sheet.write_column('A3', Names, self.bright_grey)
+        sheet.write_column('B3', Values, self.border)
+
+        return sheet
+
+
+    def _write_regression(self, ResultsLog, sheet):
+
+        Regression = ResultsLog['Regression'][0]
+        OmitChoice = ResultsLog['Regression'][1]
+        Regression_bool = ResultsLog['Regression_bool']            
+
+        TypeList = ['Power', 'Speed', 'Torque']
+        Letters = ['E','F','G']
+        ResultsList = ['Intercept', 'Rsquared', 'Slope', 'Standard Error']
+        sheet.write_row('E2',TypeList,self.dark_grey)
+        sheet.write('D2','Parameter',self.dark_grey)
+        sheet.merge_range('D7:E7','Omit Choice :',self.bright_grey)
+        if OmitChoice == 0:
+            text = 'W/o omit'
+        elif OmitChoice == 1:
+            text = 'Omit 1 (Power & Torque)'
+        elif OmitChoice == 2:
+            text = 'Omit 2 (Power & Speed)'
+        elif OmitChoice == 3:
+            text = 'Omit 3.1 (Power & Torque)'
+        elif OmitChoice == 4:
+            text = 'Omit 3.2 (Power & Speed)'
+        elif OmitChoice == 5:
+            text = 'Omit 4.1 (Power & Torque)'  
+        elif OmitChoice == 6:
+            text = 'Omit 4.2 (Power & Speed)'
+
+        sheet.merge_range('F7:G7',text,self.border)                                            
+        sheet.merge_range('D1:G1','Regression', self.merge)
+
+        for Type, letter in zip(TypeList, Letters):
+            for result, index2 in zip(ResultsList, range(1,len(ResultsList)+1)):
+                if Regression_bool[Type][result] == True:
+                    sheet.write(letter+str(index2+2),Regression[Type][result],self.green)
+                    sheet.write('D'+str(index2+2),result,self.bright_grey)
+                else:
+                    sheet.write(letter+str(index2+2),Regression[Type][result],self.red)
+                    sheet.write('D'+str(index2+2),result,self.bright_grey)
+
+        return sheet

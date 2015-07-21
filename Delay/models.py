@@ -13,7 +13,7 @@ class DelayPrep:
 
         if Results['Data'].empty:    
 
-            self.DelayArray = {'NOx':0,'CH4':0,'THC':0,'CO':0,'CO2':0,'O2':0,'NO':0,'MFRAIR':0}
+            self.DelayArray = {'NOx':0,'CH4':0,'THC':0,'CO':0,'CO2':0,'NO':0,'MFRAIR':0}
 
             if "Nitrous_Oxide_Wet" in MapDict:
                 self.DelayArray.update({'N2O':0})
@@ -35,7 +35,6 @@ class DelayPrep:
                                                      ('Nitrogen_X_Dry',self.data[self.MapDict['Nitrogen_X_Dry']]),
                                                      ('Total_Hydrocarbons_Wet',self.data[self.MapDict['Total_Hydrocarbons_Wet']]), 
                                                      ('Methane_Wet',self.data[self.MapDict['Methane_Wet']]),
-                                                     ('Oxygen_Dry',self.data[self.MapDict['Oxygen_Dry']]),
                                                      ('Nitrogen_Monoxide_Dry',self.data[self.MapDict['Nitrogen_Monoxide_Dry']]),
                                                      ('Carbon_Dioxide_Dry',self.data[self.MapDict['Carbon_Dioxide_Dry']]),
                                                      ('Engine_Torque',self.data[self.MapDict['Engine_Torque']]),
@@ -75,7 +74,7 @@ class DelaySubmit:
         self.Data = Data
 
         ChannelList = {'NOx':'Nitrogen_X_Dry','CH4':'Methane_Wet','THC':'Total_Hydrocarbons_Wet','CO':'Carbon_Monoxide_Dry',
-                       'CO2':'Carbon_Dioxide_Dry','O2':'Oxygen_Dry','NO':'Nitrogen_Monoxide_Dry','MFRAIR':'Air_Flow_Rate'}
+                       'CO2':'Carbon_Dioxide_Dry','NO':'Nitrogen_Monoxide_Dry','MFRAIR':'Air_Flow_Rate'}
 
         if "Nitrous_Oxide_Wet" in MapDict:
             ChannelList['N2O'] = "Nitrous_Oxide_Wet"

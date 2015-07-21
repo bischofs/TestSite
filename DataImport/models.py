@@ -15,7 +15,7 @@ class DataHandler:
   def __init__(self):
 
     self.resultsLog = {'Regression': {},'Regression_bool': {},
-                        'Data Alignment': {'Array':{'NOx':0,'CH4':0,'THC':0,'CO':0,'CO2':0,'O2':0,'NO':0,'MFRAIR':0,'N2O':0,'CH2O':0,'NH3':0},
+                        'Data Alignment': {'Array':{'NOx':0,'CH4':0,'THC':0,'CO':0,'CO2':0,'NO':0,'MFRAIR':0,'N2O':0,'CH2O':0,'NH3':0},
                         'Data':pd.DataFrame()}, 'Calculation': {}, 'Report':{}}
     self.fileDict = {'FULL': 'fullLoad', 'PRE':'preZeroSpan','MAIN':'testData','POST':'postZeroSpan'}
     self.CyclesData = pd.read_json("cycles.json").Cycles
@@ -52,6 +52,7 @@ class DataHandler:
 
     elif self.File == 'POST':
       fileType = ZeroSpan(dataFile)
+
     ##### Load File #####
     [masterMetaData, masterFileName] = fileType.load_data(RawData, self.masterMetaData, self.masterFileName, self.masterDict, self.ChannelData)
     setattr(self,self.fileDict[self.File],fileType)
@@ -86,6 +87,7 @@ class DataHandler:
     CycleAttr['Fuel'] = CyclesData[Cycle]['Fuel']
     CycleAttr['FactorMult'] = CyclesData[Cycle]['NOxFactorMult']
     CycleAttr['FactorAdd'] = CyclesData[Cycle]['NOxFactorAdd']
+
     return CycleAttr
 
 
@@ -107,20 +109,32 @@ class DataHandler:
 
       ##### Create MaterDict, Set Co-Channel, Load E-Bench-Data #####
       self.masterDict = self._create_master_dict(attrs)
-      self.ebenchData = self._load_ebench(self.ebenches[int(self.CycleAttr['EbenchNum'])-1].history, self.testData.TimeStamp)
+      self.ebenchData = self._load_ebench(self.ebenches.filter(EbenchID=self.CycleAttr['EbenchNum'])[0].history, self.testData.TimeStamp)
+
+      ##### Check Channel-Ranges of all files #####
+      self.ChannelData = self._set_channel_data()
+      for File in attrs:
+        vars(self)[File].check_ranges(self.ChannelData)      
 
       ##### Set used Species #####
       self.Species = self.testData.Species
 
+  def _set_channel_data(self):
+    
+    ##### Lists of ChannelNames and BottleNames #####
+    ListSpecies = ['Carbon_Dioxide_Dry', 'Carbon_Monoxide_High_Dry', 'Nitrogen_X_Dry', 'Total_Hydrocarbons_Wet', 'Methane_Wet']
+    ListBottles = ['Bottle_Concentration_CO2', 'Bottle_Concentration_CO', 'Bottle_Concentration_NOX', 'Bottle_Concentration_THC', 'Bottle_Concentration_NMHC']      
+
+    ##### Change maximum Range-Values of Species to 110% of Bottle-Concentration #####
+    for spec, bottle in zip(ListSpecies, ListBottles):
+      self.ChannelData[spec]['maximum_value'] = self.ebenchData[bottle] * 1.1
+
+    return self.ChannelData
 
   def _create_master_dict(self, attrs):
 
     masterDict = self.testData.mapDict
     masterDict.update(self.preZeroSpan.mapDict) # testData.mapDict is changed as well
-
-    ##### Check Channel-Ranges of all files and create MasterDict #####
-    for File in attrs:
-      vars(self)[File].check_ranges(self.ChannelData)
 
     masterDict = self._set_CO(self.testData.data, masterDict)
 
@@ -306,7 +320,7 @@ class Data:
     return mapDict
 
 
-  def _create_mapDict_util(self, channel, channelNames, multipleBenches, Species, data, fileName, mapDict):   
+  def _create_mapDict_util(self, channel, channelNames, multipleBenches, Optional, data, fileName, mapDict):   
 
     ##### For Loop through all entries of of mapDict        
     for name in channelNames:
@@ -314,7 +328,7 @@ class Data:
         mapDict[channel] = name
         return mapDict
     else:
-      if Species == False:
+      if Optional == False:
         raise Exception("Cannot find %s channel %s in file %s" % (channel.replace("_"," "), channelNames, fileName))   
 
     # Clear Variables
@@ -336,7 +350,7 @@ class Data:
   def check_ranges(self, ChannelData):
 
     for channel in self.mapDict:       
-      if channel != 'Carbon_Monoxide_Low_Dry':
+      if channel != 'Carbon_Monoxide_Dry':
 
         ##### Read Max/Min-Vaues from json-file #####
         maxValue = ChannelData[channel]['maximum_value']
@@ -389,7 +403,7 @@ class ZeroSpan(Data):
     return super()._create_mapDict(ChannelData)
 
 
-  def _create_mapDict_util(self, channel, channelNames, multipleBenches, Species, data, fileName, mapDict):
+  def _create_mapDict_util(self, channel, channelNames, multipleBenches, Optional, data, fileName, mapDict):
 
     ##### Write used Ebench-Channel #####
     for name in channelNames:
@@ -400,7 +414,7 @@ class ZeroSpan(Data):
           mapDict[channel] =  name
         return mapDict
     else:
-      if Species == False:
+      if Optional == False:
         raise Exception("Cannot find %s channel %s in file %s" % (channel.replace("_"," "), channelNames, fileName))   
 
     # Clear Variables
@@ -459,24 +473,7 @@ class TestData(Data):
     # Clear Variables
     Torque71_6r, Date, Time = None, None, None
 
-    return DataSteady
-
-
-  def _create_mapDict_util(self, channel, channelNames, multipleBenches, Species, data, fileName, mapDict):   
-
-      ##### For Loop through all entries of of mapDict        
-      for name in channelNames:
-        if name in data.columns:
-          mapDict[channel] = name
-          if Species == True:
-            self.Species[channel] = name
-          return mapDict
-      else:
-        if Species == False:
-          raise Exception("Cannot find %s channel %s in file %s" % (channel.replace("_"," "), channelNames, fileName))   
-
-      # Clear Variables
-      name = None         
+    return DataSteady   
 
 
 

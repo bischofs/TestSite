@@ -6,8 +6,8 @@
             "minimum_value": "-1",
             "multiple_benches": false,
             "header_data": true,
-            "Optional":false,
-             "files": [
+            "Optional": false,
+            "files": [
                 "TestData"
             ],
             "channel_names": [
@@ -20,8 +20,8 @@
             "minimum_value": "-10",
             "multiple_benches": false,
             "header_data": true,
-            "Optional":false,
-             "files": [
+            "Optional": false,
+            "files": [
                 "TestData"
             ],
             "channel_names": [
@@ -34,8 +34,8 @@
             "minimum_value": "-1",
             "multiple_benches": false,
             "header_data": true,
-            "Optional":false,
-             "files": [
+            "Optional": false,
+            "files": [
                 "TestData"
             ],
             "channel_names": [
@@ -48,8 +48,8 @@
             "minimum_value": "-1",
             "multiple_benches": false,
             "header_data": true,
-            "Optional":false,
-             "files": [
+            "Optional": false,
+            "files": [
                 "TestData"
             ],
             "channel_names": [
@@ -62,8 +62,8 @@
             "minimum_value": "-1",
             "multiple_benches": false,
             "header_data": true,
-            "Optional":false,
-             "files": [
+            "Optional": false,
+            "files": [
                 "TestData"
             ],
             "channel_names": [
@@ -76,23 +76,22 @@
             "minimum_value": "-1",
             "multiple_benches": false,
             "header_data": true,
-            "Optional":false,
-             "files": [
+            "Optional": false,
+            "files": [
                 "TestData"
             ],
             "channel_names": [
                 "N_MFO"
             ]
-        },                      
-
+        },
         "Carbon_Monoxide_High_Dry": {
             "unit": "%",
             "maximum_value": "20",
             "minimum_value": "-1",
             "multiple_benches": true,
             "header_data": false,
-            "Optional":true,
-	    "files": [
+            "Optional": true,
+            "files": [
                 "TestData",
                 "ZeroSpan"
             ],
@@ -105,28 +104,28 @@
             "maximum_value": "5500",
             "minimum_value": "-50",
             "multiple_benches": true,
-    	    "header_data": false,
-            "Optional":true,
+            "header_data": false,
+            "Optional": true,
             "files": [
                 "TestData",
                 "ZeroSpan"
             ],
-	    "channel_names": [
+            "channel_names": [
                 "E_COLD"
             ]
         },
         "Carbon_Dioxide_Dry": {
             "unit": "%",
-            "maximum_value": "5000",
+            "maximum_value": "20",
             "minimum_value": "-1",
             "multiple_benches": true,
             "header_data": false,
-            "Optional":true,
-	    "files": [
+            "Optional": true,
+            "files": [
                 "TestData",
                 "ZeroSpan"
             ],
-	    "channel_names": [
+            "channel_names": [
                 "E_CO2D"
             ]
         },
@@ -136,117 +135,99 @@
             "minimum_value": "-10",
             "multiple_benches": true,
             "header_data": false,
-            "Optional":true,
-	    "files": [
+            "Optional": true,
+            "files": [
                 "TestData",
                 "ZeroSpan"
             ],
-	    "channel_names": [
+            "channel_names": [
                 "E_THCW"
             ]
         },
         "Methane_Wet": {
             "unit": "ppm",
-            "maximum_value": "25000",
-            "minimum_value": "-50",
+            "maximum_value": "5000",
+            "minimum_value": "-10",
             "multiple_benches": true,
             "header_data": false,
-            "Optional":true,
-	    "files": [
+            "Optional": true,
+            "files": [
                 "TestData",
                 "ZeroSpan"
             ],
-	    "channel_names": [
+            "channel_names": [
                 "E_CH4W"
-            ]
-        },
-        "Oxygen_Dry": {
-            "unit": "%",
-            "maximum_value": "25",
-            "minimum_value": "-1",
-            "multiple_benches": true,
-            "header_data": false,
-            "Optional":true,
-	    "files": [
-                "TestData",
-                "ZeroSpan"
-            ],
-	    "channel_names": [
-                "E_O2D"
             ]
         },
         "Nitrogen_Monoxide_Dry": {
             "unit": "ppm",
-            "maximum_value": "20010",
-            "minimum_value": "-5",
+            "maximum_value": "5000",
+            "minimum_value": "-10",
             "multiple_benches": true,
             "header_data": false,
-            "Optional":true,
-	    "files": [
+            "Optional": true,
+            "files": [
                 "TestData",
                 "ZeroSpan"
             ],
-	    "channel_names": [
+            "channel_names": [
                 "E_NOD"
             ]
         },
         "Nitrogen_X_Dry": {
             "unit": "ppm",
-            "maximum_value": "20000",
+            "maximum_value": "5000",
             "minimum_value": "-10",
             "multiple_benches": true,
             "header_data": false,
-            "Optional":true,
-	    "files": [
+            "Optional": true,
+            "files": [
                 "TestData",
                 "ZeroSpan"
             ],
-	    "channel_names": [
+            "channel_names": [
                 "E_NOXD"
             ]
         },
-	"Nitrous_Oxide_Wet": {
+        "Nitrous_Oxide_Wet": {
             "unit": "ppm",
             "maximum_value": "20000",
             "minimum_value": "-10",
             "multiple_benches": false,
             "header_data": false,
-            "Optional":true,
-	    "files": [
-                "TestData",
-                "ZeroSpan"
+            "Optional": true,
+            "files": [
+                "TestData"
             ],
-	    "channel_names": [
+            "channel_names": [
                 "M_N2OW"
             ]
         },
-	"Ammonia_Wet": {
+        "Ammonia_Wet": {
             "unit": "ppm",
             "maximum_value": "20000",
             "minimum_value": "-10",
             "multiple_benches": false,
             "header_data": false,
-            "Optional":true,
-	    "files": [
-                "TestData",
-                "ZeroSpan"
+            "Optional": true,
+            "files": [
+                "TestData"
             ],
-	    "channel_names": [
+            "channel_names": [
                 "M_NH3W"
             ]
         },
-	"Formaldehyde_Wet": {
+        "Formaldehyde_Wet": {
             "unit": "ppm",
             "maximum_value": "20000",
             "minimum_value": "-10",
             "multiple_benches": false,
             "header_data": false,
-            "Optional":true,
-	    "files": [
-                "TestData",
-                "ZeroSpan"
+            "Optional": true,
+            "files": [
+                "TestData"
             ],
-	    "channel_names": [
+            "channel_names": [
                 "M_CH2OW"
             ]
         },
@@ -256,11 +237,11 @@
             "minimum_value": "0.80",
             "multiple_benches": false,
             "header_data": false,
-            "Optional":false,
-	    "files": [
+            "Optional": false,
+            "files": [
                 "TestData"
             ],
-	    "channel_names": [
+            "channel_names": [
                 "P_INLET"
             ]
         },
@@ -270,11 +251,11 @@
             "minimum_value": "20",
             "multiple_benches": false,
             "header_data": false,
-            "Optional":false,
-	    "files": [
+            "Optional": false,
+            "files": [
                 "TestData"
             ],
-	    "channel_names": [
+            "channel_names": [
                 "T_INLET"
             ]
         },
@@ -284,11 +265,11 @@
             "minimum_value": "0.80",
             "multiple_benches": false,
             "header_data": false,
-            "Optional":false,
-	    "files": [
+            "Optional": false,
+            "files": [
                 "TestData"
             ],
-	    "channel_names": [
+            "channel_names": [
                 "P_AMB"
             ]
         },
@@ -298,11 +279,11 @@
             "minimum_value": "20",
             "multiple_benches": false,
             "header_data": false,
-            "Optional":false,
-	    "files": [
+            "Optional": false,
+            "files": [
                 "TestData"
             ],
-	    "channel_names": [
+            "channel_names": [
                 "T_AMB"
             ]
         },
@@ -312,11 +293,11 @@
             "minimum_value": "10",
             "multiple_benches": false,
             "header_data": false,
-            "Optional":false,
-	    "files": [
+            "Optional": false,
+            "files": [
                 "TestData"
             ],
-	    "channel_names": [
+            "channel_names": [
                 "M_RELHUM"
             ]
         },
@@ -326,11 +307,11 @@
             "minimum_value": "-1",
             "multiple_benches": false,
             "header_data": false,
-            "Optional":false,
-	    "files": [
+            "Optional": false,
+            "files": [
                 "TestData"
             ],
-	    "channel_names": [
+            "channel_names": [
                 "M_FRFUEL"
             ]
         },
@@ -340,11 +321,11 @@
             "minimum_value": "-100",
             "multiple_benches": false,
             "header_data": false,
-            "Optional":false,
-	    "files": [
+            "Optional": false,
+            "files": [
                 "TestData"
             ],
-	    "channel_names": [
+            "channel_names": [
                 "M_FRAIRW"
             ]
         },
@@ -354,12 +335,12 @@
             "minimum_value": "-10000",
             "multiple_benches": false,
             "header_data": false,
-            "Optional":false,
-	    "files": [
+            "Optional": false,
+            "files": [
                 "TestData",
-		"FullLoad"
+                "FullLoad"
             ],
-	    "channel_names": [
+            "channel_names": [
                 "U_BPOW"
             ]
         },
@@ -369,12 +350,12 @@
             "minimum_value": "-10000",
             "multiple_benches": false,
             "header_data": false,
-            "Optional":false,
-	    "files": [
+            "Optional": false,
+            "files": [
                 "TestData",
-		"FullLoad"
+                "FullLoad"
             ],
-	    "channel_names": [
+            "channel_names": [
                 "UDPi_FltTorque"
             ]
         },
@@ -384,12 +365,12 @@
             "minimum_value": "-10000",
             "multiple_benches": false,
             "header_data": false,
-            "Optional":false,
-	    "files": [
+            "Optional": false,
+            "files": [
                 "TestData",
-		"FullLoad"
+                "FullLoad"
             ],
-	    "channel_names": [
+            "channel_names": [
                 "UDPi_TorqueDemand"
             ]
         },
@@ -399,12 +380,12 @@
             "minimum_value": "-8000",
             "multiple_benches": false,
             "header_data": false,
-            "Optional":false,
-	    "files": [
+            "Optional": false,
+            "files": [
                 "TestData",
-		"FullLoad"
+                "FullLoad"
             ],
-	    "channel_names": [
+            "channel_names": [
                 "C_SPDDYN"
             ]
         },
@@ -414,12 +395,12 @@
             "minimum_value": "-8000",
             "multiple_benches": false,
             "header_data": false,
-            "Optional":false,
-	    "files": [
+            "Optional": false,
+            "files": [
                 "TestData",
-		"FullLoad"
+                "FullLoad"
             ],
-	    "channel_names": [
+            "channel_names": [
                 "UDPi_SpeedDemand"
             ]
         },
@@ -429,12 +410,12 @@
             "minimum_value": "-1",
             "multiple_benches": false,
             "header_data": false,
-            "Optional":false,
-	    "files": [
+            "Optional": false,
+            "files": [
                 "TestData",
-		"FullLoad"
+                "FullLoad"
             ],
-	    "channel_names": [
+            "channel_names": [
                 "UDPi_Throttle",
                 "SP_Thro"
             ]
