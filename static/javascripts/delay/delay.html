@@ -7,9 +7,9 @@
         <button type="button" ng-click="ChosenSpecies='CO'; species()" class="btn btn-primary">CO</button>
         <button type="button" ng-click="ChosenSpecies='CO2'; species()" class="btn btn-primary">CO2</button>
         <button type="button" ng-click="ChosenSpecies='NO'; species()" class="btn btn-primary">NO</button>
-        <button type="button" ng-click="ChosenSpecies='N2O'; species()" class="btn btn-primary">N2O</button>
-        <button type="button" ng-click="ChosenSpecies='CH2O'; species()" class="btn btn-primary">CH2O</button>
-        <button type="button" ng-click="ChosenSpecies='NH3'; species()" class="btn btn-primary">NH3</button>
+        <button style="display:{{N2O_Button}}" type="button" ng-click="ChosenSpecies='N2O'; species()" class="btn btn-primary">N2O</button>
+        <button style="display:{{CH2O_Button}}" type="button" ng-click="ChosenSpecies='CH2O'; species()" class="btn btn-primary">CH2O</button>
+        <button style="display:{{NH3_Button}}" type="button" ng-click="ChosenSpecies='NH3'; species()" class="btn btn-primary">NH3</button>
         <button type="button" ng-click="ChosenSpecies='MFRAIR'; species()" class="btn btn-primary">MAF</button>
     </div>
 </div>
