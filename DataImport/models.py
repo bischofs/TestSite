@@ -277,7 +277,7 @@ class Data:
     for ChannelName in MetaData:
       if ChannelName not in SkipList:
           if (not str(masterMetaData[ChannelName][0]) == str(MetaData[ChannelName][0])):
-              raise Exception("%s in file %s is not the same as in file %s" % (ChannelName, FileName, masterFileName))
+            raise Exception("%s in file %s is not the same as in file %s" % (ChannelName, FileName, masterFileName))
 
     ChannelName, SkipList = None, None
 
