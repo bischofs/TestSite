@@ -1,4 +1,4 @@
-B1;3408;0cfrom django.db import models
+from django.db import models
 from Ebench.models import Ebench
 
 import pandas as pd
@@ -695,9 +695,3 @@ class CycleValidator:
                 # Coefficient of determination
                 if self.reg_results[parameter]['Rsquared'] >= 0.91:
                     self.reg_results_bool[parameter]['Rsquared'] = True
-
-
-
-
-
-
