@@ -107,7 +107,11 @@ class Preparation:
     EbenchData.xCO2intdry = 0.000375 ## CFR 1065.655
     EbenchData.xCO2dildry = 0.000375 ## CFR 1065.655
     EbenchData.xTHC_THC_FID_init = ebenchData['xTHC[THC_FID]init']
-    EbenchData.Factorchiller = (10**(10.79574*(1-(273.16/EbenchData.Tchiller))-5.028*np.log10(EbenchData.Tchiller/273.16)+0.000150475*(1-10**(-8.2969*((EbenchData.Tchiller/273.16)-1)))+0.00042873*(10**(4.76955*(1-(273.16/EbenchData.Tchiller)))-1)-0.2138602))/(EbenchData.Pchiller)
+    EbenchData.Factorchiller = (10**( \
+      10.79574*(1-(273.16/EbenchData.Tchiller))-5.028 * \
+      np.log10(EbenchData.Tchiller/273.16)+0.000150475 * \
+      (1-10**(-8.2969*((EbenchData.Tchiller/273.16)-1)))+0.00042873 * \
+      (10**(4.76955*(1-(273.16/EbenchData.Tchiller)))-1)-0.2138602))/(EbenchData.Pchiller)
 
     ##### Bottle Concentrations from Ebench #####
     EbenchData.Bottle_Concentration_CO2 = ebenchData['Bottle_Concentration_CO2']
@@ -312,7 +316,13 @@ class Calculation:
     def _prepare_iteration(self, Data, TestData, Ebench, MapDict):    
 
         # Intake
-        Data["pH2O @ inlet"] = 10**(10.79574*(1-(273.16/(Data.T_INLET)))-5.028*np.log10((Data.T_INLET)/273.16)+0.000150475*(1-10**(-8.2969*(((Data.T_INLET)/273.16)-1)))+0.00042873*(10**(4.76955*(1-(273.16/(Data.T_INLET))))-1)-0.2138602)
+        Data["pH2O @ inlet"] = 10**( \
+          10.79574 * \
+          (1-(273.16/(Data.T_INLET))) - \
+          5.028*np.log10((Data.T_INLET)/273.16)+0.000150475 * \
+          (1-10**(-8.2969*(((Data.T_INLET)/273.16)-1)))+0.00042873 * \
+          (10**(4.76955*(1-(273.16/(Data.T_INLET))))-1)-0.2138602)
+        
         Data["xH2O"] = TestData[MapDict["Relative_Humidity"]]*Data.get("pH2O @ inlet")/(Data.get("BARO Press"))
         Data["xH2Oint"] = Data.xH2O
         Data["Mmix"] = 28.96559*(1-Data.xH2O)+18.01528*Data.xH2O
@@ -491,11 +501,50 @@ class Calculation:
     def _drift_correction(self, DataUn, ZeroSpan, TestData, MapDict):
 
         ## Correct Raw-Emissions ##
-        TestData[MapDict['Carbon_Dioxide_Dry']] = ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['Chosen']*((2*DataUn[MapDict['Carbon_Dioxide_Dry']])-(ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PreZero']+ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PostZero']))/((ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PreSpan']+ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PostSpan'])-(ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PreZero']+ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PostZero']))/10000 # in % because of later calculation
-        TestData[MapDict["Carbon_Monoxide_Dry"]] = ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['Chosen']*((2*DataUn.get(MapDict["Carbon_Monoxide_Dry"]))-(ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PreZero']+ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PostZero']))/((ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PreSpan']+ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PostSpan'])-(ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PreZero']+ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PostZero']))/10000 # in % because of later calculation
-        TestData[MapDict['Nitrogen_X_Dry']] = ZeroSpan[MapDict['Nitrogen_X_Dry']]['Chosen']*((2*TestData[MapDict['Nitrogen_X_Dry']])-(ZeroSpan[MapDict['Nitrogen_X_Dry']]['PreZero']+ZeroSpan[MapDict['Nitrogen_X_Dry']]['PostZero']))/((ZeroSpan[MapDict['Nitrogen_X_Dry']]['PreSpan']+ZeroSpan[MapDict['Nitrogen_X_Dry']]['PostSpan'])-(ZeroSpan[MapDict['Nitrogen_X_Dry']]['PreZero']+ZeroSpan[MapDict['Nitrogen_X_Dry']]['PostZero']))
-        TestData[MapDict['Total_Hydrocarbons_Wet']] = ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['Chosen']*((2*DataUn.get('xTHC[THC_FID]cor'))-(ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PreZero']+ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PostZero']))/((ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PreSpan']+ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PostSpan'])-(ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PreZero']+ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PostZero']))
-        TestData[MapDict['Methane_Wet']] = ZeroSpan[MapDict['Methane_Wet']]['Chosen']*((2*TestData[MapDict['Methane_Wet']])-(ZeroSpan[MapDict['Methane_Wet']]['PreZero']+ZeroSpan[MapDict['Methane_Wet']]['PostZero']))/((ZeroSpan[MapDict['Methane_Wet']]['PreSpan']+ZeroSpan[MapDict['Methane_Wet']]['PostSpan'])-(ZeroSpan[MapDict['Methane_Wet']]['PreZero']+ZeroSpan[MapDict['Methane_Wet']]['PostZero']))
+        TestData[MapDict['Carbon_Dioxide_Dry']] = ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['Chosen'] * \
+        ((2*DataUn[MapDict['Carbon_Dioxide_Dry']]) - \
+         (ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PreZero'] + \
+          ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PostZero'])) / \
+        ((ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PreSpan'] + \
+          ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PostSpan']) - \
+         (ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PreZero'] + \
+          ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PostZero']))/10000 # in % because of later calculation
+
+        TestData[MapDict["Carbon_Monoxide_Dry"]] = ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['Chosen'] * \
+        ((2*DataUn.get(MapDict["Carbon_Monoxide_Dry"])) - \
+         (ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PreZero'] + \
+          ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PostZero'])) / \
+        ((ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PreSpan'] + \
+          ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PostSpan']) - \
+         (ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PreZero'] + \
+          ZeroSpan[MapDict["Carbon_Monoxide_Dry"]]['PostZero']))/10000 # in % because of later calculation
+
+        TestData[MapDict['Nitrogen_X_Dry']] = ZeroSpan[MapDict['Nitrogen_X_Dry']]['Chosen'] * \
+        ((2*TestData[MapDict['Nitrogen_X_Dry']]) - \
+         (ZeroSpan[MapDict['Nitrogen_X_Dry']]['PreZero'] + \
+          ZeroSpan[MapDict['Nitrogen_X_Dry']]['PostZero'])) / \
+        ((ZeroSpan[MapDict['Nitrogen_X_Dry']]['PreSpan'] + \
+          ZeroSpan[MapDict['Nitrogen_X_Dry']]['PostSpan']) - \
+         (ZeroSpan[MapDict['Nitrogen_X_Dry']]['PreZero'] + \
+          ZeroSpan[MapDict['Nitrogen_X_Dry']]['PostZero'])) 
+        
+        TestData[MapDict['Total_Hydrocarbons_Wet']] = ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['Chosen'] * \
+        ((2*DataUn.get('xTHC[THC_FID]cor')) - \
+         (ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PreZero'] + \
+          ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PostZero'])) / \
+        ((ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PreSpan'] + \
+          ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PostSpan']) - \
+         (ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PreZero'] + \
+          ZeroSpan[MapDict['Total_Hydrocarbons_Wet']]['PostZero'])) 
+        
+        TestData[MapDict['Methane_Wet']] = ZeroSpan[MapDict['Methane_Wet']]['Chosen'] * \
+        ((2*TestData[MapDict['Methane_Wet']]) - \
+         (ZeroSpan[MapDict['Methane_Wet']]['PreZero'] + \
+          ZeroSpan[MapDict['Methane_Wet']]['PostZero'])) / \
+        ((ZeroSpan[MapDict['Methane_Wet']]['PreSpan'] + \
+          ZeroSpan[MapDict['Methane_Wet']]['PostSpan']) - \
+         (ZeroSpan[MapDict['Methane_Wet']]['PreZero'] + \
+          ZeroSpan[MapDict['Methane_Wet']]['PostZero']))
 
         return TestData
 
