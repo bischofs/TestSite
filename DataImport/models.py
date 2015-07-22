@@ -124,7 +124,7 @@ class DataHandler:
 
     ##### Change maximum Range-Values of Species to 110% of Bottle-Concentration #####
     for spec, bottle in zip(ListSpecies, ListBottles):
-      self.ChannelData[spec]['maximum_value'] = self.ebenchData[bottle] * 1.1
+      self.ChannelData[spec]['maximum_value'] = self.ebenchData[bottle]
 
     return self.ChannelData
 
@@ -303,13 +303,15 @@ class Data:
     mapDict = {}
       
     for channel in ChannelData.items():
-      if channel[1]['files'].__contains__(self.fileType) and channel[1]['header_data'] == False:
-        if (channel[1]['multiple_benches'] == True):
-          self._create_mapDict_util(channel[0], channel[1]['channel_names'], True, channel[1]['optional'], self.data, self.fileName, mapDict)
+      if channel[1]['files'].__contains__(self.fileType):
+        if channel[1]['header_data'] == False:
+          if (channel[1]['multiple_benches'] == True):
+            self._create_mapDict_util(channel[0], channel[1]['channel_names'], True, channel[1]['optional'], self.data, self.fileName, mapDict)
+          else:
+            self._create_mapDict_util(channel[0], channel[1]['channel_names'], False, channel[1]['optional'], self.data, self.fileName, mapDict)
         else:
-          self._create_mapDict_util(channel[0], channel[1]['channel_names'], False, channel[1]['optional'], self.data, self.fileName, mapDict)                   
-      elif channel[1]['header_data'] == True:
-          self._create_mapDict_util(channel[0], channel[1]['channel_names'], False, channel[1]['optional'], self.metaData, self.fileName, mapDict)
+          self._create_mapDict_util(channel[0], channel[1]['channel_names'], False, channel[1]['optional'], self.metaData, self.fileName, mapDict)            
+          
 
     # Clear Variables
     channel = None
@@ -434,6 +436,31 @@ class ZeroSpan(Data):
         return '2'
     else:
         return ''    
+
+
+  def check_ranges(self, ChannelData):
+
+    for channel in self.mapDict:       
+      if channel != 'Carbon_Monoxide_Dry':
+
+        ##### Read Max/Min-Vaues from json-file #####
+        maxValue = ChannelData[channel]['maximum_value'] * 1.05 # Span can go 5% over the Bottle Concentration
+        minValue = ChannelData[channel]['maximum_value'] * -0.05 # Span can go 5% over the Bottle Concentration
+
+        ##### Load Values from Data #####
+        maxCompare = np.nanmax(self.data[self.mapDict[channel]])[0]
+        minCompare = np.nanmin(self.data[self.mapDict[channel]])[0]
+
+        ##### Check whether maximum out of Range #####
+        if (maxCompare > float(maxValue)) == True:
+          self._output_oor(channel, maxValue, 'above required maximum', ChannelData)       
+
+        ##### Check whether minimum out of Range #####
+        if (minCompare < float(minValue)) == True:
+          self._output_oor(channel, minValue, 'below required minimum', ChannelData)
+
+    # Clear Variables
+    channel, maxValue, minValue, maxCompare, minCompare = None, None, None, None, None        
 
 
 

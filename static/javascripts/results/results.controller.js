@@ -20,7 +20,7 @@
 
             toastr.info('Calculations started!');
 
-            $scope.promise = $http.post('/1065/api/v1/data/calculations/')
+            $scope.promiseCalc = $http.post('/1065/api/v1/data/calculations/')
                 .success(function(response) {
                     $scope.TbodyVis = 'inline'
                     toastr.success('Calculations finished!');
@@ -63,7 +63,7 @@
 
         $scope.Report = function(){            
 
-            $http.get('/1065/api/v1/data/calculations/')
+            $scope.promiseReport = $http.get('/1065/api/v1/data/calculations/')
                 .success(function(response){
                     toastr.success('Report finished!');
 		            location.href =('/1065/api/v1/data/calculations/');                    
