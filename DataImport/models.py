@@ -21,13 +21,12 @@ class DataHandler:
     self.CyclesData = pd.read_json("cycles.json").Cycles
     self.ChannelData = pd.read_json("spec.json").Species
     self.ebenches = Ebench.objects.all()
-    self.masterDict = {}
     self.masterMetaData = pd.DataFrame()
-    self.Species = {}
-    self.File = None
     self.masterFileName = None
+    self.File = None
     self.allFilesLoaded = False
     self.DoCalculation = True
+    self.masterDict = {}
     self.CycleAttr = {}
     self.log = {}
 
@@ -116,8 +115,6 @@ class DataHandler:
       for File in attrs:
         vars(self)[File].check_ranges(self.ChannelData)      
 
-      ##### Set used Species #####
-      self.Species = self.testData.Species
 
   def _set_channel_data(self):
     
@@ -127,7 +124,7 @@ class DataHandler:
 
     ##### Change maximum Range-Values of Species to 110% of Bottle-Concentration #####
     for spec, bottle in zip(ListSpecies, ListBottles):
-      self.ChannelData[spec]['maximum_value'] = self.ebenchData[bottle] * 1.1
+      self.ChannelData[spec]['maximum_value'] = self.ebenchData[bottle]
 
     return self.ChannelData
 
@@ -298,7 +295,6 @@ class Data:
               raise Exception("%s in file %s is not the same as in file %s" % (ChannelName, FileName, masterFileName))
 
 
-
     ChannelName, SkipList = None, None
 
 
@@ -307,13 +303,15 @@ class Data:
     mapDict = {}
       
     for channel in ChannelData.items():
-      if channel[1]['files'].__contains__(self.fileType) and channel[1]['header_data'] == False:
-        if (channel[1]['multiple_benches'] == True):
-          self._create_mapDict_util(channel[0], channel[1]['channel_names'], True, channel[1]['Optional'], self.data, self.fileName, mapDict)
+      if channel[1]['files'].__contains__(self.fileType):
+        if channel[1]['header_data'] == False:
+          if (channel[1]['multiple_benches'] == True):
+            self._create_mapDict_util(channel[0], channel[1]['channel_names'], True, channel[1]['optional'], self.data, self.fileName, mapDict)
+          else:
+            self._create_mapDict_util(channel[0], channel[1]['channel_names'], False, channel[1]['optional'], self.data, self.fileName, mapDict)
         else:
-          self._create_mapDict_util(channel[0], channel[1]['channel_names'], False, channel[1]['Optional'], self.data, self.fileName, mapDict)                   
-      elif channel[1]['header_data'] == True:
-          self._create_mapDict_util(channel[0], channel[1]['channel_names'], False, channel[1]['Optional'], self.metaData, self.fileName, mapDict)
+          self._create_mapDict_util(channel[0], channel[1]['channel_names'], False, channel[1]['optional'], self.metaData, self.fileName, mapDict)            
+          
 
     # Clear Variables
     channel = None
@@ -321,7 +319,7 @@ class Data:
     return mapDict
 
 
-  def _create_mapDict_util(self, channel, channelNames, multipleBenches, Optional, data, fileName, mapDict):   
+  def _create_mapDict_util(self, channel, channelNames, multipleBenches, optional, data, fileName, mapDict):   
 
     ##### For Loop through all entries of of mapDict        
     for name in channelNames:
@@ -329,7 +327,7 @@ class Data:
         mapDict[channel] = name
         return mapDict
     else:
-      if Optional == False:
+      if optional == False:
         raise Exception("Cannot find %s channel %s in file %s" % (channel.replace("_"," "), channelNames, fileName))   
 
     # Clear Variables
@@ -404,7 +402,7 @@ class ZeroSpan(Data):
     return super()._create_mapDict(ChannelData)
 
 
-  def _create_mapDict_util(self, channel, channelNames, multipleBenches, Optional, data, fileName, mapDict):
+  def _create_mapDict_util(self, channel, channelNames, multipleBenches, optional, data, fileName, mapDict):
 
     ##### Write used Ebench-Channel #####
     for name in channelNames:
@@ -415,7 +413,7 @@ class ZeroSpan(Data):
           mapDict[channel] =  name
         return mapDict
     else:
-      if Optional == False:
+      if optional == False:
         raise Exception("Cannot find %s channel %s in file %s" % (channel.replace("_"," "), channelNames, fileName))   
 
     # Clear Variables
@@ -440,13 +438,37 @@ class ZeroSpan(Data):
         return ''    
 
 
+  def check_ranges(self, ChannelData):
+
+    for channel in self.mapDict:       
+      if channel != 'Carbon_Monoxide_Dry':
+
+        ##### Read Max/Min-Vaues from json-file #####
+        maxValue = ChannelData[channel]['maximum_value'] * 1.05 # Span can go 5% over the Bottle Concentration
+        minValue = ChannelData[channel]['maximum_value'] * -0.05 # Span can go 5% over the Bottle Concentration
+
+        ##### Load Values from Data #####
+        maxCompare = np.nanmax(self.data[self.mapDict[channel]])[0]
+        minCompare = np.nanmin(self.data[self.mapDict[channel]])[0]
+
+        ##### Check whether maximum out of Range #####
+        if (maxCompare > float(maxValue)) == True:
+          self._output_oor(channel, maxValue, 'above required maximum', ChannelData)       
+
+        ##### Check whether minimum out of Range #####
+        if (minCompare < float(minValue)) == True:
+          self._output_oor(channel, minValue, 'below required minimum', ChannelData)
+
+    # Clear Variables
+    channel, maxValue, minValue, maxCompare, minCompare = None, None, None, None, None        
+
+
 
 class TestData(Data):
 
   def __init__(self, dataFile, CycleType):
     super().__init__(dataFile)
     self.CycleType = CycleType
-    self.Species = {}
 
 
   def _load_data_units(self, RawData):

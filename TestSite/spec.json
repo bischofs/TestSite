@@ -2,11 +2,11 @@
     "Species": {
         "Mass_Fraction_Carbon": {
             "unit": "%",
-            "maximum_value": "100",
-            "minimum_value": "-1",
+            "maximum_value": 100,
+            "minimum_value": -1,
             "multiple_benches": false,
             "header_data": true,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -16,11 +16,11 @@
         },
         "Mass_Fraction_Hydrogen": {
             "unit": "%",
-            "maximum_value": "100",
-            "minimum_value": "-10",
+            "maximum_value": 100,
+            "minimum_value": -1,
             "multiple_benches": false,
             "header_data": true,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -30,11 +30,11 @@
         },
         "Mass_Fraction_Oxygen": {
             "unit": "%",
-            "maximum_value": "100",
-            "minimum_value": "-1",
+            "maximum_value": 100,
+            "minimum_value": -1,
             "multiple_benches": false,
             "header_data": true,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -44,11 +44,11 @@
         },
         "Mass_Fraction_Sulfur": {
             "unit": "%",
-            "maximum_value": "100",
-            "minimum_value": "-1",
+            "maximum_value": 100,
+            "minimum_value": -1,
             "multiple_benches": false,
             "header_data": true,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -58,11 +58,11 @@
         },
         "Molecular_Weight": {
             "unit": "kg/kmol",
-            "maximum_value": "1000",
-            "minimum_value": "-1",
+            "maximum_value": 1000,
+            "minimum_value": -1,
             "multiple_benches": false,
             "header_data": true,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -72,11 +72,11 @@
         },
         "Fuel_Density": {
             "unit": "kg/l",
-            "maximum_value": "1000",
-            "minimum_value": "-1",
+            "maximum_value": 1000,
+            "minimum_value": -1,
             "multiple_benches": false,
             "header_data": true,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -86,11 +86,11 @@
         },
         "Carbon_Monoxide_High_Dry": {
             "unit": "%",
-            "maximum_value": "20",
-            "minimum_value": "-1",
+            "maximum_value": 20,
+            "minimum_value": -1,
             "multiple_benches": true,
             "header_data": false,
-            "Optional": true,
+            "optional": true,
             "files": [
                 "TestData",
                 "ZeroSpan"
@@ -101,11 +101,11 @@
         },
         "Carbon_Monoxide_Low_Dry": {
             "unit": "ppm",
-            "maximum_value": "5500",
-            "minimum_value": "-50",
+            "maximum_value": 5500,
+            "minimum_value": -50,
             "multiple_benches": true,
             "header_data": false,
-            "Optional": true,
+            "optional": true,
             "files": [
                 "TestData",
                 "ZeroSpan"
@@ -116,11 +116,11 @@
         },
         "Carbon_Dioxide_Dry": {
             "unit": "%",
-            "maximum_value": "20",
-            "minimum_value": "-1",
+            "maximum_value": 20,
+            "minimum_value": -1,
             "multiple_benches": true,
             "header_data": false,
-            "Optional": true,
+            "optional": true,
             "files": [
                 "TestData",
                 "ZeroSpan"
@@ -131,11 +131,11 @@
         },
         "Total_Hydrocarbons_Wet": {
             "unit": "ppm",
-            "maximum_value": "97000",
-            "minimum_value": "-10",
+            "maximum_value": 97000,
+            "minimum_value": -10,
             "multiple_benches": true,
             "header_data": false,
-            "Optional": true,
+            "optional": true,
             "files": [
                 "TestData",
                 "ZeroSpan"
@@ -146,11 +146,11 @@
         },
         "Methane_Wet": {
             "unit": "ppm",
-            "maximum_value": "5000",
-            "minimum_value": "-10",
+            "maximum_value": 5000,
+            "minimum_value": -10,
             "multiple_benches": true,
             "header_data": false,
-            "Optional": true,
+            "optional": true,
             "files": [
                 "TestData",
                 "ZeroSpan"
@@ -161,11 +161,11 @@
         },
         "Nitrogen_Monoxide_Dry": {
             "unit": "ppm",
-            "maximum_value": "5000",
-            "minimum_value": "-10",
+            "maximum_value": 5000,
+            "minimum_value": -10,
             "multiple_benches": true,
             "header_data": false,
-            "Optional": true,
+            "optional": true,
             "files": [
                 "TestData",
                 "ZeroSpan"
@@ -176,11 +176,11 @@
         },
         "Nitrogen_X_Dry": {
             "unit": "ppm",
-            "maximum_value": "5000",
-            "minimum_value": "-10",
+            "maximum_value": 5000,
+            "minimum_value": -10,
             "multiple_benches": true,
             "header_data": false,
-            "Optional": true,
+            "optional": true,
             "files": [
                 "TestData",
                 "ZeroSpan"
@@ -191,11 +191,11 @@
         },
         "Nitrous_Oxide_Wet": {
             "unit": "ppm",
-            "maximum_value": "20000",
-            "minimum_value": "-10",
+            "maximum_value": 20000,
+            "minimum_value": -10,
             "multiple_benches": false,
             "header_data": false,
-            "Optional": true,
+            "optional": true,
             "files": [
                 "TestData"
             ],
@@ -205,11 +205,11 @@
         },
         "Ammonia_Wet": {
             "unit": "ppm",
-            "maximum_value": "20000",
-            "minimum_value": "-10",
+            "maximum_value": 20000,
+            "minimum_value": -10,
             "multiple_benches": false,
             "header_data": false,
-            "Optional": true,
+            "optional": true,
             "files": [
                 "TestData"
             ],
@@ -219,11 +219,11 @@
         },
         "Formaldehyde_Wet": {
             "unit": "ppm",
-            "maximum_value": "20000",
-            "minimum_value": "-10",
+            "maximum_value": 20000,
+            "minimum_value": -10,
             "multiple_benches": false,
             "header_data": false,
-            "Optional": true,
+            "optional": true,
             "files": [
                 "TestData"
             ],
@@ -233,11 +233,11 @@
         },
         "Air_Inlet_Pressure": {
             "unit": "Bar A",
-            "maximum_value": "1.0325",
-            "minimum_value": "0.80",
+            "maximum_value": 1.0325,
+            "minimum_value": 0.80,
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -247,11 +247,11 @@
         },
         "Air_Inlet_Temperature": {
             "unit": "°C",
-            "maximum_value": "30",
-            "minimum_value": "20",
+            "maximum_value": 30,
+            "minimum_value": 20,
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -261,11 +261,11 @@
         },
         "Air_Ambient_Pressure": {
             "unit": "Bar A",
-            "maximum_value": "1.0325",
-            "minimum_value": "0.80",
+            "maximum_value": 1.0325,
+            "minimum_value": 0.80,
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -275,11 +275,11 @@
         },
         "Air_Ambient_Temperature": {
             "unit": "°C",
-            "maximum_value": "50",
-            "minimum_value": "20",
+            "maximum_value": 50,
+            "minimum_value": 20,
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -289,11 +289,11 @@
         },
         "Relative_Humidity": {
             "unit": "%",
-            "maximum_value": "50",
-            "minimum_value": "10",
+            "maximum_value": 50,
+            "minimum_value": 10,
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -303,11 +303,11 @@
         },
         "Fuel_Flow_Rate": {
             "unit": "kg/h",
-            "maximum_value": "100000",
-            "minimum_value": "-1",
+            "maximum_value": 1000,
+            "minimum_value": -10,
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -317,11 +317,11 @@
         },
         "Air_Flow_Rate": {
             "unit": "kg/hr",
-            "maximum_value": "100000",
-            "minimum_value": "-100",
+            "maximum_value": 1000,
+            "minimum_value": -10,
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData"
             ],
@@ -331,11 +331,11 @@
         },
         "Engine_Power": {
             "unit": "kW",
-            "maximum_value": "10000",
-            "minimum_value": "-10000",
+            "maximum_value": 10000,
+            "minimum_value": -10000,
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData",
                 "FullLoad"
@@ -346,11 +346,11 @@
         },
         "Engine_Torque": {
             "unit": "Nm",
-            "maximum_value": "10000",
-            "minimum_value": "-10000",
+            "maximum_value": 10000,
+            "minimum_value": -10000,
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData",
                 "FullLoad"
@@ -361,11 +361,11 @@
         },
         "Commanded_Torque": {
             "unit": "Nm",
-            "maximum_value": "10000",
-            "minimum_value": "-10000",
+            "maximum_value": 10000,
+            "minimum_value": -10000,
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData",
                 "FullLoad"
@@ -376,11 +376,11 @@
         },
         "Engine_Speed": {
             "unit": "rpm",
-            "maximum_value": "8000",
-            "minimum_value": "-8000",
+            "maximum_value": 8000,
+            "minimum_value": -8000,
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData",
                 "FullLoad"
@@ -391,11 +391,11 @@
         },
         "Commanded_Speed": {
             "unit": "rpm",
-            "maximum_value": "8000",
-            "minimum_value": "-8000",
+            "maximum_value": 8000,
+            "minimum_value": -8000,
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData",
                 "FullLoad"
@@ -406,11 +406,11 @@
         },
         "Commanded_Throttle": {
             "unit": "%",
-            "maximum_value": "100",
-            "minimum_value": "-1",
+            "maximum_value": 100,
+            "minimum_value": -1,
             "multiple_benches": false,
             "header_data": false,
-            "Optional": false,
+            "optional": false,
             "files": [
                 "TestData",
                 "FullLoad"
