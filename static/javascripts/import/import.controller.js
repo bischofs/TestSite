@@ -35,7 +35,7 @@ function ImportController($scope, FileUploader, toastr, infoboxService) {
 
     function onSuccessItem(item, response, status, headers) {
 
-        toastr.success('File Uploaded', 'Success');
+        toastr.success('File Uploaded and Verified', 'Success');
         $scope.uploadSuccess = true;
 
         var jsonObj = JSON.parse(response);
@@ -90,7 +90,7 @@ function ImportController($scope, FileUploader, toastr, infoboxService) {
             })
 
             .error(function(response) {
-                toastr.error(response.message, 'Data is not available');
+                toastr.error(response.message, 'Regression data is not available');
         });
     }    
 }

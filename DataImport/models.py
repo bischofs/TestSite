@@ -77,7 +77,7 @@ class DataHandler:
 
     Cycle = MetaData['CycleType1065'][0]
     CycleAttr['Cycle'] = Cycle
-    CycleAttr['EbenchNum'] = MetaData['EbenchID'][0]
+    CycleAttr['EbenchID'] = MetaData['EbenchID'][0]
     CycleAttr['Name'] = CyclesData[Cycle]['Name']    
     CycleAttr['Engine'] = CyclesData[Cycle]['Engine']
     CycleAttr['CycleType'] = CyclesData[Cycle]['CycleType']
@@ -108,8 +108,12 @@ class DataHandler:
 
       ##### Create MaterDict, Set Co-Channel, Load E-Bench-Data #####
       self.masterDict = self._create_master_dict(attrs)
-      self.ebenchData = self._load_ebench(self.ebenches.filter(EbenchID=self.CycleAttr['EbenchNum'])[0].history, self.testData.TimeStamp)
-
+      
+      if len(self.ebenches.filter(EbenchID=self.CycleAttr['EbenchID'])) == 0:
+        raise Exception("Cannot find associated Ebench in database, please contact Emissions group")
+      else:
+        self.ebenchData = self._load_ebench(self.ebenches.filter(EbenchID=self.CycleAttr['EbenchID'])[0].history, self.testData.TimeStamp)
+      
       ##### Check Channel-Ranges of all files #####
       self.ChannelData = self._set_channel_data()
       for File in attrs:
