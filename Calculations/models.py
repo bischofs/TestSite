@@ -789,7 +789,7 @@ class Report:
             Length = CycleAttr['CycleLength']
         else:
             Length = '-'
-        Values = [CycleAttr['Cycle'], CycleAttr['Name'], CycleAttr['CycleType'], Length, CycleAttr['EbenchNum']]
+        Values = [CycleAttr['Cycle'], CycleAttr['Name'], CycleAttr['CycleType'], Length, CycleAttr['EbenchID']]
 
         sheet.merge_range('A1:B1','Cycle Data', self.merge)
         sheet.write('A2','Name',self.dark_grey)
