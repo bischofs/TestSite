@@ -486,7 +486,7 @@ class Calculation:
         ArraySum = {'CO2':Data.Mass_CO2.sum(),'CO':Data.Mass_CO.sum(),'NOx':Data.Mass_NOx.sum(),'THC':Data.Mass_THC.sum(),'NMHC':Data.Mass_NMHC.sum()}
 
         if "Nitrous_Oxide_Wet" in MapDict:
-            Data["Mass_N2O"] = Data.xNO2wet*Data.nexh*Fuel.M_N2O
+            Data["Mass_N2O"] = Data.xN2Owet*Data.nexh*Fuel.M_N2O
             ArraySum.update({'N2O':Data.Mass_N2O.sum()})
         if "Formaldehyde_Wet" in MapDict:
             Data["Mass_CH2O"] = Data.xCH2Owet*Data.nexh*Fuel.M_CH2O
@@ -623,6 +623,7 @@ class Report:
     def __init__(self, DataHandler, MapDict, CalculatorLog, DelayArray, output):
 
         ###### Load Variables #####
+        import ipdb; ipdb.set_trace()
         self.output = output
         Uncorrected, Corrected = CalculatorLog['Data']
         ArraySumUn, ArraySumCor, ArraySumCorWon = CalculatorLog['Array']

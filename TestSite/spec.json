@@ -190,7 +190,7 @@
             ]
         },
         "Nitrous_Oxide_Wet": {
-            "unit": "ppm",
+            "unit": "",
             "maximum_value": 20000,
             "minimum_value": -10,
             "multiple_benches": false,
@@ -204,7 +204,7 @@
             ]
         },
         "Ammonia_Wet": {
-            "unit": "ppm",
+            "unit": "",
             "maximum_value": 20000,
             "minimum_value": -10,
             "multiple_benches": false,
@@ -218,7 +218,7 @@
             ]
         },
         "Formaldehyde_Wet": {
-            "unit": "ppm",
+            "unit": "",
             "maximum_value": 20000,
             "minimum_value": -10,
             "multiple_benches": false,
