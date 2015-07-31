@@ -35,14 +35,11 @@ class DataHandler:
 
     ##### Prepare DataHandler and File #####
     self._clear_all_files_loaded()
-    import ipdb; ipdb.set_trace()
-
-    RawData = pd.read_csv(dataFile,  names=range(1,500), encoding='windows-1258')
+    RawData = pd.read_csv(dataFile, names=range(1,500), encoding='windows-1258')
     RawData.columns = RawData.loc[0].values
     RawData = RawData[1:]
-    RawData = RawData.dropna(how="all",axis=(1)) # Drop Zero-Columns
+    RawData = RawData.dropna(how="all", axis=(1))
     RawData.index = range(0,len(RawData))
-    
     self.File = RawData[:1]['CycleState1065'][0] # Reads the filetype out of header page
 
     ##### Create FileClass #####
