@@ -117,7 +117,7 @@
                     toastr.success('Preparation for Delay finished!');            
                 })
                 .error(function(response) {
-                    toastr.error(response.message, 'Preparation for Delay failed!');
+                    toastr.error(response.responseJSON.message, 'Preparation for Delay failed!');
                 });
         };
 

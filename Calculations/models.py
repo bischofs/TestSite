@@ -623,7 +623,6 @@ class Report:
     def __init__(self, DataHandler, MapDict, CalculatorLog, DelayArray, output):
 
         ###### Load Variables #####
-        import ipdb; ipdb.set_trace()
         self.output = output
         Uncorrected, Corrected = CalculatorLog['Data']
         ArraySumUn, ArraySumCor, ArraySumCorWon = CalculatorLog['Array']
@@ -790,7 +789,7 @@ class Report:
             Length = CycleAttr['CycleLength']
         else:
             Length = '-'
-        Values = [CycleAttr['Cycle'], CycleAttr['Name'], CycleAttr['CycleType'], Length, CycleAttr['EbenchNum']]
+        Values = [CycleAttr['Cycle'], CycleAttr['Name'], CycleAttr['CycleType'], Length, CycleAttr['EbenchID']]
 
         sheet.merge_range('A1:B1','Cycle Data', self.merge)
         sheet.write('A2','Name',self.dark_grey)

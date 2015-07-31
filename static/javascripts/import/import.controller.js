@@ -90,7 +90,7 @@ function ImportController($scope, FileUploader, toastr, infoboxService) {
             })
 
             .error(function(response) {
-                toastr.error(response.message, 'Data is not available');
+                toastr.error(response.responseJSON.message, 'Data is not available');
         });
     }    
 }
