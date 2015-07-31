@@ -121,7 +121,7 @@ class DataHandler:
       ##### Check Channel-Ranges of all files #####
       self.ChannelData = self._set_channel_data()
       for File in attrs:
-        vars(self)[File].check_ranges(self.ChannelData)      
+        vars(self)[File].check_ranges(self.ChannelData, File)      
 
 
   def _set_channel_data(self):
@@ -358,7 +358,7 @@ class Data:
           raise Exception("%s units are not in %s" % (self.mapDict[channel], unit))
 
 
-  def check_ranges(self, ChannelData):
+  def check_ranges(self, ChannelData, File):
 
     for channel in self.mapDict:       
       if channel != 'Carbon_Monoxide_Dry':
@@ -379,20 +379,20 @@ class Data:
 
         ##### Check whether maximum out of Range #####
         if (maxCompare > float(maxValue)) == True:
-          self._output_oor(channel, maxValue, 'above required maximum', ChannelData)       
+          self._output_oor(channel, maxValue, 'above required maximum', ChannelData, File)       
 
         ##### Check whether minimum out of Range #####
         if (minCompare < float(minValue)) == True:
-          self._output_oor(channel, minValue, 'below required minimum', ChannelData)
+          self._output_oor(channel, minValue, 'below required minimum', ChannelData, File)
 
     # Clear Variables
     channel, maxValue, minValue, maxCompare, minCompare = None, None, None, None, None
 
   # oor = Out of Range
-  def _output_oor(self, channel, Value, ErrorString, ChannelData):   
+  def _output_oor(self, channel, Value, ErrorString, ChannelData, File):   
 
-    self.logDict['error'] = "%s is %s of %s %s" % (self.mapDict[channel], ErrorString, str(Value), ChannelData[channel]['unit'])
-    raise Exception ("%s is %s of %s %s" % (self.mapDict[channel], ErrorString, str(Value), ChannelData[channel]['unit']))
+    self.logDict['error'] = "%s is %s of %s %s in %s" % (self.mapDict[channel], ErrorString, str(Value), ChannelData[channel]['unit'], File)
+    raise Exception ("%s is %s of %s %s in %s" % (self.mapDict[channel], ErrorString, str(Value), ChannelData[channel]['unit'], File))
 
 
 
@@ -450,7 +450,7 @@ class ZeroSpan(Data):
         return ''    
 
 
-  def check_ranges(self, ChannelData):
+  def check_ranges(self, ChannelData, File):
 
     for channel in self.mapDict:       
       if channel != 'Carbon_Monoxide_Dry':
@@ -465,11 +465,11 @@ class ZeroSpan(Data):
 
         ##### Check whether maximum out of Range #####
         if (maxCompare > float(maxValue)) == True:
-          self._output_oor(channel, maxValue, 'above required maximum', ChannelData)       
+          self._output_oor(channel, maxValue, 'above required maximum', ChannelData, File)       
 
         ##### Check whether minimum out of Range #####
         if (minCompare < float(minValue)) == True:
-          self._output_oor(channel, minValue, 'below required minimum', ChannelData)
+          self._output_oor(channel, minValue, 'below required minimum', ChannelData, File)
 
     # Clear Variables
     channel, maxValue, minValue, maxCompare, minCompare = None, None, None, None, None        
