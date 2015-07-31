@@ -35,12 +35,18 @@ class DataHandler:
 
     ##### Prepare DataHandler and File #####
     self._clear_all_files_loaded()
+   
     RawData = pd.read_csv(dataFile, names=range(1,500), encoding='windows-1258')
     RawData.columns = RawData.loc[0].values
     RawData = RawData[1:]
     RawData = RawData.dropna(how="all", axis=(1))
     RawData.index = range(0,len(RawData))
-    self.File = RawData[:1]['CycleState1065'][0] # Reads the filetype out of header page
+
+    if('CycleState1065'in RawData.columns.values):
+      self.File = RawData[:1]['CycleState1065'][0] # Reads the filetype out of header page
+    else:
+      raise Exception("MetaData missing CycleState1065, cannot detect cycle state in %s" (dataFile.file))
+
 
     ##### Create FileClass #####
     if self.File == 'FULL':
@@ -79,6 +85,7 @@ class DataHandler:
       
   def _load_cycle_attr(self, CycleAttr, MetaData, CyclesData):
 
+
     Cycle = MetaData['CycleType1065'][0]
     CycleAttr['Cycle'] = Cycle
     CycleAttr['EbenchID'] = MetaData['EbenchID'][0]
@@ -90,6 +97,7 @@ class DataHandler:
     CycleAttr['Fuel'] = CyclesData[Cycle]['Fuel']
     CycleAttr['FactorMult'] = CyclesData[Cycle]['NOxFactorMult']
     CycleAttr['FactorAdd'] = CyclesData[Cycle]['NOxFactorAdd']
+      
 
     return CycleAttr
 
