@@ -187,7 +187,7 @@ class Preparation:
       
       for i in range(0,len(ColumnZero)):
 
-          if ColumnZero[i]> ZeroSpan[spec]['Chosen']*0.01: # Acceptable Range of noise 1%
+          if ColumnZero[i]> ZeroSpan[spec]['Chosen']*0.001: # Acceptable Range of noise 1%
               ColumnZero = ColumnZero.drop(i)
 
           if (ColumnSpan[i]< ZeroSpan[spec]['Chosen']*0.98) | (ColumnSpan[i] > ZeroSpan[spec]['Chosen']*1.02): # Acceptable Range of noise +-2%
