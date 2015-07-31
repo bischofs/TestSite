@@ -285,7 +285,6 @@ class Data:
 
 
   def _load_timestamp(self, Data):
-    import ipdb; ipdb.set_trace()
     try:
       return time.mktime(datetime.datetime.strptime(Data['Date'][0] + ' ' + Data['Time'][0], "%m/%d/%Y %H:%M:%S.%f").timetuple())
     except :

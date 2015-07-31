@@ -90,9 +90,7 @@ function ImportController($scope, FileUploader, toastr, infoboxService) {
             })
 
             .error(function(response) {
-
                 toastr.error(response.responseJSON.message, 'Regression data is not available');
-
         });
     }    
 }
