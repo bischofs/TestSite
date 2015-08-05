@@ -85,7 +85,7 @@ class DataHandler:
       self.__init__()
 
       
-  def _load_cycle_attr(self, cycle_attr, meta_data, CyclesData):
+  def _load_cycle_attr(self, cycle_attr, meta_data, cycles_data):
 
 
     cycle = meta_data['CycleType1065'][0]
@@ -118,7 +118,7 @@ class DataHandler:
     else:
       self.all_files_loaded = True
       ##### Check Timestamps of Files
-      self._check_time_stamp(self.pre_zero_span.TimeStamp, self.test_data.TimeStamp, self.post_zero_span.TimeStamp, len(self.test_data.data))
+      self._check_time_stamp(self.pre_zero_span.time_stamp, self.test_data.time_stamp, self.post_zero_span.time_stamp, len(self.test_data.data))
 
       ##### Create MaterDict, Set Co-Channel, Load E-Bench-Data #####
       self.master_dict = self._create_master_dict(attrs)
@@ -126,7 +126,7 @@ class DataHandler:
       if len(self.ebenches.filter(EbenchID=self.cycle_attr['EbenchID'])) == 0:
         raise Exception("Cannot find associated Ebench in database, please contact Emissions group")
       else:
-        self.ebenchData = self._load_ebench(self.ebenches.filter(EbenchID=self.cycle_attr['EbenchID'])[0].history, self.test_data.TimeStamp)
+        self.ebenchData = self._load_ebench(self.ebenches.filter(EbenchID=self.cycle_attr['EbenchID'])[0].history, self.test_data.time_stamp)
       
       ##### Check Channel-Ranges of all files #####
       self.channel_data = self._set_channel_data()
@@ -148,8 +148,8 @@ class DataHandler:
 
   def _create_master_dict(self, attrs):
 
-    master_dict = self.test_data.mapDict
-    master_dict.update(self.pre_zero_span.mapDict) # test_data.mapDict is changed as well
+    master_dict = self.test_data.map_dict
+    master_dict.update(self.pre_zero_span.map_dict) # test_data.map_dict is changed as well
 
     master_dict = self._set_CO(self.test_data.data, master_dict)
 
@@ -183,15 +183,15 @@ class DataHandler:
     return master_dict
 
 
-  def _load_ebench(self, Ebenches, TimeStamp):
+  def _load_ebench(self, Ebenches, time_stamp):
 
     ############### HARD CODED TIMESTAMP #######################
-    TimeStamp = time.time()
+    time_stamp = time.time()
     ############################################################
 
     ebenchData = {}    
     for EbenchSet in Ebenches.values():
-      if EbenchSet['history_date'].timestamp() < TimeStamp :
+      if EbenchSet['history_date'].timestamp() < time_stamp :
 
         ebenchData['RFPF'] = EbenchSet['CH4_Penetration_Factor']
         ebenchData['CH4_RF'] = EbenchSet['CH4_Response_Factor']
@@ -234,13 +234,13 @@ class Data:
 
   def __init__(self, data_file):
       
-    self.mapDict = {}
+    self.map_dict = {}
     self.logDict = {}
 
     self.data_file = data_file
     self.fileName = data_file.name
     self.file_type = self.__class__.__name__
-    self.TimeStamp = None
+    self.time_stamp = None
 
 
   def load_data(self, raw_data, master_meta_data, master_file_name, master_dict, channel_data):
@@ -249,8 +249,8 @@ class Data:
     self.data = raw_data
     [self.metaData, master_meta_data, master_file_name] = self._load_metadata(self.data, self.fileName, master_meta_data, master_file_name, channel_data)
     [self.data, self.units] = self._load_data_units(self.data)
-    self.TimeStamp = self._load_timestamp(self.data)
-    self.mapDict = self._create_mapDict(channel_data)
+    self.time_stamp = self._load_timestamp(self.data)
+    self.map_dict = self._create_map_dict(channel_data)
 
     ##### Perform Checks on Data #####
     self._check_metadata(self.metaData, self.fileName, master_meta_data, master_file_name) 
@@ -320,34 +320,34 @@ class Data:
     ChannelName, SkipList = None, None
 
 
-  def _create_mapDict(self, channel_data):
+  def _create_map_dict(self, channel_data):
 
-    mapDict = {}
+    map_dict = {}
       
     for channel in channel_data.items():
       if channel[1]['files'].__contains__(self.file_type):
         if channel[1]['header_data'] == False:
           if (channel[1]['multiple_benches'] == True):
-            self._create_mapDict_util(channel[0], channel[1]['channel_names'], True, channel[1]['optional'], self.data, self.fileName, mapDict)
+            self._create_map_dict_util(channel[0], channel[1]['channel_names'], True, channel[1]['optional'], self.data, self.fileName, map_dict)
           else:
-            self._create_mapDict_util(channel[0], channel[1]['channel_names'], False, channel[1]['optional'], self.data, self.fileName, mapDict)
+            self._create_map_dict_util(channel[0], channel[1]['channel_names'], False, channel[1]['optional'], self.data, self.fileName, map_dict)
         else:
-          self._create_mapDict_util(channel[0], channel[1]['channel_names'], False, channel[1]['optional'], self.metaData, self.fileName, mapDict)            
+          self._create_map_dict_util(channel[0], channel[1]['channel_names'], False, channel[1]['optional'], self.metaData, self.fileName, map_dict)            
           
 
     # Clear Variables
     channel = None
 
-    return mapDict
+    return map_dict
 
 
-  def _create_mapDict_util(self, channel, channelNames, multipleBenches, optional, data, fileName, mapDict):   
+  def _create_map_dict_util(self, channel, channelNames, multipleBenches, optional, data, fileName, map_dict):   
 
-    ##### For Loop through all entries of of mapDict        
+    ##### For Loop through all entries of of map_dict        
     for name in channelNames:
       if name in data.columns:
-        mapDict[channel] = name
-        return mapDict
+        map_dict[channel] = name
+        return map_dict
     else:
       if optional == False:
         raise Exception("Cannot find %s channel %s in file %s" % (channel.replace("_"," "), channelNames, fileName))   
@@ -358,19 +358,19 @@ class Data:
 
   def _check_units(self, channel_data):
 
-    for channel in self.mapDict:
+    for channel in self.map_dict:
       unit = channel_data[channel]['unit']
       if channel_data[channel]['header_data'] == False:
-        booleanCond = self.units[self.mapDict[channel]].str.contains(unit)
+        booleanCond = self.units[self.map_dict[channel]].str.contains(unit)
 
         if not (booleanCond.any()):
-          self.logDict['error'] = "%s units are not in %s" % (self.mapDict[channel], unit)          
-          raise Exception("%s units are not in %s" % (self.mapDict[channel], unit))
+          self.logDict['error'] = "%s units are not in %s" % (self.map_dict[channel], unit)          
+          raise Exception("%s units are not in %s" % (self.map_dict[channel], unit))
 
 
   def check_ranges(self, channel_data, File):
 
-    for channel in self.mapDict:       
+    for channel in self.map_dict:       
       if channel != 'Carbon_Monoxide_Dry':
 
         ##### Read Max/Min-Vaues from json-file #####
@@ -379,13 +379,13 @@ class Data:
 
         ##### Load Values from Data #####
         if channel_data[channel]['header_data'] == False:
-          maxCompare = np.nanmax(self.data[self.mapDict[channel]])[0]
-          minCompare = np.nanmin(self.data[self.mapDict[channel]])[0]
+          maxCompare = np.nanmax(self.data[self.map_dict[channel]])[0]
+          minCompare = np.nanmin(self.data[self.map_dict[channel]])[0]
 
         ##### Load Values from Metadata #####
         else:
-          maxCompare = float(self.metaData[self.mapDict[channel]][0])
-          minCompare = float(self.metaData[self.mapDict[channel]][0])
+          maxCompare = float(self.metaData[self.map_dict[channel]][0])
+          minCompare = float(self.metaData[self.map_dict[channel]][0])
 
         ##### Check whether maximum out of Range #####
         if (maxCompare > float(maxValue)) == True:
@@ -401,8 +401,8 @@ class Data:
   # oor = Out of Range
   def _output_oor(self, channel, Value, ErrorString, channel_data, File):   
 
-    self.logDict['error'] = "%s is %s of %s %s in %s" % (self.mapDict[channel], ErrorString, str(Value), channel_data[channel]['unit'], File)
-    raise Exception ("%s is %s of %s %s in %s" % (self.mapDict[channel], ErrorString, str(Value), channel_data[channel]['unit'], File))
+    self.logDict['error'] = "%s is %s of %s %s in %s" % (self.map_dict[channel], ErrorString, str(Value), channel_data[channel]['unit'], File)
+    raise Exception ("%s is %s of %s %s in %s" % (self.map_dict[channel], ErrorString, str(Value), channel_data[channel]['unit'], File))
 
 
 
@@ -418,22 +418,22 @@ class ZeroSpan(Data):
     super().__init__(data_file)
 
 
-  def _create_mapDict(self, channel_data):
+  def _create_map_dict(self, channel_data):
 
     self.Channel = self._bench_channel(channel_data)
-    return super()._create_mapDict(channel_data)
+    return super()._create_map_dict(channel_data)
 
 
-  def _create_mapDict_util(self, channel, channelNames, multipleBenches, optional, data, fileName, mapDict):
+  def _create_map_dict_util(self, channel, channelNames, multipleBenches, optional, data, fileName, map_dict):
 
     ##### Write used Ebench-Channel #####
     for name in channelNames:
       if name in data.columns:
         if multipleBenches == True:
-          mapDict[channel] =  name + self.Channel
+          map_dict[channel] =  name + self.Channel
         else:
-          mapDict[channel] =  name
-        return mapDict
+          map_dict[channel] =  name
+        return map_dict
     else:
       if optional == False:
         raise Exception("Cannot find %s channel %s in file %s" % (channel.replace("_"," "), channelNames, fileName))   
@@ -462,7 +462,7 @@ class ZeroSpan(Data):
 
   def check_ranges(self, channel_data, File):
 
-    for channel in self.mapDict:       
+    for channel in self.map_dict:       
       if channel != 'Carbon_Monoxide_Dry':
 
         ##### Read Max/Min-Vaues from json-file #####
@@ -470,8 +470,8 @@ class ZeroSpan(Data):
         minValue = channel_data[channel]['maximum_value'] * -0.05 # Span can go 5% over the Bottle Concentration
 
         ##### Load Values from Data #####
-        maxCompare = np.nanmax(self.data[self.mapDict[channel]])[0]
-        minCompare = np.nanmin(self.data[self.mapDict[channel]])[0]
+        maxCompare = np.nanmax(self.data[self.map_dict[channel]])[0]
+        minCompare = np.nanmin(self.data[self.map_dict[channel]])[0]
 
         ##### Check whether maximum out of Range #####
         if (maxCompare > float(maxValue)) == True:
@@ -524,102 +524,120 @@ class TestData(Data):
 
 class CycleValidator:
     
+    def __init__(self, test_data, map_dict, full_load, warm_idle, filter_choice):
 
-    def __init__(self, Testdata, Mapdict, Fullload, Warmidle, filterChoice):
+      ##### Load Data #####
+      self._filter_choice = filter_choice
+      self._data = test_data.data
+      self._data_full = Fullload.data
+      self._data_full.index = range(0,len(self.data_full))
+      self._data.index = range(0,len(self.data))
+      self._map_dict = map_dict
 
-        ##### Load Data #####
-        self.FilterChoice = filterChoice     
-        self.data = Testdata.data
-        self.data_full = Fullload.data
-        self.data_full.index = range(0,len(self.data_full))
-        self.data.index = range(0,len(self.data))
-        self.mapDict = Mapdict
+      ##### Define Variables #####     
+      self._throttle = self.data[self.map_dict['Commanded__throttle']]
+      self._torque_demand = self.data[self.map_dict['Commanded_Torque']]
+      self._torque_engine = self.data[self.map_dict['Engine_Torque']] 
+      self._speed_demand = self.data[self.map_dict['Commanded_Speed']]
+      self._speed_engine = self.data[self.map_dict['Engine_Speed']]
+      self._power_demand = (self.data[self.map_dict['Commanded_Torque']] * self.data[self.map_dict['Commanded_Speed']] / 9.5488) / 1000
+      self._power_engine = self.data[self.map_dict['Engine_Power']]
+      self.data = None
 
-        ##### Define Variables #####     
-        self.Throttle = self.data[self.mapDict['Commanded_Throttle']]
-        self.Torque_Demand = self.data[self.mapDict['Commanded_Torque']]
-        self.Torque_Engine = self.data[self.mapDict['Engine_Torque']] 
-        self.Speed_Demand = self.data[self.mapDict['Commanded_Speed']]
-        self.Speed_Engine = self.data[self.mapDict['Engine_Speed']]
-        self.Power_Demand = (self.data[self.mapDict['Commanded_Torque']] * self.data[self.mapDict['Commanded_Speed']] / 9.5488) / 1000
-        self.Power_Engine = self.data[self.mapDict['Engine_Power']]
-        self.data = None
-
-        ##### Maximum of Speed, Torque, Power and warm idle #####
-        self.Speed_Max = np.nanmax(self.data_full[self.mapDict['Engine_Speed']])[0]
-        self.Torque_Max = np.nanmax(self.data_full[self.mapDict['Engine_Torque']])[0]
-        self.Power_Max = np.nanmax(self.data_full[self.mapDict['Engine_Power']])[0]
-        self.Warm_Idle = Warmidle[0]
-        self.data_full = None
-
-        ##### Index of Maximum and Minimum Throttle #####
-        self.Index_Min = np.where([self.Throttle==np.nanmin(self.Throttle)[0]])[1]
-        self.Index_Max = np.where([self.Throttle==np.nanmax(self.Throttle)[0]])[1]
-
-
-        ##### Drop Lists #####
-        self.Torque_Drop = []
-        self.Speed_Drop = []
-        self.Power_Drop = []
-
-        self.dataDict = {'Torque': ['Torque_Demand', 'Torque_Engine'],
-                         'Power': ['Power_Demand', 'Power_Engine'], 
-                         'Speed': ['Speed_Demand', 'Speed_Engine']}
-
-        if (self.FilterChoice != 0):
-          self._pre_regression_filter(self.FilterChoice)        
-        self._regression()
-        self._regression_validation()
+      ##### Maximum of Speed, Torque, Power and warm idle #####
+      self._speed_max = np.nanmax(self.data_full[self.map_dict['Engine_Speed']])[0]
+      self._torque_max = np.nanmax(self.data_full[self.map_dict['Engine_Torque']])[0]
+      self._power_max = np.nanmax(self.data_full[self.map_dict['Engine_Power']])[0]
+      self._warm_idle = Warmidle[0]
+      self.data_full = None
         
-    def _pre_regression_filter(self, FilterChoice):
+      ##### Index of Maximum and Minimum _throttle #####
+      self.Index_Min = np.where([self._throttle==np.nanmin(self._throttle)[0]])[1]
+      self.Index_Max = np.where([self._throttle==np.nanmax(self._throttle)[0]])[1]
 
-        for i in self.Index_Min:
-            ##### Check Minimum Throttle ##### -- Table 1 EPA 1065.514
-            if (self.Torque_Demand[i])<0 and (FilterChoice == 1):
-                self.Torque_Drop.append(i)
-                self.Power_Drop.append(i)                  
-                
-            if (self.Torque_Demand[i]==0) and (self.Speed_Demand[i]==0) and ((self.Torque_Engine[i]-0.02*self.Torque_Max)<self.Torque_Engine[i]) and (self.Torque_Engine[i]<(self.Torque_Engine[i]+0.02*self.Torque_Max)) and (FilterChoice == 2):
-                self.Speed_Drop.append(i)
-                self.Power_Drop.append(i)
-                
-            if (self.Torque_Engine[i]>self.Torque_Demand[i]) and ((self.Torque_Engine[i]<(self.Torque_Engine[i]+0.02*self.Torque_Max)) | (self.Torque_Engine[i]<(self.Torque_Engine[i]-0.02*self.Torque_Max))) and (FilterChoice == 3):
-                self.Torque_Drop.append(i)
-                self.Power_Drop.append(i)
-                
-            if (self.Speed_Engine[i]>self.Speed_Demand[i]) and (self.Speed_Engine[i]<self.Speed_Demand[i]*1.02) and (FilterChoice == 4):
-                self.Speed_Drop.append(i)
-                self.Power_Drop.append(i)
+
+      ##### Drop Lists #####
+      self._torque_drop = []
+      self._speed_drop = []
+      self._power_drop = []
+
+      self._data_dict = {'Torque': ['_torque_demand', '_torque_engine'],
+                         'Power': ['_power_demand', '_power_engine'], 
+                         'Speed': ['_speed_demand', '_speed_engine']}
+
+      if (self.filter_choice != 0):
+        self._pre_regression_filter(self.filter_choice)        
+      self._regression()
+      self._regression_validation()
+        
+    def _pre_regression_filter(self, filter_choice):
+
+      for i in self.Index_Min:
             
-        for j in self.Index_Max:
-            ##### Check Maximum Throttle ##### -- Table 1 EPA 1065.514                
-            if (self.Torque_Engine[j]<self.Torque_Demand[j]) and (self.Torque_Engine[j]>(self.Torque_Engine[j]-0.02*self.Torque_Max)) and (FilterChoice == 5):
-                self.Torque_Drop.append(j)
-                self.Power_Drop.append(j)
+        ##### Check Minimum _throttle ##### -- Table 1 EPA 1065.514
+        if (self._torque_demand[i])<0 and \
+           (filter_choice == 1):
+              
+          self._torque_drop.append(i)
+          self._power_drop.append(i)                  
+                
+        if (self._torque_demand[i]==0) and \
+           (self._speed_demand[i]==0) and \
+           ((self._torque_engine[i]-0.02*self._torque_max)<self._torque_engine[i]) and \
+           (self._torque_engine[i]<(self._torque_engine[i]+0.02*self._torque_max)) and \
+           (filter_choice == 2):
+               
+          self._speed_drop.append(i)
+          self._power_drop.append(i)
+                
+        if (self._torque_engine[i]>self._torque_demand[i]) and \
+           ((self._torque_engine[i]<(self._torque_engine[i]+0.02*self._torque_max)) | (self._torque_engine[i]<(self._torque_engine[i]-0.02*self._torque_max))) and \
+           (filter_choice == 3):
+              
+          self._torque_drop.append(i)
+          self._power_drop.append(i)
+                
+        if (self._speed_engine[i]>self._speed_demand[i]) and \
+           (self._speed_engine[i]<self._speed_demand[i]*1.02) and \
+           (filter_choice == 4):
+          self._speed_drop.append(i)
+          self._power_drop.append(i)
+            
+      for j in self.Index_Max:
+        ##### Check Maximum _throttle ##### -- Table 1 EPA 1065.514                
+        if (self._torque_engine[j]<self._torque_demand[j]) and \
+           (self._torque_engine[j]>(self._torque_engine[j]-0.02*self._torque_max)) and \
+           (filter_choice == 5):
+          
+          self._torque_drop.append(j)
+          self._power_drop.append(j)
 
-            if (self.Speed_Engine[j]<self.Speed_Demand[j]) and (self.Speed_Engine[j]>self.Speed_Demand[j]*0.98) and (FilterChoice == 6):
-                self.Speed_Drop.append(j)
-                self.Power_Drop.append(j)                    
+        if (self._speed_engine[j]<self._speed_demand[j]) and \
+           (self._speed_engine[j]>self._speed_demand[j]*0.98) and \
+           (filter_choice == 6):
+          
+          self._speed_drop.append(j)
+          self._power_drop.append(j)                    
 
         ##### Omitting the Data #####
-        self.Speed_Engine = self.Speed_Engine.drop(self.Speed_Drop)
-        self.Speed_Demand = self.Speed_Demand.drop(self.Speed_Drop)
-        self.Torque_Engine = self.Torque_Engine.drop(self.Torque_Drop)
-        self.Torque_Demand = self.Torque_Demand.drop(self.Torque_Drop)
-        self.Power_Engine = self.Power_Engine.drop(self.Power_Drop)
-        self.Power_Demand = self.Power_Demand.drop(self.Power_Drop)            
+        self._speed_engine = self._speed_engine.drop(self._speed_drop)
+        self._speed_demand = self._speed_demand.drop(self._speed_drop)
+        self._torque_engine = self._torque_engine.drop(self._torque_drop)
+        self._torque_demand = self._torque_demand.drop(self._torque_drop)
+        self._power_engine = self._power_engine.drop(self._power_drop)
+        self._power_demand = self._power_demand.drop(self._power_drop)            
 
         ##### Reindexing the data #####
-        self.Torque_Engine.index = range(0,len(self.Torque_Engine))
-        self.Torque_Demand.index = range(0,len(self.Torque_Demand))
-        self.Speed_Engine.index = range(0,len(self.Speed_Engine))
-        self.Speed_Demand.index = range(0,len(self.Speed_Demand))
-        self.Power_Engine.index = range(0,len(self.Power_Engine))
-        self.Power_Demand.index = range(0,len(self.Power_Demand))
+        self._torque_engine.index = range(0,len(self._torque_engine))
+        self._torque_demand.index = range(0,len(self._torque_demand))
+        self._speed_engine.index = range(0,len(self._speed_engine))
+        self._speed_demand.index = range(0,len(self._speed_demand))
+        self._power_engine.index = range(0,len(self._power_engine))
+        self._power_demand.index = range(0,len(self._power_demand))
 
         ##### Cleaning Variables #####
-        self.Throttle, self.Index_Min = None, None
-        self.Torque_Drop, self.Speed_Drop, self.Power_Drop = None, None, None
+        self._throttle, self.Index_Min = None, None
+        self._torque_drop, self._speed_drop, self._power_drop = None, None, None
        
 
     def _regression(self):
@@ -628,51 +646,50 @@ class CycleValidator:
                             'Power': { 'Slope': " ", 'Intercept': " ", 'Standard Error': " ", 'Rsquared': " " }, 
                             'Speed': { 'Slope': " ", 'Intercept': " ", 'Standard Error': " ", 'Rsquared': " " }}
         
-        for channel in self.dataDict.items():
-
+        for channel in self._data_dict.items():
           self._regression_util(channel[0], channel[1][1], channel[1][0])
  
 
     def _regression_util(self, channel, X, Y):
 
-        ymean = vars(self)[Y].mean()
-        xmean = vars(self)[X].mean()
+        _ymean = vars(self)[Y].mean()
+        _xmean = vars(self)[X].mean()
 
         # -- Regression Slope -- EPA 1065.602-9   
-        numerator, denominator = 0.0, 0.0
+        _numerator, _denominator = 0.0, 0.0
         for x, y in zip(vars(self)[X], vars(self)[Y]):
-            numerator = numerator + ((x - xmean) * (y - ymean))
+            _numerator = _numerator + ((x - _xmean) * (y - _ymean))
         for x, y in zip(vars(self)[X], vars(self)[Y]):
-            denominator = denominator + ((y - ymean) ** 2)
+            _denominator = _denominator + ((y - _ymean) ** 2)
                 
-        if np.isnan(numerator/denominator) == True:
-          slope = 1
+        if np.isnan(_numerator/_denominator) == True:
+          _slope = 1
         else:
-          slope = numerator / denominator 
+          _slope = _numerator /_denominator 
 
         # -- Regression Intercept -- EPA 1065.602-10 
-        Intercept = (xmean - (slope * ymean))
+        _intercept = (_xmean - (_slope * _ymean))
 
         # -- Regression Standard Error of Estimate -- EPA 1065.602-11 
-        sumat = 0.0
+        _sumat = 0.0
         for x, y in zip(vars(self)[X], vars(self)[Y]):
-            sumat = sumat + ((x - Intercept - (Slope * y)) ** 2)
-        see = sumat / (vars(self)[X].size - 2)
-        standerror = math.sqrt(see)
+            _sumat = _sumat + ((x - _intercept - (_slope * y)) ** 2)
+        _see = _sumat / (vars(self)[X].size - 2)
+        _standerror = math.sqrt(_see)
 
         # -- Regression Coefficient of determination -- EPA 1065.602-12
-        numerator, denominator = 0.0, 0.0
+        _numerator, _denominator = 0.0, 0.0
         for x, y in zip(vars(self)[X], vars(self)[Y]):
-            numerator = numerator + ((x - Intercept - (Slope * y)) ** 2)
+            _numerator = _numerator + ((x - _intercept - (_slope * y)) ** 2)
         for x, y in zip(vars(self)[X], vars(self)[Y]):
-            denominator = denominator + ((x - ymean) ** 2)
+            _denominator = _denominator + ((x - _ymean) ** 2)
                 
-        r2 = 1 - (numerator / denominator)
+        _r2 = 1 - (_numerator / _denominator)
 
-        self.reg_results[channel]['Slope'] = round(Slope,2)
-        self.reg_results[channel]['Intercept'] = round(Intercept,2)
-        self.reg_results[channel]['Standard Error'] = round(standerror,2)
-        self.reg_results[channel]['Rsquared'] = round(r2,2)
+        self.reg_results[channel]['Slope'] = round(_slope, 2)
+        self.reg_results[channel]['Intercept'] = round(_intercept, 2)
+        self.reg_results[channel]['Standard Error'] = round(_standerror, 2)
+        self.reg_results[channel]['Rsquared'] = round(_r2, 2)
 
 
     def _regression_validation(self):
@@ -692,11 +709,11 @@ class CycleValidator:
                     self.reg_results_bool[parameter]['Slope'] = True
 
                 # Intercept
-                if (self.reg_results[parameter]['Intercept'] <= 0.1*float(self.Warm_Idle)):
+                if (self.reg_results[parameter]['Intercept'] <= 0.1*float(self._warm_idle)):
                     self.reg_results_bool[parameter]['Intercept'] = True
 
                 # Standard error
-                if self.reg_results[parameter]['Standard Error'] <= 0.05*self.Speed_Max:
+                if self.reg_results[parameter]['Standard Error'] <= 0.05*self._speed_max:
                     self.reg_results_bool[parameter]['Standard Error'] = True
 
                 # Coefficient of determination
@@ -710,11 +727,11 @@ class CycleValidator:
                 if (self.reg_results[parameter]['Slope'] <= 1.03) and (self.reg_results[parameter]['Slope'] >= 0.83):
                     self.reg_results_bool[parameter]['Slope'] = True
                 # Intercept
-                if (self.reg_results[parameter]['Intercept'] <= 0.02*self.Torque_Max):
+                if (self.reg_results[parameter]['Intercept'] <= 0.02*self._torque_max):
                     self.reg_results_bool[parameter]['Intercept'] = True
 
                 # Standard error
-                if self.reg_results[parameter]['Standard Error'] <= 0.1*self.Torque_Max:
+                if self.reg_results[parameter]['Standard Error'] <= 0.1*self._torque_max:
                     self.reg_results_bool[parameter]['Standard Error'] = True
 
                 # Coefficient of determination
@@ -729,11 +746,11 @@ class CycleValidator:
                     self.reg_results_bool[parameter]['Slope'] = True
 
                 # Intercept
-                if (self.reg_results[parameter]['Intercept'] <= 0.02*self.Power_Max):
+                if (self.reg_results[parameter]['Intercept'] <= 0.02*self._power_max):
                     self.reg_results_bool[parameter]['Intercept'] = True
 
                 # Standard error
-                if self.reg_results[parameter]['Standard Error'] <= 0.1*self.Power_Max:
+                if self.reg_results[parameter]['Standard Error'] <= 0.1*self._power_max:
                     self.reg_results_bool[parameter]['Standard Error'] = True
 
                 # Coefficient of determination
