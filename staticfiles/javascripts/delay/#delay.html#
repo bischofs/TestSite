@@ -1,34 +1,182 @@
-
 <!-- <div ac-chart="chartType" ac-data="data" ac-config="config" id='chart' class='chart'></div> -->
-<div class="row">
-    <div class="col-md-6 col-md-offset-1">
-        <button type="button" class="btn btn-warning">NOx</button>
-        <button type="button" class="btn btn-warning">CH4</button>
-        <button type="button" class="btn btn-warning">CO</button>
-        <button type="button" class="btn btn-warning">CO2</button>
-        <button type="button" class="btn btn-warning">O2</button>
-        <button type="button" class="btn btn-warning">NO</button>
-        <button type="button" class="btn btn-warning">MAF</button>
+    <div class="row">
+        <div class="col-md-12">
+            <button type="button" ng-click="ChosenSpecies='NOx'; species()" class="btn btn-primary">NOx</button>
+            <button type="button" ng-click="ChosenSpecies='CH4'; species()" class="btn btn-primary">CH4</button>
+            <button type="button" ng-click="ChosenSpecies='THC'; species()" class="btn btn-primary">THC</button>
+            <button type="button" ng-click="ChosenSpecies='CO'; species()" class="btn btn-primary">CO</button>
+            <button type="button" ng-click="ChosenSpecies='CO2'; species()" class="btn btn-primary">CO2</button>
+            <button type="button" ng-click="ChosenSpecies='O2'; species()" class="btn btn-primary">O2</button>
+            <button type="button" ng-click="ChosenSpecies='NO'; species()" class="btn btn-primary">NO</button>
+            <button type="button" ng-click="ChosenSpecies='N2O'; species()" class="btn btn-primary">N2O</button>
+	    <button type="button" ng-click="ChosenSpecies='CH2O'; species()" class="btn btn-primary">CH2O</button>
+	    <button type="button" ng-click="ChosenSpecies='NH3'; species()" class="btn btn-primary">NH3</button>
+	    <button type="button" ng-click="ChosenSpecies='MFRAIR'; species()" class="btn btn-primary">MAF</button>
+        </div>
+        <div id="chart-shift" class="col-md-4">
+            <button type="button" ng-click="left()" class="btn btn-primary btn-arrow-left">1 sec</button>
+            <input type="text" ng-model="currentDelay" class="input-sm" placeholder="0">
+            <button type="button" ng-click="right()" class="btn btn-primary btn-arrow-right">1 sec</button>
+        </div>
+        <div id="chart-wrapper">
+            <canvas id="line" class="chart chart-line" data="data" labels="labels" legend="true" series="series" click="onClick" options="options">
+            </canvas>
+        </div>
     </div>
-    <div class="col-md-4 col-md-offset-1">
-
-        <button class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span> 1 second</button>
-        <button class="btn btn-default">1 second <span class="glyphicon glyphicon-arrow-right"></span> </button>
+    <div class="row">
+        <div class="col-md-8">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>NOx</th>
+                        <th>CH4</th>
+                        <th>THC</th>
+                        <th>CO</th>
+                        <th>CO2</th>
+                        <th>O2</th>
+                        <th>NO</th>
+                        <th>N2O</th>
+                        <th>CH2O</th>
+                        <th>NH3</th>                       
+                        <th>MAF</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>{{save['NOx']}}</th>
+                        <th>{{save['CH4']}}</th>
+                        <th>{{save['THC']}}</th>
+                        <th>{{save['CO']}}</th>
+                        <th>{{save['CO2']}}</th>
+                        <th>{{save['O2']}}</th>
+                        <th>{{save['NO']}}</th>
+                        <th>{{save['N2O']}}</th>
+                        <th>{{save['CH2O']}}</th>
+                        <th>{{save['NH3']}}</th>
+                        <th>{{save['MFRAIR']}}</th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-4">    
+            <button type="button" ng-click="submit()" class="btn btn-success btn-s" style="float:right;">
+                <span class="glyphicon glyphicon-arrow-up"></span> Submit Delays
+            </button>
+        </div>
     </div>
-</div>
-<div>
-    <canvas id="line" class="chart chart-line" data="data" labels="labels" legend="true" series="series" click="onClick">
-    </canvas>
-    <button type="button" class="btn btn-success btn-s" style="float:right;">
-        <span class="glyphicon glyphicon-arrow-up"></span> Submit Delays
-    </button>
-</div>
 <style>
+.input-sm {
+    height: 33px;
+    width: 35px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
 .well {
     min-height: 155px;
 }
 
 .top-buffer {
     margin-top: 20px;
+}
+
+.btn-arrow-right,
+.btn-arrow-left {
+    position: relative;
+    padding-left: 18px;
+    padding-right: 18px;
+}
+
+.btn-arrow-right {
+    padding-left: 36px;
+}
+
+.btn-arrow-left {
+    padding-right: 36px;
+}
+
+.btn-arrow-right:before,
+.btn-arrow-right:after,
+.btn-arrow-left:before,
+.btn-arrow-left:after {
+    /* make two squares (before and after), looking similar to the button */
+
+    content: "";
+    position: absolute;
+    top: 5px;
+    /* move it down because of rounded corners */
+
+    width: 22.627417px;
+    /* same as height */
+
+    height: 22.627417px;
+    /* button_inner_height / sqrt(2) */
+
+    background: inherit;
+    /* use parent background */
+
+    border: inherit;
+    /* use parent border */
+
+    border-left-color: transparent;
+    /* hide left border */
+
+    border-bottom-color: transparent;
+    /* hide bottom border */
+
+    border-radius: 0px 4px 0px 0px;
+    /* round arrow corner, the shorthand property doesn't accept "inherit" so it is set to 4px */
+
+    -webkit-border-radius: 0px 4px 0px 0px;
+    -moz-border-radius: 0px 4px 0px 0px;
+}
+
+.btn-arrow-right:before,
+.btn-arrow-right:after {
+    transform: rotate(45deg);
+    /* rotate right arrow squares 45 deg to point right */
+
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+}
+
+.btn-arrow-left:before,
+.btn-arrow-left:after {
+    transform: rotate(225deg);
+    /* rotate left arrow squares 225 deg to point left */
+
+    -webkit-transform: rotate(225deg);
+    -moz-transform: rotate(225deg);
+    -o-transform: rotate(225deg);
+    -ms-transform: rotate(225deg);
+}
+
+.btn-arrow-right:before,
+.btn-arrow-left:before {
+    /* align the "before" square to the left */
+
+    left: -11px;
+}
+
+.btn-arrow-right:after,
+.btn-arrow-left:after {
+    /* align the "after" square to the right */
+
+    right: -11px;
+}
+
+.btn-arrow-right:after,
+.btn-arrow-left:before {
+    /* bring arrow pointers to front */
+
+    z-index: 1;
+}
+
+.btn-arrow-right:before,
+.btn-arrow-left:after {
+    /* hide arrow tails background */
+
+    background-color: white;
 }
 </style>

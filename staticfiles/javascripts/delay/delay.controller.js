@@ -5,18 +5,16 @@
         .module('TestSite.delay.controllers')
         .controller('DelayController', DelayController);
 
-    DelayController.$inject = ['$scope', '$http', 'toastr'];
+    DelayController.$inject = ['$scope', '$http', 'toastr', '$location'];
     /**
      * @namespace UploadController
      */
-    function DelayController($scope, $http, toastr) {
+    function DelayController($scope, $http, toastr, $location) {
 
-
-        $scope.delay = 0;
-        $scope.CH4Delay = $scope.NOxDelay = $scope.CODelay  = $scope.CO2Delay = $scope.O2Delay = $scope.NODelay = $scope.MAFDelay = $scope.THCDelay = 0;
-        $scope.currentSpec = "Nitrogen_X_Dry";
-        $scope.save = {'NOx':0,'CH4':0,'THC':0,'CO':0,'CO2':0,'O2':0,'NO':0,'MFRAIR':0}
-        $scope.Array = {'NOx':'Nitrogen_X_Dry','CH4':'Methane_Wet','THC':'Total_Hydrocarbons_Wet','CO':'Carbon_Monoxide_High_Dry','CO2':'Carbon_Dioxide_Dry','O2':'Oxygen_Dry','NO':'Nitrogen_Monoxide_Dry','MFRAIR':'Air_Flow_Rate'}
+        $scope.Array = {'NOx':'Nitrogen_X_Dry','CH4':'Methane_Wet','THC':'Total_Hydrocarbons_Wet',
+                        'CO':'Carbon_Monoxide_Dry','CO2':'Carbon_Dioxide_Dry','NO':'Nitrogen_Monoxide_Dry',
+                        'MFRAIR':'Air_Flow_Rate','N2O':'Nitrous_Oxide_Wet','CH2O':'Formaldehyde_Wet','NH3':'Ammonia_Wet'}
+        read();
 
         $scope.species = function() {
 
@@ -69,7 +67,7 @@
             $http.post('/1065/api/v1/data/delay/',{'delay':$scope.save})
                 .success(function(response) {
                     toastr.success('Delay submitted!');
-                    //location.href = '/1065/evaluation/results';
+                    $location.path('/1065/evaluation/results');
 
                 })
                 .error(function(response) {
@@ -78,33 +76,50 @@
         }
 
 
-        $scope.read = function() {
+        function read() {
             $http.get('/1065/api/v1/data/delay/')
                 .success(function(data) {
-                    var spec = JSON.parse(data)
-                    $scope.spec = spec
+                    
+                    $scope.spec = JSON.parse(data.DelaySpecies)
+                    $scope.save = data.Array
                     $scope.options = {
                         pointDot: false,
-                        showTooltips: false
+                        showTooltips: false,
+                        responsive: false,
                     };
 
-                    $scope.ChosenSpecies = 'NOx'
-                    $scope.currentDelay = 0
-                    $scope.series = ['NOx', 'Torque'];
-                    $scope.labels = _.keys($scope.spec[$scope.Array[$scope.ChosenSpecies]]).splice(50, 100);
-                    $scope.data = [_.values($scope.spec[$scope.Array[$scope.ChosenSpecies]]).splice(50, 100), _.values($scope.spec.Engine_Torque).splice(50, 100)];
-                    $scope.currentSpec = $scope.spec[$scope.Array[$scope.ChosenSpecies]];            
-                    $scope.apply;        
-                    toastr.success('Preparation for Delay finished!');            
+                    if ($scope.Array['N2O'] in $scope.spec){
+                         $scope.N2O_Button = 'inline';
+                    } else{
+                         $scope.N2O_Button = 'None';
+                         $scope.save.N2O = '-'
+                    }
+                    if ($scope.Array['CH2O'] in $scope.spec){
+                        $scope.CH2O_Button = 'inline';
+                    } else{
+                        $scope.CH2O_Button = 'None';
+                        $scope.save.CH2O = '-'
+                    }
+                    if ($scope.Array['NH3'] in $scope.spec){
+                        $scope.NH3_Button = 'inline';
+                    } else{
+                        $scope.NH3_Button = 'None';
+                        $scope.save.NH3 = '-'
+                    }
+                    $scope.apply                                   
 
+
+                    $scope.series = ['NOx', 'Torque'];
+                    $scope.currentDelay = $scope.save[$scope.series[0]];
+                    $scope.labels = _.keys($scope.spec[$scope.Array['NOx']]).splice(50+data.Array['NOx'], 100);
+                    $scope.data = [_.values($scope.spec[$scope.Array['NOx']]).splice(50+data.Array['NOx'], 100), _.values($scope.spec.Engine_Torque).splice(50, 100)];
+                    $scope.currentSpec = $scope.spec[$scope.Array['NOx']];            
+                    //toastr.success('Preparation for Delay finished!');            
                 })
                 .error(function(response) {
-                    toastr.error(response.message, 'Preparation for Delay failed!');
+                    toastr.error(response.responseJSON.message, 'Preparation for alignment failed, try clearing and re-uploading data');
                 });
         };
-
-
-
 
     }
 

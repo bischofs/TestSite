@@ -14,62 +14,64 @@ class DataHandler:
 
   def __init__(self):
 
-    self.resultsLog = {'Regression': {},'Regression_bool': {},
+    self.results_log = {'Regression': {},'Regression_bool': {},
                         'Data Alignment': {'Array':{'NOx':0,'CH4':0,'THC':0,'CO':0,'CO2':0,'NO':0,'MFRAIR':0,'N2O':0,'CH2O':0,'NH3':0},
                         'Data':pd.DataFrame()}, 'Calculation': {}, 'Report':{}}
-    self.fileDict = {'FULL': 'fullLoad', 'PRE':'preZeroSpan','MAIN':'testData','POST':'postZeroSpan'}
-    self.CyclesData = pd.read_json("cycles.json").Cycles
-    self.ChannelData = pd.read_json("spec.json").Species
+    self.file_dict = {'FULL': 'full_load', 'PRE':'pre_zero_span','MAIN':'test_data','POST':'post_zero_span'}
+    self.cycles_data = pd.read_json("cycles.json").Cycles
+    self.channel_data = pd.read_json("spec.json").Species
     self.ebenches = Ebench.objects.all()
-    self.masterMetaData = pd.DataFrame()
-    self.masterFileName = None
+    self.master_meta_data = pd.DataFrame()
+    self.master_file_name = None
     self.File = None
-    self.allFilesLoaded = False
-    self.DoCalculation = True
-    self.masterDict = {}
-    self.CycleAttr = {}
+    self.all_files_loaded = False
+    self.do_calculation = True
+    self.master_dict = {}
+    self.cycle_attr = {}
     self.log = {}
 
-  def import_data(self, dataFile):   
-
+  def import_data(self, data_file):   
 
     ##### Prepare DataHandler and File #####
     self._clear_all_files_loaded()
    
-    RawData = pd.read_csv(dataFile, names=range(1,500), encoding='windows-1258')
-    RawData.columns = RawData.loc[0].values
-    RawData = RawData[1:]
-    RawData = RawData.dropna(how="all", axis=(1))
-    RawData.index = range(0,len(RawData))
+    try:
+      raw_data = pd.read_csv(data_file, names=range(1,500), encoding='windows-1258')
+      raw_data.columns = raw_data.loc[0].values
+      raw_data = raw_data[1:]
+      raw_data = raw_data.dropna(how="all", axis=(1))
+      raw_data.index = range(0,len(raw_data))
+    except:
+      raise Exception("Problem parsing data in file %s" (data_file.file))
 
-    if('CycleState1065'in RawData.columns.values):
-      self.File = RawData[:1]['CycleState1065'][0] # Reads the filetype out of header page
+    if('CycleState1065'in raw_data.columns.values):
+      self.File = raw_data[:1]['CycleState1065'][0] # Reads the filetype out of header page
     else:
-      raise Exception("MetaData missing CycleState1065, cannot detect cycle state in %s" (dataFile.file))
+      raise Exception("MetaData missing CycleState1065, cannot detect cycle state in %s" (data_file.file))
 
 
     ##### Create FileClass #####
     if self.File == 'FULL':
-      fileType = FullLoad(dataFile)
+      file_type = FullLoad(data_file)
 
     elif self.File == 'PRE':
-      fileType = ZeroSpan(dataFile)
+      file_type = ZeroSpan(data_file)
 
     elif self.File == 'MAIN':
-      self.CycleAttr = self._load_cycle_attr(self.CycleAttr, RawData[:1], self.CyclesData)
-      fileType = TestData(dataFile, self.CycleAttr['CycleType'])
+      self.cycle_attr = self._load_cycle_attr(self.cycle_attr, raw_data[:1], self.cycles_data)
+      file_type = TestData(data_file, self.cycle_attr['CycleType'])
 
     elif self.File == 'POST':
-      fileType = ZeroSpan(dataFile)
+      file_type = ZeroSpan(data_file)
 
     ##### Load File #####
-    [masterMetaData, masterFileName] = fileType.load_data(RawData, self.masterMetaData, self.masterFileName, self.masterDict, self.ChannelData)
-    setattr(self,self.fileDict[self.File],fileType)
+    [masterMetaData, masterFileName] = file_type.load_data(raw_data, self.master_meta_data, self.master_file_name, self.master_dict, self.channel_data)
+    setattr(self,self.file_dict[self.File], file_type)
 
     ##### Set MasterFile #####
-    if (self.masterFileName == None):
-      self.masterFileName = masterFileName
-      self.masterMetaData = masterMetaData 
+    if (self.master_file_name == None):
+      self.master_file_name = master_file_name
+      self.master_meta_data = master_meta_data 
 
     ##### Finish Upload #####
     self._check_all_files_loaded()
@@ -78,58 +80,58 @@ class DataHandler:
   def _clear_all_files_loaded(self):
 
   ##### Clears all Data and resets the Datahandler when 5th file is uploaded #####
-    if(self.allFilesLoaded == True):
-      del self.testData, self.preZeroSpan, self.postZeroSpan, self.fullLoad
+    if(self.all_files_loaded == True):
+      del self.test_data, self.pre_zero_span, self.post_zero_span, self.full_load
       self.__init__()
 
       
-  def _load_cycle_attr(self, CycleAttr, MetaData, CyclesData):
+  def _load_cycle_attr(self, cycle_attr, meta_data, CyclesData):
 
 
-    Cycle = MetaData['CycleType1065'][0]
-    CycleAttr['Cycle'] = Cycle
-    CycleAttr['EbenchID'] = MetaData['EbenchID'][0]
-    CycleAttr['Name'] = CyclesData[Cycle]['Name']    
-    CycleAttr['Engine'] = CyclesData[Cycle]['Engine']
-    CycleAttr['CycleType'] = CyclesData[Cycle]['CycleType']
-    if CycleAttr['CycleType'] == 'Transient':
-      CycleAttr['CycleLength'] = CyclesData[Cycle]['CycleLength']
-    CycleAttr['Fuel'] = CyclesData[Cycle]['Fuel']
-    CycleAttr['FactorMult'] = CyclesData[Cycle]['NOxFactorMult']
-    CycleAttr['FactorAdd'] = CyclesData[Cycle]['NOxFactorAdd']
+    cycle = meta_data['CycleType1065'][0]
+    cycle_attr['Cycle'] = cycle
+    cycle_attr['EbenchID'] = meta_data['EbenchID'][0]
+    cycle_attr['Name'] = cycles_data[Cycle]['Name']    
+    cycle_attr['Engine'] = cycles_data[Cycle]['Engine']
+    cycle_attr['CycleType'] = cycles_data[Cycle]['CycleType']
+    if(cycle_attr['CycleType'] == 'Transient'):
+      cycle_attr['CycleLength'] = cycles_data[Cycle]['CycleLength']
+    cycle_attr['Fuel'] = cycles_data[Cycle]['Fuel']
+    cycle_attr['FactorMult'] = cycles_data[Cycle]['NOxFactorMult']
+    cycle_attr['FactorAdd'] = cycles_data[Cycle]['NOxFactorAdd']
       
 
-    return CycleAttr
+    return cycle_attr
 
 
   def _check_all_files_loaded(self):
 
     ##### Checks whether all files are uploaded #####
-    attrs = ['fullLoad', 'postZeroSpan', 'preZeroSpan', 'testData']        
+    attrs = ['full_load', 'post_zero_span', 'pre_zero_span', 'test_data']        
 
     for attr in attrs:
 
       if not hasattr(self, attr):
-        self.allFilesLoaded = False
+        self.all_files_loaded = False
         break
 
     else:
-      self.allFilesLoaded = True
+      self.all_files_loaded = True
       ##### Check Timestamps of Files
-      self._check_time_stamp(self.preZeroSpan.TimeStamp, self.testData.TimeStamp, self.postZeroSpan.TimeStamp, len(self.testData.data))
+      self._check_time_stamp(self.pre_zero_span.TimeStamp, self.test_data.TimeStamp, self.post_zero_span.TimeStamp, len(self.test_data.data))
 
       ##### Create MaterDict, Set Co-Channel, Load E-Bench-Data #####
-      self.masterDict = self._create_master_dict(attrs)
+      self.master_dict = self._create_master_dict(attrs)
       
-      if len(self.ebenches.filter(EbenchID=self.CycleAttr['EbenchID'])) == 0:
+      if len(self.ebenches.filter(EbenchID=self.cycle_attr['EbenchID'])) == 0:
         raise Exception("Cannot find associated Ebench in database, please contact Emissions group")
       else:
-        self.ebenchData = self._load_ebench(self.ebenches.filter(EbenchID=self.CycleAttr['EbenchID'])[0].history, self.testData.TimeStamp)
+        self.ebenchData = self._load_ebench(self.ebenches.filter(EbenchID=self.cycle_attr['EbenchID'])[0].history, self.test_data.TimeStamp)
       
       ##### Check Channel-Ranges of all files #####
-      self.ChannelData = self._set_channel_data()
+      self.channel_data = self._set_channel_data()
       for File in attrs:
-        vars(self)[File].check_ranges(self.ChannelData, File)      
+        vars(self)[File].check_ranges(self.channel_data, File)      
 
 
   def _set_channel_data(self):
@@ -140,45 +142,45 @@ class DataHandler:
 
     ##### Change maximum Range-Values of Species to 110% of Bottle-Concentration #####
     for spec, bottle in zip(ListSpecies, ListBottles):
-      self.ChannelData[spec]['maximum_value'] = self.ebenchData[bottle]
+      self.channel_data[spec]['maximum_value'] = self.ebenchData[bottle]
 
-    return self.ChannelData
+    return self.channel_data
 
   def _create_master_dict(self, attrs):
 
-    masterDict = self.testData.mapDict
-    masterDict.update(self.preZeroSpan.mapDict) # testData.mapDict is changed as well
+    master_dict = self.test_data.mapDict
+    master_dict.update(self.pre_zero_span.mapDict) # test_data.mapDict is changed as well
 
-    masterDict = self._set_CO(self.testData.data, masterDict)
-
-
-    return masterDict
+    master_dict = self._set_CO(self.test_data.data, master_dict)
 
 
-  def _set_CO(self, data, masterDict):
+    return master_dict
 
-    ##### CO-Strings for masterDict #####
+
+  def _set_CO(self, data, master_dict):
+
+    ##### CO-Strings for master_dict #####
     COL = 'Carbon_Monoxide_Low_Dry'
     COH = 'Carbon_Monoxide_High_Dry'
     CO = 'Carbon_Monoxide_Dry'
 
     ##### Load Min- Compare/Value for COL #####
-    minValue = self.ChannelData[COL]['minimum_value']
-    minCompare = np.nanmin(data[masterDict[COL]])[0]
+    minValue = self.channel_data[COL]['minimum_value']
+    minCompare = np.nanmin(data[master_dict[COL]])[0]
 
     ##### Check whether minimum out of Range #####
     if (minCompare < float(minValue)) == True:
-      masterDict[CO] = masterDict[COH]
+      master_dict[CO] = master_dict[COH]
     else:
-      masterDict[CO] = masterDict[COL]
+      master_dict[CO] = master_dict[COL]
   
-    del masterDict[COL]
-    del masterDict[COH]
+    del master_dict[COL]
+    del master_dict[COH]
 
     # Clear Variables
     COl, COH, CO, minValue, minCompare = None, None, None, None, None
 
-    return masterDict
+    return master_dict
 
 
   def _load_ebench(self, Ebenches, TimeStamp):
@@ -197,7 +199,7 @@ class DataHandler:
         ebenchData['Pchiller'] = EbenchSet['Thermal_Absolute_Pressure']
         ebenchData['xTHC[THC_FID]init'] = EbenchSet['THC_Initial_Contamination']
         ebenchData['Bottle_Concentration_CO2'] = EbenchSet['Bottle_Concentration_CO2']/10000 # ppm --> %
-        if 'COH' in self.masterDict['Carbon_Monoxide_Dry']:
+        if 'COH' in self.master_dict['Carbon_Monoxide_Dry']:
           ebenchData['Bottle_Concentration_CO'] = EbenchSet['Bottle_Concentration_COH']/10000 # ppm --> %
         else:
           ebenchData['Bottle_Concentration_CO'] = EbenchSet['Bottle_Concentration_COL']
@@ -230,39 +232,39 @@ class DataHandler:
 
 class Data:
 
-  def __init__(self, dataFile):
+  def __init__(self, data_file):
       
     self.mapDict = {}
     self.logDict = {}
 
-    self.dataFile = dataFile
-    self.fileName = dataFile.name
-    self.fileType = self.__class__.__name__
+    self.data_file = data_file
+    self.fileName = data_file.name
+    self.file_type = self.__class__.__name__
     self.TimeStamp = None
 
 
-  def load_data(self, RawData, masterMetaData, masterFileName, masterDict, ChannelData):
+  def load_data(self, raw_data, master_meta_data, master_file_name, master_dict, channel_data):
 
     ##### Load Spec-File, Metadata, Data, Units #####
-    self.data = RawData
-    [self.metaData, masterMetaData, masterFileName] = self._load_metadata(self.data, self.fileName, masterMetaData, masterFileName, ChannelData)
+    self.data = raw_data
+    [self.metaData, master_meta_data, master_file_name] = self._load_metadata(self.data, self.fileName, master_meta_data, master_file_name, channel_data)
     [self.data, self.units] = self._load_data_units(self.data)
     self.TimeStamp = self._load_timestamp(self.data)
-    self.mapDict = self._create_mapDict(ChannelData)
+    self.mapDict = self._create_mapDict(channel_data)
 
     ##### Perform Checks on Data #####
-    self._check_metadata(self.metaData, self.fileName, masterMetaData, masterFileName) 
-    self._check_units(ChannelData)
+    self._check_metadata(self.metaData, self.fileName, master_meta_data, master_file_name) 
+    self._check_units(channel_data)
 
-    return masterMetaData, masterFileName
+    return master_meta_data, master_file_name
 
 
-  def _load_metadata(self, data, FileName, masterMetaData, masterFileName, ChannelData):
+  def _load_metadata(self, data, FileName, master_meta_data, master_file_name, channel_data):
 
     metaData = data[:1].dropna(how="all",axis=(1)) # Drop Zero-Columns
 
-    ##### Loop through all entries of ChannelData in the header page #####
-    for channel in ChannelData.items():
+    ##### Loop through all entries of channel_data in the header page #####
+    for channel in channel_data.items():
       if channel[1]['header_data'] == True:
         for channelName in channel[1]['channel_names']:
           if channelName in metaData.columns:
@@ -272,19 +274,19 @@ class Data:
             self.logDict['warning'] = "Meta-Data missing in import file %s" % self.fileName
             raise Exception("Cannot find %s channel in header data of file %s" % (channelName, self.fileName))
 
-    if masterFileName == None:
+    if master_file_name == None:
 
-      masterMetaData = metaData
-      masterFileName = FileName                
+      master_meta_data = metaData
+      master_file_name = FileName                
 
-    return metaData, masterMetaData, masterFileName  
+    return metaData, master_meta_data, master_file_name  
 
 
-  def _load_data_units(self, RawData):
+  def _load_data_units(self, raw_data):
 
-      self.data.columns = RawData.loc[1].values
-      self.data = RawData[2:]
-      units = RawData[2:3]
+      self.data.columns = raw_data.loc[1].values
+      self.data = raw_data[2:]
+      units = raw_data[2:3]
       self.data = self.data.dropna(how="all",axis=(1)) # Drop Zero-Columns
       self.data = (self.data.convert_objects(convert_numeric=True)).dropna() # Convert and drop NA
       self.data.index = range(0,len(self.data))
@@ -300,30 +302,30 @@ class Data:
     
 
 
-  def _check_metadata(self, MetaData, FileName, masterMetaData, masterFileName):
+  def _check_metadata(self, meta_data, FileName, master_meta_data, master_file_name):
 
     SkipList = ['N_TR','no_run','Comment1','Comment2','Proj#', 'N_TQ', 'CycleCondition1065','CycleState1065', 'N_FLAG2'] # Remove CycleCondition later e.g COS = Coldstart
 
-    ##### Compare Metadata with Master-MetaData #####
-    for ChannelName in MetaData:
+    ##### Compare Metadata with Master-meta_data #####
+    for ChannelName in meta_data:
       if ChannelName not in SkipList:
-          if (not str(masterMetaData[ChannelName][0]) == str(MetaData[ChannelName][0])):
+          if (not str(master_meta_data[ChannelName][0]) == str(meta_data[ChannelName][0])):
             try:
-              if (not float(masterMetaData[ChannelName][0]) == float(MetaData[ChannelName][0])):
-                raise Exception("%s in file %s is not the same as in file %s" % (ChannelName, FileName, masterFileName))
+              if (not float(master_meta_data[ChannelName][0]) == float(meta_data[ChannelName][0])):
+                raise Exception("%s in file %s is not the same as in file %s" % (ChannelName, FileName, master_file_name))
             except:
-              raise Exception("%s in file %s is not the same as in file %s" % (ChannelName, FileName, masterFileName))
+              raise Exception("%s in file %s is not the same as in file %s" % (ChannelName, FileName, master_file_name))
 
 
     ChannelName, SkipList = None, None
 
 
-  def _create_mapDict(self, ChannelData):
+  def _create_mapDict(self, channel_data):
 
     mapDict = {}
       
-    for channel in ChannelData.items():
-      if channel[1]['files'].__contains__(self.fileType):
+    for channel in channel_data.items():
+      if channel[1]['files'].__contains__(self.file_type):
         if channel[1]['header_data'] == False:
           if (channel[1]['multiple_benches'] == True):
             self._create_mapDict_util(channel[0], channel[1]['channel_names'], True, channel[1]['optional'], self.data, self.fileName, mapDict)
@@ -354,11 +356,11 @@ class Data:
     name = None                      
                
 
-  def _check_units(self, ChannelData):
+  def _check_units(self, channel_data):
 
     for channel in self.mapDict:
-      unit = ChannelData[channel]['unit']
-      if ChannelData[channel]['header_data'] == False:
+      unit = channel_data[channel]['unit']
+      if channel_data[channel]['header_data'] == False:
         booleanCond = self.units[self.mapDict[channel]].str.contains(unit)
 
         if not (booleanCond.any()):
@@ -366,17 +368,17 @@ class Data:
           raise Exception("%s units are not in %s" % (self.mapDict[channel], unit))
 
 
-  def check_ranges(self, ChannelData, File):
+  def check_ranges(self, channel_data, File):
 
     for channel in self.mapDict:       
       if channel != 'Carbon_Monoxide_Dry':
 
         ##### Read Max/Min-Vaues from json-file #####
-        maxValue = ChannelData[channel]['maximum_value']
-        minValue = ChannelData[channel]['minimum_value']
+        maxValue = channel_data[channel]['maximum_value']
+        minValue = channel_data[channel]['minimum_value']
 
         ##### Load Values from Data #####
-        if ChannelData[channel]['header_data'] == False:
+        if channel_data[channel]['header_data'] == False:
           maxCompare = np.nanmax(self.data[self.mapDict[channel]])[0]
           minCompare = np.nanmin(self.data[self.mapDict[channel]])[0]
 
@@ -387,39 +389,39 @@ class Data:
 
         ##### Check whether maximum out of Range #####
         if (maxCompare > float(maxValue)) == True:
-          self._output_oor(channel, maxValue, 'above required maximum', ChannelData, File)       
+          self._output_oor(channel, maxValue, 'above required maximum', channel_data, File)       
 
         ##### Check whether minimum out of Range #####
         if (minCompare < float(minValue)) == True:
-          self._output_oor(channel, minValue, 'below required minimum', ChannelData, File)
+          self._output_oor(channel, minValue, 'below required minimum', channel_data, File)
 
     # Clear Variables
     channel, maxValue, minValue, maxCompare, minCompare = None, None, None, None, None
 
   # oor = Out of Range
-  def _output_oor(self, channel, Value, ErrorString, ChannelData, File):   
+  def _output_oor(self, channel, Value, ErrorString, channel_data, File):   
 
-    self.logDict['error'] = "%s is %s of %s %s in %s" % (self.mapDict[channel], ErrorString, str(Value), ChannelData[channel]['unit'], File)
-    raise Exception ("%s is %s of %s %s in %s" % (self.mapDict[channel], ErrorString, str(Value), ChannelData[channel]['unit'], File))
+    self.logDict['error'] = "%s is %s of %s %s in %s" % (self.mapDict[channel], ErrorString, str(Value), channel_data[channel]['unit'], File)
+    raise Exception ("%s is %s of %s %s in %s" % (self.mapDict[channel], ErrorString, str(Value), channel_data[channel]['unit'], File))
 
 
 
 class FullLoad(Data):
 
-  def __init__(self, dataFile):
-    super().__init__(dataFile)
+  def __init__(self, data_file):
+    super().__init__(data_file)
 
 
 class ZeroSpan(Data):
 
-  def __init__(self, dataFile):
-    super().__init__(dataFile)
+  def __init__(self, data_file):
+    super().__init__(data_file)
 
 
-  def _create_mapDict(self, ChannelData):
+  def _create_mapDict(self, channel_data):
 
-    self.Channel = self._bench_channel(ChannelData)
-    return super()._create_mapDict(ChannelData)
+    self.Channel = self._bench_channel(channel_data)
+    return super()._create_mapDict(channel_data)
 
 
   def _create_mapDict_util(self, channel, channelNames, multipleBenches, optional, data, fileName, mapDict):
@@ -440,12 +442,12 @@ class ZeroSpan(Data):
     name = None
 
 
-  def _bench_channel(self, ChannelData):
+  def _bench_channel(self, channel_data):
 
     BenchList = {}
 
     ##### Scrape Species-List to identify Ebench-Channel #####
-    for channel in ChannelData.items():
+    for channel in channel_data.items():
       if channel[1]['multiple_benches'] == True:
         BenchList[channel[0]] = channel[1]['channel_names'][0]       
 
@@ -458,14 +460,14 @@ class ZeroSpan(Data):
         return ''    
 
 
-  def check_ranges(self, ChannelData, File):
+  def check_ranges(self, channel_data, File):
 
     for channel in self.mapDict:       
       if channel != 'Carbon_Monoxide_Dry':
 
         ##### Read Max/Min-Vaues from json-file #####
-        maxValue = ChannelData[channel]['maximum_value'] * 1.05 # Span can go 5% over the Bottle Concentration
-        minValue = ChannelData[channel]['maximum_value'] * -0.05 # Span can go 5% over the Bottle Concentration
+        maxValue = channel_data[channel]['maximum_value'] * 1.05 # Span can go 5% over the Bottle Concentration
+        minValue = channel_data[channel]['maximum_value'] * -0.05 # Span can go 5% over the Bottle Concentration
 
         ##### Load Values from Data #####
         maxCompare = np.nanmax(self.data[self.mapDict[channel]])[0]
@@ -473,11 +475,11 @@ class ZeroSpan(Data):
 
         ##### Check whether maximum out of Range #####
         if (maxCompare > float(maxValue)) == True:
-          self._output_oor(channel, maxValue, 'above required maximum', ChannelData, File)       
+          self._output_oor(channel, maxValue, 'above required maximum', channel_data, File)       
 
         ##### Check whether minimum out of Range #####
         if (minCompare < float(minValue)) == True:
-          self._output_oor(channel, minValue, 'below required minimum', ChannelData, File)
+          self._output_oor(channel, minValue, 'below required minimum', channel_data, File)
 
     # Clear Variables
     channel, maxValue, minValue, maxCompare, minCompare = None, None, None, None, None        
@@ -486,14 +488,14 @@ class ZeroSpan(Data):
 
 class TestData(Data):
 
-  def __init__(self, dataFile, CycleType):
-    super().__init__(dataFile)
+  def __init__(self, data_file, CycleType):
+    super().__init__(data_file)
     self.CycleType = CycleType
 
 
-  def _load_data_units(self, RawData):
+  def _load_data_units(self, raw_data):
 
-    [data, units] = super()._load_data_units(RawData)
+    [data, units] = super()._load_data_units(raw_data)
 
     if self.CycleType == 'Steady State':
       data = self._load_steady_state(data)
@@ -644,12 +646,12 @@ class CycleValidator:
             denominator = denominator + ((y - ymean) ** 2)
                 
         if np.isnan(numerator/denominator) == True:
-          Slope = 1
+          slope = 1
         else:
-          Slope = numerator / denominator 
+          slope = numerator / denominator 
 
         # -- Regression Intercept -- EPA 1065.602-10 
-        Intercept = (xmean - (Slope * ymean))
+        Intercept = (xmean - (slope * ymean))
 
         # -- Regression Standard Error of Estimate -- EPA 1065.602-11 
         sumat = 0.0

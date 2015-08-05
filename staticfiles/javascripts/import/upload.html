@@ -1,39 +1,3 @@
-<style>
-  .btn-file {
-    position: relative;
-    overflow: hidden;
-    left:0px
-  }
-  .btn-file input[type=file] {
-    position: absolute;
-    top: 0;
-    right: 0;
-    min-width: 100%;
-    min-height: 100%;
-    font-size: 100px;
-    text-align: right;
-    filter: alpha(opacity=0);
-    opacity: 0;
-    background: red;
-    cursor: inherit;
-    display: block;
-
-  }
-  input[readonly] {
-    background-color: white !important;
-    cursor: text !important;
-  }
-  .regoutput {
-    width: 130px;
-  }
-  .progress{
-    margin-top: 10px;
-    margin-left: 15px;
-    width: 365px;
-    height: 20px;
-  }
-
-</style>
 <div style="row">
   <div class="col-md-12">
     <div class="col-md-7">                
@@ -46,7 +10,7 @@
             <h4>Full Load</h4>
             <table>
               <td>
-                <span class="btn btn-primary btn-file">Browse <input ng-click = "filetype='full'" type="file" multiple="multiple" nv-file-select="" uploader="uploader" name="file" /></span>  
+                <span class="btn btn-primary btn-file">Browse <input type="file" multiple="multiple" nv-file-select="" uploader="uploader" name="file" /></span>  
               </td>
               <td width="120px">
                 <div class="progress">
@@ -88,7 +52,7 @@
             <h4>Pre-Zero/Span</h4>
             <table>
               <td>
-                <span class="btn btn-primary btn-file">Browse <input type="file" ng-click="filetype='pre'" multiple="multiple" nv-file-select="" uploader="uploader" name="file" /></span>  
+                <span class="btn btn-primary btn-file">Browse <input type="file" multiple="multiple" nv-file-select="" uploader="uploader" name="file" /></span>  
               </td>
               <td width="120px">
                 <div class="progress">
@@ -130,7 +94,7 @@
             <h4>Test</h4>
             <table>
               <td>
-                <span class="btn btn-primary btn-file">Browse <input type="file" multiple="multiple" ng-click="filetype='test'" nv-file-select="" uploader="uploader" name="file" /></span>  
+                <span class="btn btn-primary btn-file">Browse <input type="file" multiple="multiple" nv-file-select="" uploader="uploader" name="file" /></span>  
               </td>
               <td width="120px">
                 <div class="progress">
@@ -172,7 +136,7 @@
             <h4>Post-Zero/Span</h4>
             <table>
               <td>
-                <span class="btn btn-primary btn-file">Browse <input type="file" multiple="multiple" ng-click="filetype='post'" nv-file-select="" uploader="uploader" name="file" /></span>  
+                <span class="btn btn-primary btn-file">Browse <input type="file" multiple="multiple" nv-file-select="" uploader="uploader" name="file" /></span>  
               </td>
               <td width="120px">
                 <div class="progress">
@@ -220,6 +184,17 @@
             <h2 class="panel-title">Regression</h2>
           </div>
           <div class="panel-body">
+            <div class="form-group">
+              <select class="form-control" id="sel1">
+                <option value=0>No Omissions</option>
+                <option value=1>Omit 1 (Power & Torque)</option>
+                <option value=2>Omit 2 (Power & Speed)</option>
+                <option value=3>Omit 3.1 (Power & Torque)</option>
+                <option value=4>Omit 3.2 (Power & Speed)</option>
+                <option value=5>Omit 4.1 (Power & Torque)</option>                                    
+                <option value=6>Omit 4.2 (Power & Speed)</option>            
+              </select>
+            </div>      
             <div class="col-xs-4 ">
               <h4>Power</h4> Intercept
               <h4><span class="label {{label_powerI}}">{{powerI}}</span></h4>
@@ -227,7 +202,7 @@
               <h4><span class="label {{label_powerr}}">{{powerr}}</span></h4>
               Slope
               <h4><span class="label {{label_powers}}">{{powers}}</span></h4>
-              Standard Error
+              Std. Error
               <h4><span class="label {{label_powerse}}">{{powerse}}</span></h4>
             </div>
             <div class="col-xs-4">
@@ -237,7 +212,7 @@
               <h4><span class="label {{label_speedr}}">{{speedr}}</span></h4>
               Slope
               <h4><span class="label {{label_speeds}}">{{speeds}}</span></h4>
-              Standard Error
+              Std. Error
               <h4><span class="label {{label_speedse}}">{{speedse}}</span></h4>
             </div>
             <div class="col-xs-4">
@@ -247,25 +222,50 @@
               <h4><span class="label {{label_torquer}}">{{torquer}}</span></h4>
               Slope
               <h4><span class="label {{label_torques}}">{{torques}}</span></h4>
-              Standard Error
+              Std. Error
               <h4><span class="label {{label_torquese}}">{{torquese}}</span></h4>
             </div>            
           </div>
+          <button type="button" class="btn btn-default" style="margin-bottom:10px;margin-left:10px" ng-click="Regression()">Update</button>
         </div>
-        <div class="form-group">
-          <select class="form-control" id="sel1">
-            <option value=0>W/o omit</option>
-            <option value=1>Omit 1 (Power & Torque)</option>
-            <option value=2>Omit 2 (Power & Speed)</option>
-            <option value=3>Omit 3.1 (Power & Torque)</option>
-            <option value=4>Omit 3.2 (Power & Speed)</option>
-            <option value=5>Omit 4.1 (Power & Torque)</option>                                    
-            <option value=6>Omit 4.2 (Power & Speed)</option>            
-          </select>
-        </div>      
-        <hr>
-        <button type="button" class="btn btn-default" ng-click="Regression()">Regression</button>
       </div>
     </div>
   </div>
 </div>
+<style>
+  .btn-file {
+    position: relative;
+    overflow: hidden;
+    left:0px
+  }
+  .btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    background: red;
+    cursor: inherit;
+    display: block;
+
+  }
+  input[readonly] {
+    background-color: white !important;
+    cursor: text !important;
+  }
+  .regoutput {
+    width: 130px;
+  }
+  .progress{
+    margin-top: 10px;
+    margin-left: 15px;
+    width: 365px;
+    height: 20px;
+  }
+
+</style>
+

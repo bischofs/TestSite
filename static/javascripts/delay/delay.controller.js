@@ -114,10 +114,10 @@
                     $scope.labels = _.keys($scope.spec[$scope.Array['NOx']]).splice(50+data.Array['NOx'], 100);
                     $scope.data = [_.values($scope.spec[$scope.Array['NOx']]).splice(50+data.Array['NOx'], 100), _.values($scope.spec.Engine_Torque).splice(50, 100)];
                     $scope.currentSpec = $scope.spec[$scope.Array['NOx']];            
-                    toastr.success('Preparation for Delay finished!');            
+                    //toastr.success('Preparation for Delay finished!');            
                 })
                 .error(function(response) {
-                    toastr.error(response.responseJSON.message, 'Preparation for Delay failed!');
+                    toastr.error(response.responseJSON.message, 'Preparation for alignment failed, try clearing and re-uploading data');
                 });
         };
 

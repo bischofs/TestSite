@@ -7,7 +7,7 @@
         ]);
 
     angular.module('TestSite.infobox.services', []);
-    angular.module('TestSite.infobox.controllers', ['angularFileUpload', 'toastr']);
+    angular.module('TestSite.infobox.controllers', ['angularFileUpload', 'ngAnimate', 'toastr']);
 
 
 

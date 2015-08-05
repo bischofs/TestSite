@@ -39,8 +39,9 @@
     * @desc Log the user in
     * @memberOf TestSite.authentication.controllers.LoginController
     */
-    function login() {
-      Authentication.login(vm.email, vm.password);
+    function login() { 
+
+      $scope.promise = Authentication.login(vm.email, vm.password);
     }
   }
 })();
