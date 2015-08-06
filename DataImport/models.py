@@ -652,44 +652,44 @@ class CycleValidator:
 
     def _regression_util(self, channel, X, Y):
 
-        _ymean = vars(self)[Y].mean()
-        _xmean = vars(self)[X].mean()
+        ymean = vars(self)[Y].mean()
+        xmean = vars(self)[X].mean()
 
         # -- Regression Slope -- EPA 1065.602-9   
-        _numerator, _denominator = 0.0, 0.0
+        numerator, denominator = 0.0, 0.0
         for x, y in zip(vars(self)[X], vars(self)[Y]):
-            _numerator = _numerator + ((x - _xmean) * (y - _ymean))
+            numerator = numerator + ((x - xmean) * (y - ymean))
         for x, y in zip(vars(self)[X], vars(self)[Y]):
-            _denominator = _denominator + ((y - _ymean) ** 2)
+            denominator = denominator + ((y - ymean) ** 2)
                 
-        if np.isnan(_numerator/_denominator) == True:
-          _slope = 1
+        if np.isnan(numerator / denominator) == True:
+          slope = 1
         else:
-          _slope = _numerator /_denominator 
+          slope = _numerator / denominator 
 
         # -- Regression Intercept -- EPA 1065.602-10 
-        _intercept = (_xmean - (_slope * _ymean))
+        intercept = (_xmean - (_slope * _ymean))
 
         # -- Regression Standard Error of Estimate -- EPA 1065.602-11 
-        _sumat = 0.0
+        sumat = 0.0
         for x, y in zip(vars(self)[X], vars(self)[Y]):
-            _sumat = _sumat + ((x - _intercept - (_slope * y)) ** 2)
-        _see = _sumat / (vars(self)[X].size - 2)
-        _standerror = math.sqrt(_see)
+            sumat = sumat + ((x - intercept - (slope * y)) ** 2)
+        see = _sumat / (vars(self)[X].size - 2)
+        standerror = math.sqrt(see)
 
         # -- Regression Coefficient of determination -- EPA 1065.602-12
-        _numerator, _denominator = 0.0, 0.0
+        numerator, denominator = 0.0, 0.0
         for x, y in zip(vars(self)[X], vars(self)[Y]):
-            _numerator = _numerator + ((x - _intercept - (_slope * y)) ** 2)
+            numerator = numerator + ((x - intercept - (slope * y)) ** 2)
         for x, y in zip(vars(self)[X], vars(self)[Y]):
-            _denominator = _denominator + ((x - _ymean) ** 2)
+            denominator = denominator + ((x - ymean) ** 2)
                 
-        _r2 = 1 - (_numerator / _denominator)
+        r2 = 1 - (numerator / denominator)
 
-        self.reg_results[channel]['Slope'] = round(_slope, 2)
-        self.reg_results[channel]['Intercept'] = round(_intercept, 2)
-        self.reg_results[channel]['Standard Error'] = round(_standerror, 2)
-        self.reg_results[channel]['Rsquared'] = round(_r2, 2)
+        self.reg_results[channel]['Slope'] = round(slope, 2)
+        self.reg_results[channel]['Intercept'] = round(intercept, 2)
+        self.reg_results[channel]['Standard Error'] = round(standerror, 2)
+        self.reg_results[channel]['Rsquared'] = round(r2, 2)
 
 
     def _regression_validation(self):
