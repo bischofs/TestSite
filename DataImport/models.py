@@ -66,7 +66,7 @@ class DataHandler:
 
     ##### Load File #####
     [master_meta_data, master_file_name] = file_type.load_data(raw_data, self.master_meta_data, self.master_file_name, self.master_dict, self.channel_data)
-    setattr(self,self.file_dict[file_type_string], file_type)
+    setattr(self,self.file_dict[self.file_type_string], file_type)
 
     ##### Set MasterFile #####
     if (self.master_file_name == None):
@@ -90,14 +90,14 @@ class DataHandler:
     cycle = meta_data['CycleType1065'][0]
     cycle_attr['Cycle'] = cycle
     cycle_attr['EbenchID'] = meta_data['EbenchID'][0]
-    cycle_attr['Name'] = cycles_data[Cycle]['Name']    
-    cycle_attr['Engine'] = cycles_data[Cycle]['Engine']
-    cycle_attr['CycleType'] = cycles_data[Cycle]['CycleType']
+    cycle_attr['Name'] = cycles_data[cycle]['Name']    
+    cycle_attr['Engine'] = cycles_data[cycle]['Engine']
+    cycle_attr['CycleType'] = cycles_data[cycle]['CycleType']
     if(cycle_attr['CycleType'] == 'Transient'):
-      cycle_attr['CycleLength'] = cycles_data[Cycle]['CycleLength']
-    cycle_attr['Fuel'] = cycles_data[Cycle]['Fuel']
-    cycle_attr['FactorMult'] = cycles_data[Cycle]['NOxFactorMult']
-    cycle_attr['FactorAdd'] = cycles_data[Cycle]['NOxFactorAdd']
+      cycle_attr['CycleLength'] = cycles_data[cycle]['CycleLength']
+    cycle_attr['Fuel'] = cycles_data[cycle]['Fuel']
+    cycle_attr['FactorMult'] = cycles_data[cycle]['NOxFactorMult']
+    cycle_attr['FactorAdd'] = cycles_data[cycle]['NOxFactorAdd']
       
     return cycle_attr
 
@@ -120,15 +120,15 @@ class DataHandler:
       ##### Create MaterDict, Set Co-Channel, Load E-Bench-Data #####
       self.master_dict = self._create_master_dict(attrs)
       
-      if len(self.ebenches.filter(ebench_id=self.cycle_attr['EbenchID'])) == 0:
+      if len(self.ebenches.filter(EbenchID=self.cycle_attr['EbenchID'])) == 0:
         raise Exception("Cannot find associated Ebench in database, please contact Emissions group")
       else:
-        self.ebench_data = self._load_ebench(self.ebenches.filter(ebench_id=self.cycle_attr['EbenchID'])[0].history, self.test_data.time_stamp)
+        self.ebench_data = self._load_ebench(self.ebenches.filter(EbenchID=self.cycle_attr['EbenchID'])[0].history, self.test_data.time_stamp)
       
       ##### Check Channel-Ranges of all files #####
       self.channel_data = self._set_channel_data()
       for file in attrs:
-        vars(self)[File].check_ranges(self.channel_data, file)###SOMETHING STRANGE HERE 
+        vars(self)[file].check_ranges(self.channel_data, file)###SOMETHING STRANGE HERE 
 
 
   def _set_channel_data(self):
@@ -181,10 +181,6 @@ class DataHandler:
 
   def _load_ebench(self, ebenches, time_stamp):
 
-    ############### HARD CODED TIMESTAMP #######################
-    time_stamp = time.time()
-    ############################################################
-
     ebench_data = {}    
     for ebench_set in ebenches.values():
       if ebench_set['history_date'].timestamp() < time_stamp :
@@ -195,7 +191,7 @@ class DataHandler:
         ebench_data['Pchiller'] = ebench_set['Thermal_Absolute_Pressure']
         ebench_data['xTHC[THC_FID]init'] = ebench_set['THC_Initial_Contamination']
         ebench_data['Bottle_Concentration_CO2'] = ebench_set['Bottle_Concentration_CO2']/10000 # ppm --> %
-        if 'COH' in self.master_dict['Carbon_Monoxide_Dry']:##ASK ANTON WHAT IS GOING ON HERE!!!!!
+        if 'COH' in self.master_dict['Carbon_Monoxide_Dry']:
           ebench_data['Bottle_Concentration_CO'] = ebench_set['Bottle_Concentration_COH']/10000 # ppm --> %
         else:
           ebench_data['Bottle_Concentration_CO'] = ebench_set['Bottle_Concentration_COL']
@@ -326,7 +322,7 @@ class Data:
           else:
             self._create_map_dict_util(channel[0], channel[1]['channel_names'], False, channel[1]['optional'], self.data, self.file_name, map_dict)
         else:
-          self._create_map_dict_util(channel[0], channel[1]['channel_names'], False, channel[1]['optional'], self.metaData, self.file_name, map_dict)            
+          self._create_map_dict_util(channel[0], channel[1]['channel_names'], False, channel[1]['optional'], self.meta_data, self.file_name, map_dict)            
           
 
     # Clear Variables
@@ -335,7 +331,7 @@ class Data:
     return map_dict
 
 
-  def _create_map_dict_util(self, channel, channel_names, optional, data, file_name, map_dict):   
+  def _create_map_dict_util(self, channel, channel_names, multiple_benches, optional, data, file_name, map_dict):   
 
     ##### For Loop through all entries of of map_dict        
     for name in channel_names:
@@ -511,7 +507,7 @@ class TestData(Data):
     data_steady.Time[0] = data.Time[0]
 
     # Clear Variables
-    Torque71_6r, Date, Time = None, None, None #ASK ANTON ABOUT THIS
+    torque_71_6r = None
 
     return data_steady   
 
