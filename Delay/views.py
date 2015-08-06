@@ -17,14 +17,14 @@ class DelayView(views.APIView):
 
         try:
             cache = caches['default']
-            dataHandler = cache.get(request.session.session_key)
+            data_handler = cache.get(request.session.session_key)
 
-            delayPrep = DelayPrep(dataHandler.resultsLog['Data Alignment'], dataHandler.testData.data, dataHandler.masterDict)
-            if dataHandler.resultsLog['Data Alignment']['Data'].empty:
-                dataHandler.resultsLog['Data Alignment']['Data'] = delayPrep.Copy
-            js = delayPrep.create_windows()
+            delay_prep = DelayPrep(data_handler.resultsLog['Data Alignment'], data_handler.test_data.data, data_handler.master_dict)
+            if data_handler.results_log['Data Alignment']['Data'].empty:
+                data_handler.results_log['Data Alignment']['Data'] = delay_prep.Copy
+            js = delay_prep.create_windows()
 
-            cache.set(request.session.session_key, dataHandler)
+            cache.set(request.session.session_key, data_handler)
                 
             return Response(js,status=200)
 
@@ -41,15 +41,15 @@ class DelayView(views.APIView):
         try:
 
             cache = caches['default']
-            dataHandler = cache.get(request.session.session_key)
+            data_handler = cache.get(request.session.session_key)
 
-            if request.DATA['delay'] != dataHandler.resultsLog['Data Alignment']['Array']:
-                Submit = DelaySubmit(dataHandler.testData.data, dataHandler.masterDict, request.DATA['delay'], dataHandler.CycleAttr['CycleLength'])
-                dataHandler.testData.data = Submit.Data
-                dataHandler.resultsLog['Data Alignment']['Array'] = request.DATA['delay']
-                dataHandler.DoCalculation = True
+            if request.DATA['delay'] != data_handler.results_log['Data Alignment']['Array']:
+                submit = DelaySubmit(data_handler.test_data.data, data_handler.master_dict, request.DATA['delay'], data_handler.cycle_attr['CycleLength'])
+                data_handler.test_data.data = submit.data
+                data_handler.results_log['Data Alignment']['Array'] = request.DATA['delay']
+                data_handler.do_calculation = True
 
-            cache.set(request.session.session_key, dataHandler)
+            cache.set(request.session.session_key, data_handler)
                 
             return Response(status=200)
 
