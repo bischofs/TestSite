@@ -1,4 +1,3 @@
-
 import json
 
 from django.core.cache import caches
@@ -20,30 +19,26 @@ class FileUploadView(views.APIView):
     #Each cached file will have a timeout of 10 minutes
     #the final  container will timeout at 8 hours in the cache
 
-
     parser_classes = (FormParser,MultiPartParser)
 
     def post(self, request, format=None):
-
         
-        try:
-            
+        try:            
             cache = caches['default']
-
             request.session.set_test_cookie()
 
             if(not cache.get(request.session.session_key)):
-                dataHandler = DataHandler()
+                data_handler = DataHandler()
             else:
-                dataHandler = cache.get(request.session.session_key)
+                data_handler = cache.get(request.session.session_key)
 
-            dataHandler.import_data(request.data['file'])
-            jsonDict = {'errors': dataHandler.log, 'CycleAttr': dataHandler.CycleAttr,'FilesLoaded':dataHandler.allFilesLoaded,'File':dataHandler.File}
+            data_handler.import_data(request.data['file'])
+            json_dict = {'errors': data_handler.log, 'CycleAttr': data_handler.cycle_attr,'FilesLoaded':data_handler.all_files_loaded,'File':data_handler.file_type_string}
 
-            cache.set(request.session.session_key, dataHandler)
+            cache.set(request.session.session_key, data_handler)
             
-            jsonLog = json.dumps(jsonDict)
-            return Response(jsonLog, status=200)
+            json_log = json.dumps(json_dict)
+            return Response(json_log, status=200)
             
         except Exception as e:
          
@@ -56,28 +51,27 @@ class FileUploadView(views.APIView):
     def get(self, request):
 
         try:
-            
             ##### Read in the choice to omit #####
-            OmitChoice = int(request.QUERY_PARAMS['choice'])
+            omit_choice = int(request.QUERY_PARAMS['choice'])
 
             cache = caches['default']
-            dataHandler = cache.get(request.session.session_key)
+            data_handler = cache.get(request.session.session_key)
 
-            cycleValidator = CycleValidator(dataHandler.testData, dataHandler.masterDict,
-                                            dataHandler.fullLoad, dataHandler.fullLoad.metaData['n_CurbIdle'], OmitChoice)
+            cycle_validator = CycleValidator(data_handler.test_data, data_handler.master_dict,
+                                            data_handler.full_load, data_handler.full_load.meta_data['n_CurbIdle'], omit_choice)
 
             ##### Saving Results in Log #####
-            dataHandler.resultsLog['Regression'] = [cycleValidator.reg_results,cycleValidator.FilterChoice]
-            dataHandler.resultsLog['Regression_bool'] = cycleValidator.reg_results_bool      
+            data_handler.results_log['Regression'] = [cycle_validator.reg_results, cycle_validator.filter_choice]
+            data_handler.results_log['Regression_bool'] = cycle_validator.reg_results_bool
 
             ##### Saving Results in Json-File #####
-            jsonDict = {'Regression':cycleValidator.reg_results,
-                        'Regression_bool':cycleValidator.reg_results_bool,
-                        'errors': dataHandler.log}
-            cache.set(request.session.session_key, dataHandler)            
-            jsonLog = json.dumps(jsonDict)
+            json_dict = {'Regression':cycle_validator.reg_results,
+                        'Regression_bool':cycle_validator.reg_results_bool,
+                        'errors': data_handler.log}
+            cache.set(request.session.session_key, data_handler)            
+            json_log = json.dumps(json_dict)
 
-            return Response(jsonLog, status=200)
+            return Response(json_log, status=200)
 
         except Exception as e:        
         
@@ -99,8 +93,8 @@ class MetaDataView(views.APIView):
         if(not cache.get(request.session.session_key)):
             return Response({'message':'No Data available!'}, status=200) 
         else:
-            dataHandler = cache.get(request.session.session_key)
-            dataHandler = None
-            cache.set(request.session.session_key, dataHandler)
+            data_handler = cache.get(request.session.session_key)
+            data_handler = None
+            cache.set(request.session.session_key, data_handler)
             return Response({'message':'Data cleared!'}, status=200)
         

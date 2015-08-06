@@ -24,11 +24,12 @@ class DataHandler:
     self.master_meta_data = pd.DataFrame()
     self.master_file_name = None
     self.all_files_loaded = False
+    self.file_type_string = None
     self.do_calculation = True
     self.master_dict = {}
     self.cycle_attr = {}
     self.log = {}
-
+    
 
   def import_data(self, data_file):   
 
@@ -45,22 +46,22 @@ class DataHandler:
       raise Exception("Problem parsing data in file %s" (data_file.file))
 
     if('CycleState1065'in raw_data.columns.values):
-      file_type_string = raw_data[:1]['CycleState1065'][0] # Reads the filetype out of header page
+      self.file_type_string = raw_data[:1]['CycleState1065'][0] # Reads the filetype out of header page
     else:
       raise Exception("MetaData missing CycleState1065, cannot detect cycle state in %s" (data_file.file))
 
     ##### Create FileClass #####
-    if file_type_string == 'FULL':
+    if self.file_type_string == 'FULL':
       file_type = FullLoad(data_file)
 
-    elif file_type_string == 'PRE':
+    elif self.file_type_string == 'PRE':
       file_type = ZeroSpan(data_file)
 
-    elif file_type_string == 'MAIN':
+    elif self.file_type_string == 'MAIN':
       self.cycle_attr = self._load_cycle_attr(self.cycle_attr, raw_data[:1], self.cycles_data)
       file_type = TestData(data_file, self.cycle_attr['CycleType'])
 
-    elif file_type_string == 'POST':
+    elif self.file_type_string == 'POST':
       file_type = ZeroSpan(data_file)
 
     ##### Load File #####
@@ -220,7 +221,7 @@ class DataHandler:
       init_string = init_string + 'Timestamp of Pre-ZeroSpan is too early. '
 
     if init_string != 'Timestamp-Check Failed ! : ':
-      raise Exception (String)
+      raise Exception (init_string)
 
 
 class Data:
@@ -413,7 +414,7 @@ class ZeroSpan(Data):
 
   def _create_map_dict(self, channel_data):
 
-    self.Channel = self._bench_channel(channel_data)
+    self.channel = self._bench_channel(channel_data)
     return super()._create_map_dict(channel_data)
 
 
@@ -521,7 +522,7 @@ class CycleValidator:
     def __init__(self, test_data, map_dict, full_load, warm_idle, filter_choice):
 
       ##### Load Data #####
-      self._filter_choice = filter_choice
+      self.filter_choice = filter_choice
       self._data = test_data.data
       self._data_full = Fullload.data
       self._data_full.index = range(0,len(self.data_full))
@@ -535,14 +536,14 @@ class CycleValidator:
       self._speed_demand = self._data[self._map_dict['Commanded_Speed']]
       self._speed_engine = self._data[self._map_dict['Engine_Speed']]
       self._power_demand = (self._data[self._map_dict['Commanded_Torque']] * self._data[self._map_dict['Commanded_Speed']] / 9.5488) / 1000
-      self._power_engine = self.-data[self._map_dict['Engine_Power']]
-      self.data = None
+      self._power_engine = self._data[self._map_dict['Engine_Power']]
+      self._data = None
 
       ##### Maximum of Speed, Torque, Power and warm idle #####
       self._speed_max = np.nanmax(self._data_full[self._map_dict['Engine_Speed']])[0]
       self._torque_max = np.nanmax(self._data_full[self._map_dict['Engine_Torque']])[0]
       self._power_max = np.nanmax(self._data_full[self._map_dict['Engine_Power']])[0]
-      self._warm_idle = Warmidle[0]
+      self._warm_idle = warm_idle[0]
       self._data_full = None
         
       ##### Index of Maximum and Minimum _throttle #####
@@ -560,7 +561,7 @@ class CycleValidator:
                          'Speed': ['_speed_demand', '_speed_engine']}
 
       if (self.filter_choice != 0):
-        self._pre_regression_filter(self._filter_choice)        
+        self._pre_regression_filter(self.filter_choice)        
       self._regression()
       self._regression_validation()
 
@@ -631,7 +632,7 @@ class CycleValidator:
         self._power_demand.index = range(0,len(self._power_demand))
 
         ##### Cleaning Variables #####
-        self._throttle, self.Index_Min = None, None
+        self._throttle, self._index_Min = None, None
         self._torque_drop, self._speed_drop, self._power_drop = None, None, None
        
 
