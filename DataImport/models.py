@@ -292,7 +292,7 @@ class Data:
       raise Exception('The file is not raw data. Please upload raw data from LabCentral.')
     
 
-  def _check_metadata(self, meta_data, FileName, master_meta_data, master_file_name):
+  def _check_metadata(self, meta_data, file_name, master_meta_data, master_file_name):
 
     skip = ['N_TR','no_run','Comment1','Comment2','Proj#', 'N_TQ', 'CycleCondition1065','CycleState1065', 'N_FLAG2'] # Remove CycleCondition later e.g COS = Coldstart
 
