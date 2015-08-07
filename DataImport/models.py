@@ -169,6 +169,7 @@ class DataHandler:
       master_dict[co] = master_dict[coh]
     else:
       master_dict[co] = master_dict[col]
+      self.test_data.data[master_dict[co]] = self.test_data.data[master_dict[co]]/10000
   
     del master_dict[col]
     del master_dict[coh]
