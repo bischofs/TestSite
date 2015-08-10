@@ -289,7 +289,7 @@
         },
         "Relative_Humidity": {
             "unit": "%",
-            "maximum_value": 50,
+            "maximum_value": 80,
             "minimum_value": 10,
             "multiple_benches": false,
             "header_data": false,

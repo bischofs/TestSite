@@ -521,7 +521,7 @@ class CycleValidator:
       ##### Load Data #####
       self.filter_choice = filter_choice
       self._data = test_data.data
-      self._data_full = Fullload.data
+      self._data_full = full_load.data
       self._data_full.index = range(0,len(self.data_full))
       self._data.index = range(0,len(self.data))
       self._map_dict = map_dict
