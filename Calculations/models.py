@@ -187,7 +187,7 @@ class Preparation:
 
       for i in range(0,len(ColumnZero)):
 
-          if ColumnZero[i]> ZeroSpan[spec]['Chosen']*0.001: # Acceptable Range of noise 0.1%
+          if ColumnZero[i]> ZeroSpan[spec]['Chosen']*0.01: # Acceptable Range of noise 1%
               ColumnZero = ColumnZero.drop(i)
 
           if (ColumnSpan[i]< ZeroSpan[spec]['Chosen']*0.98) | (ColumnSpan[i] > ZeroSpan[spec]['Chosen']*1.02): # Acceptable Range of noise +-2%
@@ -642,10 +642,10 @@ class Report:
 
         ##### Write Emissions in Report ######
         self.sheet = self._write_emissions(self.sheet, self.DriftUncorrected, self.DriftCorrected, self.Final, ArraySumUn, ArraySumCor, ArraySumCorWon, Species)
-        self.sheet = self._write_first_page(self.sheet, DataHandler.resultsLog, CalculatorLog['ZeroSpan'], DelayArray, Species, DataHandler.CycleAttr, DataHandler.ebenchData)
+        self.sheet = self._write_first_page(self.sheet, DataHandler.results_log, CalculatorLog['ZeroSpan'], DelayArray, Species, DataHandler.cycle_attr, DataHandler.ebench_data)
 
         ##### Write Data according to choosen options #####
-        self.sheet2 = self._write_dataframe(self.sheet2, DataHandler.testData.data)
+        self.sheet2 = self._write_dataframe(self.sheet2, DataHandler.test_data.data)
         self.sheet3 = self._write_dataframe(self.sheet3, Uncorrected)
         self.sheet4 = self._write_dataframe(self.sheet4, Corrected)
 
