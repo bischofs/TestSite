@@ -28,6 +28,9 @@ class CalculationView(views.APIView):
             cache = caches['default']
             data_handler = cache.get(request.session._get_session_key())
 
+            if data_handler is None or not data_handler.all_files_loaded:
+                raise Exception("Calculations not available without all files loaded and verified")
+
             if data_handler.do_calculation == True:
 
                 ##### Initialize Calculation #####
