@@ -641,10 +641,11 @@ class CycleValidator:
  
 
     def _regression_util(self, channel, X, Y):
-
+      
+      
         ymean = vars(self)[Y].mean()
         xmean = vars(self)[X].mean()
-
+        
         # -- Regression Slope -- EPA 1065.602-9   
         numerator, denominator = 0.0, 0.0
         for x, y in zip(vars(self)[X], vars(self)[Y]):
