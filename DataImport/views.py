@@ -56,6 +56,9 @@ class FileUploadView(views.APIView):
 
             cache = caches['default']
             data_handler = cache.get(request.session.session_key)
+        
+            if data_handler is None or not data_handler.all_files_loaded:
+                raise Exception("Regression not available without all files loaded and verified")
 
             cycle_validator = CycleValidator(data_handler.test_data, data_handler.master_dict,
                                             data_handler.full_load, data_handler.full_load.meta_data['n_CurbIdle'], omit_choice)
@@ -91,10 +94,10 @@ class MetaDataView(views.APIView):
         request.session.set_test_cookie()
 
         if(not cache.get(request.session.session_key)):
-            return Response({'message':'No Data available!'}, status=200) 
+            return Response({'message':'No files loaded'}, status=200) 
         else:
             data_handler = cache.get(request.session.session_key)
             data_handler = None
             cache.set(request.session.session_key, data_handler)
-            return Response({'message':'Data cleared!'}, status=200)
+            return Response({'message':'All files cleared'}, status=200)
         

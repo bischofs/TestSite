@@ -28,6 +28,7 @@ class DataHandler:
     self.do_calculation = True
     self.master_dict = {}
     self.cycle_attr = {}
+    self.report = None
     self.log = {}
     
 
