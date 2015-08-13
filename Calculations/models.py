@@ -300,7 +300,7 @@ class Calculation:
 
         # Flows
         Data["mfuel"] = TestData[MapDict["Fuel_Flow_Rate"]]*1000/3600 # kg/h --> g/s
-        Data["Molar Flow Wet"] = TestData.C_FRAIRWS*1000/3600 # kg/h --> g/s
+        Data["Molar Flow Wet"] = TestData[MapDict["Air_Flow_Rate"]]*1000/3600 # kg/h --> g/s
         Data["Intake Air flow"] = Data.get("Molar Flow Wet")/28.96 # g/sec --> mol/sec
 
         # Rest
