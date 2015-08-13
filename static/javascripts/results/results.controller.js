@@ -18,8 +18,6 @@
 
         $scope.Calculation = function() {
 
-            toastr.info('Calculations started!');
-
             $scope.promiseCalc = $http.post('/1065/api/v1/data/calculations/')
                 .success(function(response) {
                     $scope.TbodyVis = 'inline'
@@ -55,6 +53,16 @@
                         };
                         $scope[report.Name[i]+'_visibility'] = 'inline';
                     };
+
+		    $scope.promiseReport = $http.get('/1065/api/v1/data/calculations/')
+			.success(function(response){
+			    toastr.success('Report finished!');
+			    
+			})
+			.error(function(response){
+			    toastr.error(response.message, 'Report failed!');
+			});
+		    
                 })
                 .error(function(response) {
                     toastr.error(response.message, 'Calculations failed!');                    
@@ -62,15 +70,7 @@
         };
 
         $scope.Report = function(){            
-
-            $scope.promiseReport = $http.get('/1065/api/v1/data/calculations/')
-                .success(function(response){
-                    toastr.success('Report finished!');
-		            location.href =('/1065/api/v1/data/calculations/');                    
-                })
-                .error(function(response){
-                    toastr.error(response.message, 'Report failed!');
-                });
+            location.href =('/1065/api/v1/data/calculations/');
         }
 
         function FirstLoad() {

@@ -28,6 +28,9 @@ class CalculationView(views.APIView):
             cache = caches['default']
             data_handler = cache.get(request.session._get_session_key())
 
+            if data_handler is None or not data_handler.all_files_loaded:
+                raise Exception("Calculations not available without all files loaded and verified")
+
             if data_handler.do_calculation == True:
 
                 ##### Initialize Calculation #####
@@ -59,14 +62,14 @@ class CalculationView(views.APIView):
 
             ##### Load dataHandler from Cache #####
             cache = caches['default']
-            data_handler = cache.get(request.session._get_session_key())
+            data_handler = cache.get(request.session.session_key)
 
             ##### Initialize Report #####
             output = io.BytesIO()
             report = Report(data_handler, data_handler.master_dict, data_handler.results_log['Calculation'], data_handler.results_log['Data Alignment']['Array'], output)
 
             ##### Save Session #####
-            cache.set(request.session._get_session_key(), data_handler)
+            cache.set(request.session.session_key, data_handler)
 
             ##### Prepare the Response #####
             report.output.seek(0)
@@ -78,7 +81,7 @@ class CalculationView(views.APIView):
             response['Content-Disposition'] = 'attachment; filename="Final.xlsx"'
             response['Content-length'] = report.output.tell()
 
-            return Response
+            return response
 
         except Exception as e:
 

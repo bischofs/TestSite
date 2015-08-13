@@ -18,18 +18,17 @@ class DelayView(views.APIView):
         try:
             cache = caches['default']
             data_handler = cache.get(request.session.session_key)
-
-            delay_prep = DelayPrep(data_handler.resultsLog['Data Alignment'], data_handler.test_data.data, data_handler.master_dict)
+            delay_prep = DelayPrep(data_handler.results_log['Data Alignment'], data_handler.test_data.data, data_handler.master_dict)
             if data_handler.results_log['Data Alignment']['Data'].empty:
-                data_handler.results_log['Data Alignment']['Data'] = delay_prep.Copy
+                data_handler.results_log['Data Alignment']['Data'] = delay_prep.copy
             js = delay_prep.create_windows()
-
             cache.set(request.session.session_key, data_handler)
+
                 
             return Response(js,status=200)
 
         except Exception as e:
-
+            
             return Response({
             'status': 'Bad request',
             'message': str(e)

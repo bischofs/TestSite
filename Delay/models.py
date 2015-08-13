@@ -20,7 +20,7 @@ class DelayPrep:
             if "Ammonia_Wet" in map_dict:
                 self.delays.update({'NH3':0})        
                   
-            self.copy = copy.deepcopy(Data)
+            self.copy = copy.deepcopy(data)
             self.data = data
             
         else:

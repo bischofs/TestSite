@@ -28,6 +28,7 @@ class DataHandler:
     self.do_calculation = True
     self.master_dict = {}
     self.cycle_attr = {}
+    self.report = None
     self.log = {}
     
 
@@ -520,33 +521,32 @@ class CycleValidator:
 
       ##### Load Data #####
       self.filter_choice = filter_choice
-      self._data = test_data.data
-      self._data_full = Fullload.data
-      self._data_full.index = range(0,len(self.data_full))
-      self._data.index = range(0,len(self.data))
+      self.data = test_data.data
+      self.data_full = full_load.data
+      self.data_full.index = range(0,len(self.data_full))
+      self.data.index = range(0,len(self.data))
       self._map_dict = map_dict
 
       ##### Define Variables #####     
-      self._throttle = self._data[self._map_dict['Commanded__throttle']]
-      self._torque_demand = self._data[self._map_dict['Commanded_Torque']]
-      self._torque_engine = self._data[self._map_dict['Engine_Torque']] 
-      self._speed_demand = self._data[self._map_dict['Commanded_Speed']]
-      self._speed_engine = self._data[self._map_dict['Engine_Speed']]
-      self._power_demand = (self._data[self._map_dict['Commanded_Torque']] * self._data[self._map_dict['Commanded_Speed']] / 9.5488) / 1000
-      self._power_engine = self._data[self._map_dict['Engine_Power']]
-      self._data = None
+      self._throttle = self.data[self._map_dict['Commanded_Throttle']]
+      self._torque_demand = self.data[self._map_dict['Commanded_Torque']]
+      self._torque_engine = self.data[self._map_dict['Engine_Torque']] 
+      self._speed_demand = self.data[self._map_dict['Commanded_Speed']]
+      self._speed_engine = self.data[self._map_dict['Engine_Speed']]
+      self._power_demand = (self.data[self._map_dict['Commanded_Torque']] * self.data[self._map_dict['Commanded_Speed']] / 9.5488) / 1000
+      self._power_engine = self.data[self._map_dict['Engine_Power']]
+      self.data = None
 
       ##### Maximum of Speed, Torque, Power and warm idle #####
-      self._speed_max = np.nanmax(self._data_full[self._map_dict['Engine_Speed']])[0]
-      self._torque_max = np.nanmax(self._data_full[self._map_dict['Engine_Torque']])[0]
-      self._power_max = np.nanmax(self._data_full[self._map_dict['Engine_Power']])[0]
+      self._speed_max = np.nanmax(self.data_full[self._map_dict['Engine_Speed']])[0]
+      self._torque_max = np.nanmax(self.data_full[self._map_dict['Engine_Torque']])[0]
+      self._power_max = np.nanmax(self.data_full[self._map_dict['Engine_Power']])[0]
       self._warm_idle = warm_idle[0]
-      self._data_full = None
+      self.data_full = None
         
       ##### Index of Maximum and Minimum _throttle #####
       self._index_min = np.where([self._throttle==np.nanmin(self._throttle)[0]])[1]
       self._index_max = np.where([self._throttle==np.nanmax(self._throttle)[0]])[1]
-
 
       ##### Drop Lists #####
       self._torque_drop = []
@@ -566,18 +566,17 @@ class CycleValidator:
     def _pre_regression_filter(self, filter_choice):
 
       for i in self._index_min:
-            
         ##### Check Minimum _throttle ##### -- Table 1 EPA 1065.514
-        if (self._torque_demand[i])<0 and \
+        if (self._torque_demand[i]) < 0 and \
            (filter_choice == 1):
               
           self._torque_drop.append(i)
           self._power_drop.append(i)                  
                 
-        if (self._torque_demand[i]==0) and \
-           (self._speed_demand[i]==0) and \
-           ((self._torque_engine[i]-0.02*self._torque_max)<self._torque_engine[i]) and \
-           (self._torque_engine[i]<(self._torque_engine[i]+0.02*self._torque_max)) and \
+        if (self._torque_demand[i] == 0) and \
+           (self._speed_demand[i] == 0) and \
+           ((self._torque_engine[i] - 0.02 * self._torque_max) < self._torque_engine[i]) and \
+           (self._torque_engine[i] < (self._torque_engine[i] + 0.02 * self._torque_max)) and \
            (filter_choice == 2):
                
           self._speed_drop.append(i)
@@ -596,12 +595,10 @@ class CycleValidator:
           self._speed_drop.append(i)
           self._power_drop.append(i)
             
-      for j in self.Index_Max:
+      for j in self._index_max:
         ##### Check Maximum _throttle ##### -- Table 1 EPA 1065.514                
-        if (self._torque_engine[j]<self._torque_demand[j]) and \
-           (self._torque_engine[j]>(self._torque_engine[j]-0.02*self._torque_max)) and \
-           (filter_choice == 5):
-          
+        if (self._torque_engine[j] < self._torque_demand[j]) and (self._torque_engine[j] > (self._torque_engine[j] - 0.02 * self._torque_max)) and (filter_choice == 5):
+      
           self._torque_drop.append(j)
           self._power_drop.append(j)
 
@@ -612,25 +609,25 @@ class CycleValidator:
           self._speed_drop.append(j)
           self._power_drop.append(j)                    
 
-        ##### Omitting the Data #####
-        self._speed_engine = self._speed_engine.drop(self._speed_drop)
-        self._speed_demand = self._speed_demand.drop(self._speed_drop)
-        self._torque_engine = self._torque_engine.drop(self._torque_drop)
-        self._torque_demand = self._torque_demand.drop(self._torque_drop)
-        self._power_engine = self._power_engine.drop(self._power_drop)
-        self._power_demand = self._power_demand.drop(self._power_drop)            
+      ##### Omitting the Data #####
+      self._speed_engine = self._speed_engine.drop(self._speed_drop)
+      self._speed_demand = self._speed_demand.drop(self._speed_drop)
+      self._torque_engine = self._torque_engine.drop(self._torque_drop)
+      self._torque_demand = self._torque_demand.drop(self._torque_drop)
+      self._power_engine = self._power_engine.drop(self._power_drop)
+      self._power_demand = self._power_demand.drop(self._power_drop)            
 
-        ##### Reindexing the data #####
-        self._torque_engine.index = range(0,len(self._torque_engine))
-        self._torque_demand.index = range(0,len(self._torque_demand))
-        self._speed_engine.index = range(0,len(self._speed_engine))
-        self._speed_demand.index = range(0,len(self._speed_demand))
-        self._power_engine.index = range(0,len(self._power_engine))
-        self._power_demand.index = range(0,len(self._power_demand))
-
-        ##### Cleaning Variables #####
-        self._throttle, self._index_Min = None, None
-        self._torque_drop, self._speed_drop, self._power_drop = None, None, None
+      ##### Reindexing the data #####
+      self._torque_engine.index = range(0,len(self._torque_engine))
+      self._torque_demand.index = range(0,len(self._torque_demand))
+      self._speed_engine.index = range(0,len(self._speed_engine))
+      self._speed_demand.index = range(0,len(self._speed_demand))
+      self._power_engine.index = range(0,len(self._power_engine))
+      self._power_demand.index = range(0,len(self._power_demand))
+      
+      ##### Cleaning Variables #####
+      self._throttle, self._index_min = None, None
+      self._torque_drop, self._speed_drop, self._power_drop = None, None, None
        
 
     def _regression(self):
@@ -644,10 +641,11 @@ class CycleValidator:
  
 
     def _regression_util(self, channel, X, Y):
-
+      
+      
         ymean = vars(self)[Y].mean()
         xmean = vars(self)[X].mean()
-
+        
         # -- Regression Slope -- EPA 1065.602-9   
         numerator, denominator = 0.0, 0.0
         for x, y in zip(vars(self)[X], vars(self)[Y]):
@@ -667,7 +665,7 @@ class CycleValidator:
         sumat = 0.0
         for x, y in zip(vars(self)[X], vars(self)[Y]):
             sumat = sumat + ((x - intercept - (slope * y)) ** 2)
-        see = _sumat / (vars(self)[X].size - 2)
+        see = sumat / (vars(self)[X].size - 2)
         standerror = math.sqrt(see)
 
         # -- Regression Coefficient of determination -- EPA 1065.602-12
