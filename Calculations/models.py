@@ -1,6 +1,7 @@
 from django.db import models
 from Ebench.models import Ebench
 
+import copy
 import pandas as pd
 import statsmodels.api as sm
 import pandas as pd
@@ -49,7 +50,7 @@ class Preparation:
 
 
     ##### Carbon Mass Fraction and Fuel Composition -- CFR 1065.655 #####
-    FuelData = pd.DataFrame(data=np.zeros([20,1]), index=['M_C','M_H','M_O','M_S','M_N','M_HC','M_NMHC','M_NOX','M_CO','M_CO2',
+    FuelData = pd.DataFrame(data=np.zeros([1,20]), columns=['M_C','M_H','M_O','M_S','M_N','M_HC','M_NMHC','M_NOX','M_CO','M_CO2',
                                                            'W_c','W_h','W_o','W_s','W_n','alpha','beta','gamma','delta','xH2Ogas'])
 
     ## Molar masses ##
@@ -64,9 +65,9 @@ class Preparation:
     FuelData.M_CO = 28.0101 # Molar mass of CO
     FuelData.M_CO2 = 44.0095 # Molar mass of CO2
 
-    FuelData.M_N2O = 44.0128 # Molar mass of N20
-    FuelData.M_CH2O = 30.02598 # Molar mass of Formaldehyde
-    FuelData.M_NH3 = 17.03052 # Molar mass of Ammonia
+    FuelData['M_N2O'] = 44.0128 # Molar mass of N20
+    FuelData['M_CH2O'] = 30.02598 # Molar mass of Formaldehyde
+    FuelData['M_NH3'] = 17.03052 # Molar mass of Ammonia
 
     ## Mass fractions ##
     FuelData.W_c = float(HeaderData[MapDict['Mass_Fraction_Carbon']])/100 # Carbon mass fraction of fuel
@@ -86,15 +87,15 @@ class Preparation:
     FuelData.xH2Ogas = 3.5 # Constant Value does not belong to fuel (water-gas reaction equilibrium coefficient)
 
     ##### Choose Factors for xNOxcorrwet Reference: CFR 1065.670, according to Fuel
-    FuelData.FactorMult = CycleAttr['FactorMult']
-    FuelData.FactorAdd = CycleAttr['FactorAdd']
+    FuelData['FactorMult'] = CycleAttr['FactorMult']
+    FuelData['FactorAdd'] = CycleAttr['FactorAdd']
 
     return FuelData
 
 
   def _ebench_data(self, ebenchData,TestData,MapDict):
 
-    EbenchData = pd.DataFrame(data=np.zeros([14,1]),index=['RFPF','CH4_RF','Tchiller','Pchiller','Pamb','Factorchiller',
+    EbenchData = pd.DataFrame(data=np.zeros([1,14]),columns=['RFPF','CH4_RF','Tchiller','Pchiller','Pamb','Factorchiller',
                                                          'xTHC_THC_FID_init','xCO2intdry','xCO2dildry','Bottle_Concentration_CO2',
                                                          'Bottle_Concentration_CO','Bottle_Concentration_NOX','Bottle_Concentration_THC',
                                                          'Bottle_Concentration_NMHC'])
@@ -234,8 +235,8 @@ class Calculation:
         [DataUn, self.ArraySumUn] = self._inner_calc(Preparation, DataUn, MapDict)
 
         ##### Drift-corrected Calc #####
-        PreparationDrift = Preparation
-        PreparationDrift.test = self._drift_correction(DataUn, ZeroSpan, Preparation.test, MapDict)
+        PreparationDrift = copy.deepcopy(Preparation)
+        PreparationDrift.test = self._drift_correction(DataUn, ZeroSpan, PreparationDrift.test, MapDict)
         [DataCor, self.ArraySumCor] = self._inner_calc(PreparationDrift, DataCor, MapDict)
         [self.ArraySumCorWon, self.U_BPOW_Factor] = self._remove_negatives(DataCor, Preparation.test, MapDict)
 
@@ -328,22 +329,22 @@ class Calculation:
         Data["Mmix"] = 28.96559*(1-Data.xH2O)+18.01528*Data.xH2O
         Data["nint (Intake Air Flow)"] = Data.get("Molar Flow Wet")/Data.Mmix
         Data["xH2Ointdry"] = Data.xH2Oint/(1-Data.xH2Oint)
-        Data["xCO2int"] = Ebench.xCO2intdry/(1+Data.xH2Ointdry)
-        Data["xO2int"] = ((0.20982-Ebench.xCO2intdry)/(1+Data.xH2Ointdry))
+        Data["xCO2int"] = Ebench.xCO2intdry[0]/(1+Data.xH2Ointdry)
+        Data["xO2int"] = ((0.20982-Ebench.xCO2intdry[0])/(1+Data.xH2Ointdry))
 
         # Dilution
         Data["xH2Odil"] = Data.xH2O
         Data["xH2Odildry"] = Data.xH2Odil/(1-Data.xH2Odil)
-        Data["xCO2dil"] = Ebench.xCO2dildry/(1+Data.xH2Odildry)
+        Data["xCO2dil"] = Ebench.xCO2dildry[0]/(1+Data.xH2Odildry)
 
         # Rest
-        Data["xTHC[THC_FID]cor"] = Data[MapDict["Total_Hydrocarbons_Wet"]]-Ebench.xTHC_THC_FID_init
+        Data["xTHC[THC_FID]cor"] = Data[MapDict["Total_Hydrocarbons_Wet"]]-Ebench.xTHC_THC_FID_init[0]
         Data[MapDict["Total_Hydrocarbons_Wet"]] = Data["xTHC[THC_FID]cor"]
         Data["xTHCmeas"] = Data[MapDict["Total_Hydrocarbons_Wet"]]/1000000 # ppm --> mol/mol
         Data["xNO2meas"] = Data.xNOxmeas*0 # NO2 not measured
         Data["xNOmeas"] = Data.xNOxmeas*1
         Data["xTHCwet"] = Data.xTHCmeas
-        Data["xNMHCwet"] = (Data.xTHCwet-Data.xCH4wet*Ebench.CH4_RF)/(1-Ebench.RFPF*Ebench.CH4_RF)
+        Data["xNMHCwet"] = (Data.xTHCwet-Data.xCH4wet*Ebench.CH4_RF[0])/(1-Ebench.RFPF[0]*Ebench.CH4_RF[0])
 
         if "Nitrous_Oxide_Wet" in MapDict:
             Data["xN2Owet"] = Data["xN2Omeas"]
@@ -389,18 +390,18 @@ class Calculation:
             # Known Variables
             S = Data.xCO2dil[i]
             T = Data.xCO2int[i]
-            U = Fuel.alpha
+            U = Fuel.alpha[0]
             V = Data.xH2Odil[i]
             W = Data.xH2Oint[i]
             X = Data.xO2int[i]
-            Y = Fuel.beta
-            Z = Fuel.gamma
-            AA = Fuel.delta
+            Y = Fuel.beta[0]
+            Z = Fuel.gamma[0]
+            AA = Fuel.delta[0]
             AB = Data.xCOmeas[i]
             AC = Data.xTHCmeas[i]
             AD = Data.xNOxmeas[i]
             AE = Data.xNO2meas[i]
-            AF = Fuel.xH2Ogas
+            AF = Fuel.xH2Ogas[0]
             AG = Data.xCO2meas[i]
 
             # Equations to solve
@@ -420,10 +421,10 @@ class Calculation:
             eq17 = AG/(1-L)-Q ## Reference: CFR 1065.659
 
             if Mode==0:
-                eq9 = Ebench.Factorchiller-H
-                eq13 = Ebench.Factorchiller-J
-                eq15 = Ebench.Factorchiller-K
-                eq18 = Ebench.Factorchiller-L
+                eq9 = Ebench.Factorchiller[0] - H
+                eq13 = Ebench.Factorchiller[0] - J 
+                eq15 = Ebench.Factorchiller[0] - K
+                eq18 = Ebench.Factorchiller[0] - L
             else:
                 eq9 = B-H
                 eq13 = B-J
@@ -436,12 +437,12 @@ class Calculation:
         ResultList = np.zeros((len(Data),18))
         g = 0.5 # First guess for iteration start
         Solution = (g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g)
-
-        for i in range(0,len(Data)-1):
+        
+        for i in range(0, len(Data)):
 
             Solution = opt.fsolve(function_iteration,Solution)
 
-            if Solution[2]<Ebench.Factorchiller:
+            if Solution[2] < Ebench.Factorchiller[0]:
                 Mode = 1 # Different Calculation with mode 1 or 0
                 Solution = opt.fsolve(function_iteration,Solution)
                 Mode = 0
@@ -464,7 +465,7 @@ class Calculation:
         Data["xH2ONOmeas"] = Data.xH2ONO2meas
         Data["xNOdry"] = Data.xNOmeas/(1-Data.xH2ONOmeas) ## Reference: CFR 1065.659
         Data["xCO2dry"] = Data.xCO2meas/(1-Data.xH2OCO2meas) ## Reference: CFR 1065.659
-        Data["xH2dry"] = (Data.xCOdry*(Data.xH2Oexhdry-Data.xH2Odil*Data.get("xdil/exhdry")))/(Fuel.xH2Ogas*(Data.xCO2dry-Data.xCO2dil*Data.get("xdil/exhdry")))
+       # Data["xH2dry"] = (Data.xCOdry*(Data.xH2Oexhdry-Data.xH2Odil*Data.get("xdil/exhdry")))/(Fuel.xH2Ogas[0]*(Data.xCO2dry-Data.xCO2dil*Data.get("xdil/exhdry")))
 
         # Wet Emissions
         Data["xCOwet"] = Data.xCOmeas*((1-Data.xH2Oexh)/(1-Data.xH2OCOmeas))
@@ -472,27 +473,27 @@ class Calculation:
         Data["xNO2wet"] = Data.xNO2meas*((1-Data.xH2Oexh)/(1-Data.xH2ONO2meas))
         Data["xNOwet"] = Data.xNOmeas*((1-Data.xH2Oexh)/(1-Data.xH2ONOmeas))
         Data["xCO2wet"] = Data.xCO2meas*((1-Data.xH2Oexh)/(1-Data.xH2OCO2meas))
-        Data["xNOxcorrwet"] = Data.xNOxwet*(float(Fuel.FactorMult) * Data.xH2O + float(Fuel.FactorAdd)) ## Reference: CFR 1065.670 !!!!!@!@!@@!??? Change the value to take from json
+        Data["xNOxcorrwet"] = Data.xNOxwet*(float(Fuel.FactorMult[0]) * Data.xH2O + float(Fuel.FactorAdd[0])) ## Reference: CFR 1065.670 !!!!!@!@!@@!??? Change the value to take from json
 
         # Masses of emissions
         Data["nexh"] = Data.get("nint (Intake Air Flow)")/(1+((Data.get("xint/exhdry")-Data.get("xraw/exhdry"))/(1+Data.xH2Oexhdry)))
-        Data["Mass_THC"] = Data.xTHCwet*Data.nexh*Fuel.M_HC
-        Data["Mass_CO"] = Data.xCOwet*Data.nexh*Fuel.M_CO
-        Data["Mass_NOx"] = Data.xNOxcorrwet*Data.nexh*Fuel.M_NOX
-        Data["Mass_CO2"] = Data.xCO2wet*Data.nexh*Fuel.M_CO2
-        Data["Mass_NMHC"] = Data.xNMHCwet*Data.nexh*Fuel.M_NMHC
+        Data["Mass_THC"] = Data.xTHCwet*Data.nexh*Fuel.M_HC[0]
+        Data["Mass_CO"] = Data.xCOwet*Data.nexh*Fuel.M_CO[0]
+        Data["Mass_NOx"] = Data.xNOxcorrwet*Data.nexh*Fuel.M_NOX[0]
+        Data["Mass_CO2"] = Data.xCO2wet*Data.nexh*Fuel.M_CO2[0]
+        Data["Mass_NMHC"] = Data.xNMHCwet*Data.nexh*Fuel.M_NMHC[0]
 
         # Emissions in total
         ArraySum = {'CO2':Data.Mass_CO2.sum(),'CO':Data.Mass_CO.sum(),'NOx':Data.Mass_NOx.sum(),'THC':Data.Mass_THC.sum(),'NMHC':Data.Mass_NMHC.sum()}
 
         if "Nitrous_Oxide_Wet" in MapDict:
-            Data["Mass_N2O"] = Data.xN2Owet*Data.nexh*Fuel.M_N2O
+            Data["Mass_N2O"] = Data.xN2Owet*Data.nexh*Fuel.M_N2O[0]
             ArraySum.update({'N2O':Data.Mass_N2O.sum()})
         if "Formaldehyde_Wet" in MapDict:
-            Data["Mass_CH2O"] = Data.xCH2Owet*Data.nexh*Fuel.M_CH2O
+            Data["Mass_CH2O"] = Data.xCH2Owet*Data.nexh*Fuel.M_CH2O[0]
             ArraySum.update({'CH2O':Data.Mass_CH2O.sum()})
         if "Ammonia_Wet" in MapDict:
-            Data["Mass_NH3"] = Data.xNH3wet*Data.nexh*Fuel.M_NH3
+            Data["Mass_NH3"] = Data.xNH3wet*Data.nexh*Fuel.M_NH3[0]
             ArraySum.update({'NH3':Data.Mass_NH3.sum()})
 
         return Data, ArraySum
@@ -548,8 +549,9 @@ class Calculation:
 
         return TestData
 
-    def _remove_negatives(self, Data, DataRaw, MapDict):
-
+    def _remove_negatives(self, data_corr, DataRaw, MapDict):
+      
+        Data = copy.deepcopy(data_corr)
         # Emissions and Engine Power in total (Negative Values removed)
         Data.Mass_CO2[np.where(Data.Mass_CO2<0)[0]] = 0
         Data.Mass_CO[np.where(Data.Mass_CO<0)[0]] = 0
@@ -639,7 +641,7 @@ class Report:
 
         ###### Preparation of Excel-File #####
         self.file = self._preparation_excel_file(self.output)
-
+        
         ##### Write Emissions in Report ######
         self.sheet = self._write_emissions(self.sheet, self.DriftUncorrected, self.DriftCorrected, self.Final, ArraySumUn, ArraySumCor, ArraySumCorWon, Species)
         self.sheet = self._write_first_page(self.sheet, DataHandler.results_log, CalculatorLog['ZeroSpan'], DelayArray, Species, DataHandler.cycle_attr, DataHandler.ebench_data)
@@ -716,8 +718,8 @@ class Report:
     def _write_dataframe(self, Sheet, Data):
 
         for i in range(0,len(Data.columns)):
-            Sheet.write(0,i,Data.columns[i])
-            Sheet.write_column(1,i,Data[Data.columns[i]])
+          Sheet.write(0,i,Data.columns[i])
+          Sheet.write_column(1,i,Data[Data.columns[i]])
 
         return Sheet
 
