@@ -344,7 +344,7 @@ class Calculation:
         Data["xNO2meas"] = Data.xNOxmeas*0 # NO2 not measured
         Data["xNOmeas"] = Data.xNOxmeas*1
         Data["xTHCwet"] = Data.xTHCmeas
-        Data["xNMHCwet"] = (Data.xTHCwet-Data.xCH4wet*Ebench.CH4_RF[0])/(1-Ebench.RFPF[0]*Ebench.CH4_RF[0])
+        Data["xNMHCwet"] = (Data.xTHCwet - Data.xCH4wet * Ebench.CH4_RF[0]) / (1 - Ebench.RFPF[0] * Ebench.CH4_RF[0])
 
         if "Nitrous_Oxide_Wet" in MapDict:
             Data["xN2Owet"] = Data["xN2Omeas"]
@@ -501,7 +501,7 @@ class Calculation:
 
     def _drift_correction(self, DataUn, ZeroSpan, TestData, MapDict):
 
-        ## Correct Raw-Emissions ##
+
         TestData[MapDict['Carbon_Dioxide_Dry']] = ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['Chosen'] * \
         ((2*DataUn[MapDict['Carbon_Dioxide_Dry']]) - \
          (ZeroSpan[MapDict['Carbon_Dioxide_Dry']]['PreZero'] + \
