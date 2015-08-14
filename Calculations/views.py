@@ -2,6 +2,7 @@ import json
 import io
 import xlsxwriter
 import os
+from time import sleep
 from django.core.servers.basehttp import FileWrapper
 
 from django.core.cache import caches
@@ -23,10 +24,11 @@ class CalculationView(views.APIView):
     def post(self, request, format=None):
 
         try:
-
+            
+            sleep(1)
             ##### Load dataHandler from Cache #####
             cache = caches['default']
-            data_handler = cache.get(request.session._get_session_key())
+            data_handler = cache.get(request.session.session_key)
 
             if data_handler is None or not data_handler.all_files_loaded:
                 raise Exception("Calculations not available without all files loaded and verified")
@@ -44,7 +46,7 @@ class CalculationView(views.APIView):
             json_log = json.dumps(json_dict)
 
             ##### Save Session #####
-            cache.set(request.session._get_session_key(), data_handler)
+            cache.set(request.session.session_key, data_handler)
 
             return Response(json_log, status=200)
 
