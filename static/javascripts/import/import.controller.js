@@ -38,6 +38,21 @@ function ImportController($scope, FileUploader, toastr, infoboxService) {
         toastr.success('File Uploaded and Verified', 'Success');
         $scope.uploadSuccess = true;
 
+
+	var arr = $("strong");
+	for(var i = 0; i < arr.length; i++){
+	
+	    if(arr[i].innerHTML.length > 20){
+		var front = arr[i].innerHTML.slice(0, 6);
+		var back = arr[i].innerHTML.slice(-8);
+		var mid = "...";
+		var res = front.concat(mid, back);
+		
+		arr[i].innerHTML = res;
+	    }
+	}
+	
+
         var jsonObj = JSON.parse(response);
         if (jsonObj.File == 'FULL') {
             infoboxService.updateFull();

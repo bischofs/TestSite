@@ -70,19 +70,19 @@ class Preparation:
     FuelData['M_NH3'] = 17.03052 # Molar mass of Ammonia
 
     ## Mass fractions ##
-    FuelData.W_c = float(HeaderData[MapDict['Mass_Fraction_Carbon']])/100 # Carbon mass fraction of fuel
-    FuelData.W_h = float(HeaderData[MapDict['Mass_Fraction_Hydrogen']])/100 # Hydrogen mass fraction of fuel
-    FuelData.W_o = float(HeaderData[MapDict['Mass_Fraction_Oxygen']])/100 # Oxygen mass fraction of fuel
+    FuelData.W_c = float(HeaderData[MapDict['Mass_Fraction_Carbon']]) / 100 # Carbon mass fraction of fuel
+    FuelData.W_h = float(HeaderData[MapDict['Mass_Fraction_Hydrogen']]) / 100 # Hydrogen mass fraction of fuel
+    FuelData.W_o = float(HeaderData[MapDict['Mass_Fraction_Oxygen']]) / 100 # Oxygen mass fraction of fuel
     FuelData.W_s = 0
     FuelData.W_n = 0
     #FuelData.W_s = headerData[MapDicht['Mass_Fraction_Sulfur']]/10000 in ppm in Header page, the sum of W doesn't equals 1
     #FuelData.W_n = headerData['N_MFN'] not in Header page
 
     ## Calculation of parameters ##
-    FuelData.alpha = (FuelData.W_h*FuelData.M_C)/(FuelData.W_c*FuelData.M_H)
-    FuelData.beta = (FuelData.W_o*FuelData.M_C)/(FuelData.W_c*FuelData.M_O)
-    FuelData.gamma = (FuelData.W_s*FuelData.M_C)/(FuelData.W_c*FuelData.M_S)
-    FuelData.delta = (FuelData.W_n*FuelData.M_C)/(FuelData.W_c*FuelData.M_N)
+    FuelData.alpha = (FuelData.W_h * FuelData.M_C) / (FuelData.W_c * FuelData.M_H)
+    FuelData.beta = (FuelData.W_o * FuelData.M_C) / (FuelData.W_c * FuelData.M_O)
+    FuelData.gamma = (FuelData.W_s * FuelData.M_C) / (FuelData.W_c * FuelData.M_S)
+    FuelData.delta = (FuelData.W_n *FuelData.M_C) / (FuelData.W_c * FuelData.M_N)
 
     FuelData.xH2Ogas = 3.5 # Constant Value does not belong to fuel (water-gas reaction equilibrium coefficient)
 
@@ -103,16 +103,16 @@ class Preparation:
     EbenchData.RFPF = ebenchData['RFPF']
     EbenchData.CH4_RF = ebenchData['CH4_RF']
     EbenchData.Tchiller = ebenchData['Tchiller'] + 273.15 # in K
-    EbenchData.Pamb = np.mean(TestData[MapDict['Air_Ambient_Pressure']])*100 # bar --> kPa
+    EbenchData.Pamb = np.mean(TestData[MapDict['Air_Ambient_Pressure']]) * 100 # bar --> kPa
     EbenchData.Pchiller = ebenchData['Pchiller'] + EbenchData.Pamb
     EbenchData.xCO2intdry = 0.000375 ## CFR 1065.655
     EbenchData.xCO2dildry = 0.000375 ## CFR 1065.655
     EbenchData.xTHC_THC_FID_init = ebenchData['xTHC[THC_FID]init']
     EbenchData.Factorchiller = (10**( \
-      10.79574*(1-(273.16/EbenchData.Tchiller))-5.028 * \
-      np.log10(EbenchData.Tchiller/273.16)+0.000150475 * \
-      (1-10**(-8.2969*((EbenchData.Tchiller/273.16)-1)))+0.00042873 * \
-      (10**(4.76955*(1-(273.16/EbenchData.Tchiller)))-1)-0.2138602))/(EbenchData.Pchiller)
+      10.79574 * (1 - (273.16 / EbenchData.Tchiller)) - 5.028 * \
+      np.log10(EbenchData.Tchiller / 273.16) + 0.000150475 * \
+      (1 - 10**(-8.2969 * ((EbenchData.Tchiller / 273.16) - 1))) + 0.00042873 * \
+      (10**(4.76955 * (1 - (273.16 / EbenchData.Tchiller))) - 1) - 0.2138602)) / (EbenchData.Pchiller)
 
     ##### Bottle Concentrations from Ebench #####
     EbenchData.Bottle_Concentration_CO2 = ebenchData['Bottle_Concentration_CO2']
@@ -129,7 +129,7 @@ class Preparation:
 
   def _zeroSpan(self, Pre, Post, MapDict, Ebench):
 
-    ListFactor = [10000,10000,1,1,1]
+    ListFactor = [10000, 10000, 1, 1, 1]
     ZeroSpan = pd.DataFrame(data=np.zeros([5,5]),index=['PreZero','PreSpan','PostZero','PostSpan','Chosen'],
                                                  columns=[MapDict['Carbon_Dioxide_Dry'], MapDict['Carbon_Monoxide_Dry'], MapDict['Nitrogen_X_Dry'],
                                                           MapDict['Total_Hydrocarbons_Wet'], MapDict['Methane_Wet']])
@@ -144,11 +144,11 @@ class Preparation:
 
     ##### Pre Zero/Span #####
     Name = {'Zero':'PreZero','Span':'PreSpan'}
-    ZeroSpan = self._prepare_type(ZeroSpan,MapDict,TimeWindow,Pre,Name)
+    ZeroSpan = self._prepare_type(ZeroSpan, MapDict, TimeWindow, Pre, Name)
 
     ##### Post Zero/Span #####
     Name = {'Zero':'PostZero','Span':'PostSpan'}
-    ZeroSpan = self._prepare_type(ZeroSpan,MapDict,TimeWindow,Post,Name)
+    ZeroSpan = self._prepare_type(ZeroSpan, MapDict, TimeWindow, Post, Name)
 
     # Clear Variables
     ListFactor, TimeWindow, Name = None, None, None
@@ -158,8 +158,8 @@ class Preparation:
 
   def _prepare_time_window(self, MapDict):
 
-    TypeTime = ['Zero_start','Zero_end','Span_start','Span_end']
-    SpecTime = [0,59,60,119] # Time window for Zero and Span Data
+    TypeTime = ['Zero_start', 'Zero_end', 'Span_start', 'Span_end']
+    SpecTime = [0, 59, 60, 119] # Time window for Zero and Span Data
     TimeWindow = pd.DataFrame(data = np.ones([4,5]), columns=[MapDict['Carbon_Dioxide_Dry'],MapDict['Carbon_Monoxide_Dry'],
                                                               MapDict['Nitrogen_X_Dry'],MapDict['Total_Hydrocarbons_Wet'],
                                                               MapDict['Methane_Wet']], index=TypeTime)
@@ -182,17 +182,17 @@ class Preparation:
 
     for spec in self.Species:
       ColumnZero = Data.loc[TimeWindow[spec][0]:TimeWindow[spec][1], spec]
-      ColumnZero.index = range(0,len(ColumnZero))
+      ColumnZero.index = range(0, len(ColumnZero))
       ColumnSpan = Data.loc[TimeWindow[spec][2]:TimeWindow[spec][3], spec]
-      ColumnSpan.index = range(0,len(ColumnSpan))
+      ColumnSpan.index = range(0, len(ColumnSpan))
 
       for i in range(0,len(ColumnZero)):
 
-          if ColumnZero[i]> ZeroSpan[spec]['Chosen']*0.01: # Acceptable Range of noise 1%
-              ColumnZero = ColumnZero.drop(i)
+        if ColumnZero[i]> ZeroSpan[spec]['Chosen'] * 0.01: # Acceptable Range of noise 1%
+          ColumnZero = ColumnZero.drop(i)
 
-          if (ColumnSpan[i]< ZeroSpan[spec]['Chosen']*0.98) | (ColumnSpan[i] > ZeroSpan[spec]['Chosen']*1.02): # Acceptable Range of noise +-2%
-              ColumnSpan = ColumnSpan.drop(i)
+        if (ColumnSpan[i]< ZeroSpan[spec]['Chosen'] * 0.98) | (ColumnSpan[i] > ZeroSpan[spec]['Chosen'] * 1.02): # Acceptable Range of noise +-2%
+          ColumnSpan = ColumnSpan.drop(i)
 
       if (len(ColumnZero)) > 30 and (len(ColumnSpan) > 30): # At least 30 points to calculate the average of Zero and Span
 
@@ -200,7 +200,6 @@ class Preparation:
           ZeroSpan[spec][name['Span']] = abs(ColumnSpan.mean())
 
       else:
-
         raise Exception('Not enough data points for average Zero/Span! Minimum : 30')
 
     # Clear Variables
@@ -253,8 +252,9 @@ class Calculation:
         TestData = data
         ModeArray = pd.Series(TestData['N_CERTMODE']).unique()
         MeanFrame = pd.DataFrame(columns=TestData.columns.values)
-        for Mode, i in zip(ModeArray, range(0,len(ModeArray))):
-            AvgArray = TestData[TestData['N_CERTMODE']==Mode].mean()
+
+        for Mode, i in zip(ModeArray, range(0, len(ModeArray))):
+            AvgArray = TestData[TestData['N_CERTMODE'] == Mode].mean()
             MeanFrame.loc[i] = AvgArray
 
         return MeanFrame
@@ -282,30 +282,30 @@ class Calculation:
     def _unit_conversion(self, Data, TestData, MapDict):
 
         # Species
-        Data[MapDict["Carbon_Dioxide_Dry"]] = TestData[MapDict["Carbon_Dioxide_Dry"]]*10000 # % --> ppm
-        Data[MapDict["Carbon_Monoxide_Dry"]] = TestData[MapDict["Carbon_Monoxide_Dry"]]*10000 # % --> ppm
+        Data[MapDict["Carbon_Dioxide_Dry"]] = TestData[MapDict["Carbon_Dioxide_Dry"]] * 10000 # % --> ppm
+        Data[MapDict["Carbon_Monoxide_Dry"]] = TestData[MapDict["Carbon_Monoxide_Dry"]] * 10000 # % --> ppm
         Data[MapDict["Nitrogen_X_Dry"]] = TestData[MapDict["Nitrogen_X_Dry"]] # in ppm
         Data[MapDict["Total_Hydrocarbons_Wet"]] = TestData[MapDict["Total_Hydrocarbons_Wet"]] # in ppm
 
-        Data["xCH4wet"] = TestData[MapDict['Methane_Wet']]/1000000 # ppm --> mol/mol
-        Data["xCO2meas"] = Data[MapDict["Carbon_Dioxide_Dry"]]/1000000 # ppm --> mol/mol
-        Data["xCOmeas"] = Data.get(MapDict["Carbon_Monoxide_Dry"])/1000000 # ppm --> mol/mol
-        Data["xNOxmeas"] = Data[MapDict["Nitrogen_X_Dry"]]/1000000 # ppm --> mol/mol
+        Data["xCH4wet"] = TestData[MapDict['Methane_Wet']] / 1000000 # ppm --> mol/mol
+        Data["xCO2meas"] = Data[MapDict["Carbon_Dioxide_Dry"]] / 1000000 # ppm --> mol/mol
+        Data["xCOmeas"] = Data.get(MapDict["Carbon_Monoxide_Dry"]) / 1000000 # ppm --> mol/mol
+        Data["xNOxmeas"] = Data[MapDict["Nitrogen_X_Dry"]] / 1000000 # ppm --> mol/mol
 
         if "Nitrous_Oxide_Wet" in MapDict:
-            Data["xN2Omeas"] = TestData[MapDict["Nitrous_Oxide_Wet"]]/1000000
+            Data["xN2Omeas"] = TestData[MapDict["Nitrous_Oxide_Wet"]] / 1000000
         if "Formaldehyde_Wet" in MapDict:
-            Data["xCH2Omeas"] = TestData[MapDict["Formaldehyde_Wet"]]/1000000
+            Data["xCH2Omeas"] = TestData[MapDict["Formaldehyde_Wet"]] / 1000000
         if "Ammonia_Wet" in MapDict:
-            Data["xNH3meas"] = TestData[MapDict["Ammonia_Wet"]]/1000000
+            Data["xNH3meas"] = TestData[MapDict["Ammonia_Wet"]] / 1000000
 
         # Flows
-        Data["mfuel"] = TestData[MapDict["Fuel_Flow_Rate"]]*1000/3600 # kg/h --> g/s
-        Data["Molar Flow Wet"] = TestData[MapDict["Air_Flow_Rate"]]*1000/3600 # kg/h --> g/s
-        Data["Intake Air flow"] = Data.get("Molar Flow Wet")/28.96 # g/sec --> mol/sec
+        Data["mfuel"] = TestData[MapDict["Fuel_Flow_Rate"]] * 1000 / 3600 # kg/h --> g/s
+        Data["Molar Flow Wet"] = TestData[MapDict["Air_Flow_Rate"]] * 1000 / 3600 # kg/h --> g/s
+        Data["Intake Air flow"] = Data.get("Molar Flow Wet") / 28.96 # g/sec --> mol/sec
 
         # Rest
-        Data["BARO Press"] = TestData[MapDict["Air_Inlet_Pressure"]]*10000 # bar --> Pa
+        Data["BARO Press"] = TestData[MapDict["Air_Inlet_Pressure"]] * 10000 # bar --> Pa
         Data["T_INLET"] = TestData[MapDict["Air_Inlet_Temperature"]] + 273.15 # °C --> K
 
         # Clear Variables
@@ -319,30 +319,30 @@ class Calculation:
         # Intake
         Data["pH2O @ inlet"] = 10**( \
           10.79574 * \
-          (1-(273.16/(Data.T_INLET))) - \
-          5.028*np.log10((Data.T_INLET)/273.16)+0.000150475 * \
-          (1-10**(-8.2969*(((Data.T_INLET)/273.16)-1)))+0.00042873 * \
-          (10**(4.76955*(1-(273.16/(Data.T_INLET))))-1)-0.2138602)
+          (1 - (273.16 / (Data.T_INLET))) - \
+          5.028 * np.log10((Data.T_INLET) / 273.16) + 0.000150475 * \
+          (1 - 10**(- 8.2969 *(((Data.T_INLET) / 273.16) - 1))) + 0.00042873 * \
+          (10**(4.76955 * (1 - (273.16 / (Data.T_INLET)))) - 1) - 0.2138602)
 
-        Data["xH2O"] = TestData[MapDict["Relative_Humidity"]]*Data.get("pH2O @ inlet")/(Data.get("BARO Press"))
+        Data["xH2O"] = TestData[MapDict["Relative_Humidity"]] * Data.get("pH2O @ inlet") / (Data.get("BARO Press"))
         Data["xH2Oint"] = Data.xH2O
-        Data["Mmix"] = 28.96559*(1-Data.xH2O)+18.01528*Data.xH2O
-        Data["nint (Intake Air Flow)"] = Data.get("Molar Flow Wet")/Data.Mmix
-        Data["xH2Ointdry"] = Data.xH2Oint/(1-Data.xH2Oint)
-        Data["xCO2int"] = Ebench.xCO2intdry[0]/(1+Data.xH2Ointdry)
-        Data["xO2int"] = ((0.20982-Ebench.xCO2intdry[0])/(1+Data.xH2Ointdry))
+        Data["Mmix"] = 28.96559 * (1 - Data.xH2O) + 18.01528 * Data.xH2O
+        Data["nint (Intake Air Flow)"] = Data.get("Molar Flow Wet") / Data.Mmix
+        Data["xH2Ointdry"] = Data.xH2Oint / (1 - Data.xH2Oint)
+        Data["xCO2int"] = Ebench.xCO2intdry[0] / (1 + Data.xH2Ointdry)
+        Data["xO2int"] = ((0.20982 - Ebench.xCO2intdry[0]) / (1 + Data.xH2Ointdry))
 
         # Dilution
         Data["xH2Odil"] = Data.xH2O
-        Data["xH2Odildry"] = Data.xH2Odil/(1-Data.xH2Odil)
-        Data["xCO2dil"] = Ebench.xCO2dildry[0]/(1+Data.xH2Odildry)
+        Data["xH2Odildry"] = Data.xH2Odil / (1-Data.xH2Odil)
+        Data["xCO2dil"] = Ebench.xCO2dildry[0] / (1 + Data.xH2Odildry)
 
         # Rest
-        Data["xTHC[THC_FID]cor"] = Data[MapDict["Total_Hydrocarbons_Wet"]]-Ebench.xTHC_THC_FID_init[0]
+        Data["xTHC[THC_FID]cor"] = Data[MapDict["Total_Hydrocarbons_Wet"]] - Ebench.xTHC_THC_FID_init[0]
         Data[MapDict["Total_Hydrocarbons_Wet"]] = Data["xTHC[THC_FID]cor"]
-        Data["xTHCmeas"] = Data[MapDict["Total_Hydrocarbons_Wet"]]/1000000 # ppm --> mol/mol
-        Data["xNO2meas"] = Data.xNOxmeas*0 # NO2 not measured
-        Data["xNOmeas"] = Data.xNOxmeas*1
+        Data["xTHCmeas"] = Data[MapDict["Total_Hydrocarbons_Wet"]] / 1000000 # ppm --> mol/mol
+        Data["xNO2meas"] = Data.xNOxmeas * 0 # NO2 not measured
+        Data["xNOmeas"] = Data.xNOxmeas * 1
         Data["xTHCwet"] = Data.xTHCmeas
         Data["xNMHCwet"] = (Data.xTHCwet - Data.xCH4wet * Ebench.CH4_RF[0]) / (1 - Ebench.RFPF[0] * Ebench.CH4_RF[0])
 
@@ -405,42 +405,42 @@ class Calculation:
             AG = Data.xCO2meas[i]
 
             # Equations to solve
-            eq1 = 1-(G/(1+D))-A
-            eq2 = D/(1+D)-B
-            eq3 = Q+(M)+(N)-(S*E)-(T*F)-C
-            eq4 = ((U/2)*(C-N))+V*E+W*F-R-D
-            eq5 = A/(1-B)-E
-            eq6 = (1/(2*X))*(((U/2)-Y+2+(2*Z))*(C-N)-(M-O-(2*P)+R))-F
-            eq7 = 0.5*(((U/2)+Y+AA)*(C-N)+((2*N)+M-P+R))+F-G
-            eq8 = AB/(1-H)-M ## Reference: CFR 1065.659
-            eq10 = AC/(1-I)-N ## Reference: CFR 1065.659
-            eq11 = B-I
-            eq12 = AD/(1-J)-O ## Reference: CFR 1065.659
-            eq14 = AE/(1-K)-P ## Reference: CFR 1065.659
-            eq16 = (M*(D-V*E))/(AF*(Q-S*E))-R ## Reference: CFR 1065.659
-            eq17 = AG/(1-L)-Q ## Reference: CFR 1065.659
+            eq1 = 1 - ( G / (1 + D)) - A
+            eq2 = D / (1 + D) - B
+            eq3 = Q + (M) + (N) - (S * E) - (T * F) - C
+            eq4 = ((U / 2) * (C - N)) + V * E + W * F - R - D
+            eq5 = A / (1 - B) - E
+            eq6 = (1 / (2 * X)) * (((U / 2) - Y + 2 + (2 * Z)) * (C - N) - (M - O - (2 * P) + R)) - F
+            eq7 = 0.5 * (((U / 2) + Y + AA) * (C - N) + ((2 * N) + M - P + R)) + F - G
+            eq8 = AB / (1 - H) - M ## Reference: CFR 1065.659
+            eq10 = AC / (1 - I) - N ## Reference: CFR 1065.659
+            eq11 = B - I
+            eq12 = AD / (1 - J) - O ## Reference: CFR 1065.659
+            eq14 = AE / (1 - K) - P ## Reference: CFR 1065.659
+            eq16 = ( M * (D - V * E)) / (AF * (Q - S * E)) - R ## Reference: CFR 1065.659
+            eq17 = AG / (1 - L) - Q ## Reference: CFR 1065.659
 
-            if Mode==0:
+            if Mode == 0:
                 eq9 = Ebench.Factorchiller[0] - H
                 eq13 = Ebench.Factorchiller[0] - J 
                 eq15 = Ebench.Factorchiller[0] - K
                 eq18 = Ebench.Factorchiller[0] - L
             else:
-                eq9 = B-H
-                eq13 = B-J
-                eq15 = B-K
-                eq18 = B-L
+                eq9 = B - H
+                eq13 = B - J
+                eq15 = B - K
+                eq18 = B - L
 
             return [eq1,eq2,eq3,eq4,eq5,eq6,eq7,eq8,eq9,eq10,eq11,eq12,eq13,eq14,eq15,eq16,eq17,eq18]
 
         Mode = 0
-        ResultList = np.zeros((len(Data),18))
+        ResultList = np.zeros((len(Data), 18))
         g = 0.5 # First guess for iteration start
         Solution = (g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g)
         
         for i in range(0, len(Data)):
 
-            Solution = opt.fsolve(function_iteration,Solution)
+            Solution = opt.fsolve(function_iteration, Solution)
 
             if Solution[2] < Ebench.Factorchiller[0]:
                 Mode = 1 # Different Calculation with mode 1 or 0
@@ -451,7 +451,7 @@ class Calculation:
         Iteration = pd.DataFrame(ResultList,columns =['xdil/exh','xH2Oexh','xCcombdry','xH2Oexhdry','xdil/exhdry','xint/exhdry',
                                                       'xraw/exhdry','xH2OCOmeas','xH2OTHCmeas','xH2ONOxmeas','xH2ONO2meas','xH2OCO2meas',
                                                       'xCOdry','xTHCdry','xNOxdry','xNO2dry','xCO2dry','xH2dry'])
-        Data = pd.concat([Data,Iteration],axis=1)
+        Data = pd.concat([Data,Iteration], axis=1)
 
         # Clear Variables
         Iteration, Mode, ResultList, g, Solution = None, None, None, None, None
@@ -463,25 +463,25 @@ class Calculation:
 
         # Dry Emissions
         Data["xH2ONOmeas"] = Data.xH2ONO2meas
-        Data["xNOdry"] = Data.xNOmeas/(1-Data.xH2ONOmeas) ## Reference: CFR 1065.659
-        Data["xCO2dry"] = Data.xCO2meas/(1-Data.xH2OCO2meas) ## Reference: CFR 1065.659
+        Data["xNOdry"] = Data.xNOmeas / (1 - Data.xH2ONOmeas) ## Reference: CFR 1065.659
+        Data["xCO2dry"] = Data.xCO2meas / (1 - Data.xH2OCO2meas) ## Reference: CFR 1065.659
        # Data["xH2dry"] = (Data.xCOdry*(Data.xH2Oexhdry-Data.xH2Odil*Data.get("xdil/exhdry")))/(Fuel.xH2Ogas[0]*(Data.xCO2dry-Data.xCO2dil*Data.get("xdil/exhdry")))
 
         # Wet Emissions
-        Data["xCOwet"] = Data.xCOmeas*((1-Data.xH2Oexh)/(1-Data.xH2OCOmeas))
-        Data['xNOxwet'] = Data.xNOxmeas*((1-Data.xH2Oexh)/(1-Data.xH2ONOxmeas))
-        Data["xNO2wet"] = Data.xNO2meas*((1-Data.xH2Oexh)/(1-Data.xH2ONO2meas))
-        Data["xNOwet"] = Data.xNOmeas*((1-Data.xH2Oexh)/(1-Data.xH2ONOmeas))
-        Data["xCO2wet"] = Data.xCO2meas*((1-Data.xH2Oexh)/(1-Data.xH2OCO2meas))
+        Data["xCOwet"] = Data.xCOmeas * ((1 - Data.xH2Oexh) / (1 - Data.xH2OCOmeas))
+        Data['xNOxwet'] = Data.xNOxmeas * ((1 - Data.xH2Oexh) / (1 - Data.xH2ONOxmeas))
+        Data["xNO2wet"] = Data.xNO2meas * ((1 - Data.xH2Oexh) / (1 - Data.xH2ONO2meas))
+        Data["xNOwet"] = Data.xNOmeas * ((1 - Data.xH2Oexh) / (1 - Data.xH2ONOmeas))
+        Data["xCO2wet"] = Data.xCO2meas * ((1 - Data.xH2Oexh) / (1 - Data.xH2OCO2meas))
         Data["xNOxcorrwet"] = Data.xNOxwet*(float(Fuel.FactorMult[0]) * Data.xH2O + float(Fuel.FactorAdd[0])) ## Reference: CFR 1065.670 !!!!!@!@!@@!??? Change the value to take from json
 
         # Masses of emissions
-        Data["nexh"] = Data.get("nint (Intake Air Flow)")/(1+((Data.get("xint/exhdry")-Data.get("xraw/exhdry"))/(1+Data.xH2Oexhdry)))
-        Data["Mass_THC"] = Data.xTHCwet*Data.nexh*Fuel.M_HC[0]
-        Data["Mass_CO"] = Data.xCOwet*Data.nexh*Fuel.M_CO[0]
-        Data["Mass_NOx"] = Data.xNOxcorrwet*Data.nexh*Fuel.M_NOX[0]
-        Data["Mass_CO2"] = Data.xCO2wet*Data.nexh*Fuel.M_CO2[0]
-        Data["Mass_NMHC"] = Data.xNMHCwet*Data.nexh*Fuel.M_NMHC[0]
+        Data["nexh"] = Data.get("nint (Intake Air Flow)") / (1 + ((Data.get("xint/exhdry") - Data.get("xraw/exhdry")) / (1 + Data.xH2Oexhdry)))
+        Data["Mass_THC"] = Data.xTHCwet * Data.nexh * Fuel.M_HC[0]
+        Data["Mass_CO"] = Data.xCOwet * Data.nexh * Fuel.M_CO[0]
+        Data["Mass_NOx"] = Data.xNOxcorrwet * Data.nexh * Fuel.M_NOX[0]
+        Data["Mass_CO2"] = Data.xCO2wet * Data.nexh * Fuel.M_CO2[0]
+        Data["Mass_NMHC"] = Data.xNMHCwet * Data.nexh * Fuel.M_NMHC[0]
 
         # Emissions in total
         ArraySum = {'CO2':Data.Mass_CO2.sum(),'CO':Data.Mass_CO.sum(),'NOx':Data.Mass_NOx.sum(),'THC':Data.Mass_THC.sum(),'NMHC':Data.Mass_NMHC.sum()}
@@ -553,25 +553,25 @@ class Calculation:
       
         Data = copy.deepcopy(data_corr)
         # Emissions and Engine Power in total (Negative Values removed)
-        Data.Mass_CO2[np.where(Data.Mass_CO2<0)[0]] = 0
-        Data.Mass_CO[np.where(Data.Mass_CO<0)[0]] = 0
-        Data.Mass_NOx[np.where(Data.Mass_NOx<0)[0]] = 0
-        Data.Mass_THC[np.where(Data.Mass_THC<0)[0]] = 0
-        Data.Mass_NMHC[np.where(Data.Mass_NMHC<0)[0]] = 0
+        Data.Mass_CO2[np.where(Data.Mass_CO2 < 0)[0]] = 0
+        Data.Mass_CO[np.where(Data.Mass_CO < 0)[0]] = 0
+        Data.Mass_NOx[np.where(Data.Mass_NOx < 0)[0]] = 0
+        Data.Mass_THC[np.where(Data.Mass_THC < 0)[0]] = 0
+        Data.Mass_NMHC[np.where(Data.Mass_NMHC < 0)[0]] = 0
 
-        U_BPOW_Factor = DataRaw[MapDict['Engine_Power']].drop(np.where(DataRaw[MapDict['Engine_Power']]<0)[0]).sum(skipna=True)/(3600*0.746)
+        U_BPOW_Factor = DataRaw[MapDict['Engine_Power']].drop(np.where(DataRaw[MapDict['Engine_Power']] < 0)[0]).sum(skipna=True) / (3600 * 0.746)
 
         ArraySumCorWon = {'CO2':Data.Mass_CO2.sum(),'CO':Data.Mass_CO.sum(),'NOx':Data.Mass_NOx.sum(),
                          'THC':Data.Mass_THC.sum(),'NMHC':Data.Mass_NMHC.sum()}
 
         if "Nitrous_Oxide_Wet" in MapDict:
-            Data.Mass_N2O[np.where(Data.Mass_N2O<0)[0]] = 0
+            Data.Mass_N2O[np.where(Data.Mass_N2O < 0)[0]] = 0
             ArraySumCorWon.update({'N2O':Data.Mass_N2O.sum()})
         if "Formaldehyde_Wet" in MapDict:
-            Data.Mass_CH2O[np.where(Data.Mass_CH2O<0)[0]] = 0
+            Data.Mass_CH2O[np.where(Data.Mass_CH2O < 0)[0]] = 0
             ArraySumCorWon.update({'CH2O':Data.Mass_CH2O.sum()})
         if "Ammonia_Wet" in MapDict:
-            Data.Mass_NH3[np.where(Data.Mass_NH3<0)[0]] = 0
+            Data.Mass_NH3[np.where(Data.Mass_NH3 < 0)[0]] = 0
             ArraySumCorWon.update({'NH3':Data.Mass_NH3.sum()})
 
         return ArraySumCorWon, U_BPOW_Factor
@@ -607,12 +607,12 @@ class Calculation:
         DF = None
 
         for i in range(0,len(Species)):
-            self.DriftUncorrected['Result'][i] = np.round(self.ArraySumUn[Species[i]]/self.U_BPOW_Factor,2)
-            self.DriftUncorrected['Total'][i] = np.round(self.ArraySumUn[Species[i]],2)
-            self.DriftCorrected['Result'][i] = np.round(self.ArraySumCor[Species[i]]/self.U_BPOW_Factor,2)
-            self.DriftCorrected['Total'][i] = np.round(self.ArraySumCor[Species[i]],2)
-            self.Final['Result'][i] = np.round(self.ArraySumCorWon[Species[i]]/self.U_BPOW_Factor,2)
-            self.Final['Total'][i] = np.round(self.ArraySumCorWon[Species[i]],2)
+            self.DriftUncorrected['Result'][i] = np.round(self.ArraySumUn[Species[i]]/self.U_BPOW_Factor, 2)
+            self.DriftUncorrected['Total'][i] = np.round(self.ArraySumUn[Species[i]], 2)
+            self.DriftCorrected['Result'][i] = np.round(self.ArraySumCor[Species[i]]/self.U_BPOW_Factor, 2)
+            self.DriftCorrected['Total'][i] = np.round(self.ArraySumCor[Species[i]], 2)
+            self.Final['Result'][i] = np.round(self.ArraySumCorWon[Species[i]]/self.U_BPOW_Factor, 2)
+            self.Final['Total'][i] = np.round(self.ArraySumCorWon[Species[i]], 2)
 
         self.result = [self.DriftUncorrected.to_json(), self.DriftCorrected.to_json(), self.Final.to_json()]
 

@@ -62,18 +62,6 @@
 
         };
 
-        $scope.submit = function(){
-
-            // $http.post('/1065/api/v1/data/delay/',{'delay':$scope.save})
-            //     .success(function(response) {
-            //         toastr.success('Delay submitted!');
-            //         $location.path('/1065/evaluation/results');
-
-            //     })
-            //     .error(function(response) {
-            //         toastr.error(response.message, 'Delay submission failed!');                    
-        //     });
-        }
 	
 	$scope.$on("$destroy", function(){
 	    $http.post('/1065/api/v1/data/delay/',{'delay':$scope.save})
