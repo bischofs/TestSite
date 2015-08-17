@@ -1,4 +1,4 @@
-<!-- <div ac-chart="chartType" ac-data="data" ac-config="config" id='chart' class='chart'></div> -->
+q<!-- <div ac-chart="chartType" ac-data="data" ac-config="config" id='chart' class='chart'></div> -->
 <div class="row">
     <div class="col-md-12 center-aligned">
         <button type="button" ng-click="ChosenSpecies='NOx'; species()" class="btn btn-primary">NOx</button>
@@ -28,6 +28,49 @@
     </div>
 </div>
 <hr>
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default table-wrapper">
+            <!-- Default panel contents -->
+            <div class="panel-heading">Delays</div>
+            <div>
+                <table class=" table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>NOx</th>
+                            <th>CH4</th>
+                            <th>THC</th>
+                            <th>CO</th>
+                            <th>CO2</th>
+                            <th>NO</th>
+                            <th>N2O</th>
+                            <th>CH2O</th>
+                            <th>NH3</th>
+                            <th>MAF</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>{{save['NOx']}}</th>
+                            <th>{{save['CH4']}}</th>
+                            <th>{{save['THC']}}</th>
+                            <th>{{save['CO']}}</th>
+                            <th>{{save['CO2']}}</th>
+                            <th>{{save['NO']}}</th>
+                            <th>{{save['N2O']}}</th>
+                            <th>{{save['CH2O']}}</th>
+                            <th>{{save['NH3']}}</th>
+                            <th>{{save['MFRAIR']}}</th>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type="button" ng-click="submit()" class="btn btn-success btn-s" style="float:right;">
+                    <span class="glyphicon glyphicon-arrow-up"></span> Submit
+                </button>
+                <div>
+                </div>
+            </div>
+        </div>
         <style>
         .table-wrapper {
             height: 33px;
